@@ -2316,7 +2316,7 @@
 
   // La orientación del papel no se puede cambiar desde una clase CSS: hay que
   // reescribir la regla @page antes de imprimir.
-  let lastPaper = 'landscape';
+  let lastPaper = 'portrait';   // las aulas suelen ser más largas que anchas
   let lastMargin = 10;
   function setPaper(paper, margin) {
     lastPaper = paper === 'portrait' ? 'portrait' : 'landscape';

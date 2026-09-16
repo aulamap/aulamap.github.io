@@ -272,7 +272,7 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
    El aspecto del bloque va fuera de @media print para que la app pueda medir
    antes de imprimir cuánto ocupan el título, la fecha y la lista, y darle al
    plano el alto que sobra. En pantalla el bloque está oculto. */
-@page { size: A4 landscape; margin: 10mm; }   /* lo cambia la app al imprimir */
+@page { size: A4 portrait; margin: 10mm; }   /* lo cambia la app al imprimir */
 
 #print-area { display: none; break-inside: avoid; color: #23262b; }
 #print-area h1 { font-size: 16pt; margin: 0 0 2mm; }
