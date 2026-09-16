@@ -1,5 +1,5 @@
 // Textos de la interfaz en español. Para traducir, copiar este archivo como
-// ca.js, gl.js, eu.js o en.js y cambiar solo los valores.
+// gl.js, eu.js o en.js y cambiar solo los valores (el catalán está en ca.js).
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.es = {
   app_title: 'Plano de clase',
@@ -149,6 +149,13 @@ window.CLASSE_LOCALES.es = {
   zoom_in: 'Acercar',
   zoom_out: 'Alejar',
   zoom_fit: 'Ajustar a la ventana',
+
+  language: 'Idioma',
+  lang_auto: 'Automático',
+  theme: 'Apariencia',
+  theme_system: 'Sistema',
+  theme_light: 'Claro',
+  theme_dark: 'Oscuro',
 
   footer_code: 'Código bajo licencia',
   footer_content: 'contenidos bajo'

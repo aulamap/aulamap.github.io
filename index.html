@@ -4,7 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Plano de clase</title>
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="style.css">
+  <script>
+    // Aplica el tema guardado antes de pintar la página para evitar el
+    // destello claro al abrirla en modo oscuro. La lógica está en theme.js.
+    (function () {
+      try {
+        var saved = localStorage.getItem('classe-theme');
+        if (saved === 'dark' || saved === 'light') document.documentElement.setAttribute('data-theme', saved);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <div id="app">
@@ -24,6 +38,18 @@
         <button id="btn-import" class="btn" data-i18n="import" data-i18n-title="import_title">Importar</button>
         <input id="import-file" type="file" accept=".json,application/json" hidden>
         <button id="btn-print" class="btn primary" data-i18n="print">Imprimir</button>
+      </div>
+      <div class="topbar-settings">
+        <select id="lang-select" class="mini-select" data-i18n-title="language" data-i18n-aria="language" title="Idioma">
+          <option value="auto" data-i18n="lang_auto">Automático</option>
+          <option value="es">Español</option>
+          <option value="ca">Català</option>
+        </select>
+        <select id="theme-select" class="mini-select" data-i18n-title="theme" data-i18n-aria="theme" title="Apariencia">
+          <option value="system" data-i18n="theme_system">Sistema</option>
+          <option value="light" data-i18n="theme_light">Claro</option>
+          <option value="dark" data-i18n="theme_dark">Oscuro</option>
+        </select>
       </div>
     </header>
 
@@ -178,7 +204,9 @@
   <div id="context-menu" class="context-menu" role="menu" hidden></div>
 
   <script src="locales/es.js"></script>
+  <script src="locales/ca.js"></script>
   <script src="i18n.js"></script>
+  <script src="theme.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

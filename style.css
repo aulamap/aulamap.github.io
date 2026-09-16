@@ -1,15 +1,78 @@
+/* Colores de la interfaz. Todo el tema vive en estas variables: el modo
+   oscuro solo las redefine. El plano del aula se dibuja desde app.js leyendo
+   --floor, --grid y --wall, para que también siga el tema. */
 :root {
   --bg: #f4f2ee;
   --panel: #ffffff;
+  --field: #ffffff;
   --ink: #23262b;
   --muted: #6b7078;
   --line: #d9d5cc;
+  --line-soft: #efece6;
   --accent: #2f6f5e;
   --accent-soft: #e3efe9;
+  --on-accent: #ffffff;
   --danger: #a33a2f;
+  --danger-soft: #f8e6e3;
+  --disabled: #b5b1aa;
+  --shadow: rgba(0, 0, 0, .18);
+  --canvas-bg: #e9e6df;   /* mesa sobre la que se apoya el plano */
+  --floor: #f3f0ea;       /* suelo del aula */
+  --grid: #e4e0d6;        /* cuadrícula del suelo */
+  --wall: #55504a;        /* paredes */
   --radius: 8px;
+  color-scheme: light;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--ink);
+}
+
+/* Modo oscuro: se oscurece la interfaz, pero el plano sigue siendo una hoja
+   clara, como en cualquier editor de planos, para que se lea igual de bien y
+   se imprima tal cual. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171a;
+    --panel: #1b1f23;
+    --field: #22272c;
+    --ink: #e6e3dd;
+    --muted: #9aa1a9;
+    --line: #333a41;
+    --line-soft: #2a2f35;
+    --accent: #6fbfa3;
+    --accent-soft: #1f3630;
+    --on-accent: #10211c;
+    --danger: #e59182;
+    --danger-soft: #3a2320;
+    --disabled: #5b6169;
+    --shadow: rgba(0, 0, 0, .55);
+    --canvas-bg: #0f1113;
+    --floor: #e6e2da;
+    --grid: #d5d0c4;
+    --wall: #46423c;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #14171a;
+  --panel: #1b1f23;
+  --field: #22272c;
+  --ink: #e6e3dd;
+  --muted: #9aa1a9;
+  --line: #333a41;
+  --line-soft: #2a2f35;
+  --accent: #6fbfa3;
+  --accent-soft: #1f3630;
+  --on-accent: #10211c;
+  --danger: #e59182;
+  --danger-soft: #3a2320;
+  --disabled: #5b6169;
+  --shadow: rgba(0, 0, 0, .55);
+  --canvas-bg: #0f1113;
+  --floor: #e6e2da;
+  --grid: #d5d0c4;
+  --wall: #46423c;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -24,25 +87,28 @@ body { margin: 0; background: var(--bg); font-size: 14px; }
   padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line);
 }
 .topbar h1 { font-size: 18px; margin: 0; color: var(--accent); }
-.class-picker, .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.class-picker, .topbar-actions, .topbar-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .topbar-actions { margin-left: auto; }
+.topbar-settings { gap: 4px; }
+.mini-select { font-size: 12px; padding: 5px 4px; color: var(--muted); max-width: 150px; }
+.mini-select:hover { color: var(--ink); border-color: var(--accent); }
 .class-picker select { min-width: 150px; }
 
 .btn {
   font: inherit; padding: 6px 11px; border: 1px solid var(--line); border-radius: var(--radius);
-  background: #fff; color: var(--ink); cursor: pointer; white-space: nowrap;
+  background: var(--field); color: var(--ink); cursor: pointer; white-space: nowrap;
 }
 .btn:hover { background: var(--accent-soft); border-color: var(--accent); }
-.btn:disabled { opacity: .45; cursor: default; background: #fff; border-color: var(--line); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:disabled { opacity: .45; cursor: default; background: var(--field); border-color: var(--line); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btn.primary:hover { filter: brightness(1.1); }
 .btn.danger { color: var(--danger); }
-.btn.danger:hover { background: #f8e6e3; border-color: var(--danger); }
+.btn.danger:hover { background: var(--danger-soft); border-color: var(--danger); }
 .btn.icon { min-width: 34px; font-size: 16px; padding: 4px 8px; }
 .btn.wide { width: 100%; margin-top: 6px; }
 
 select, input[type=text], input[type=number], textarea {
-  font: inherit; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink);
+  font: inherit; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); color: var(--ink);
 }
 textarea { width: 100%; resize: vertical; }
 
@@ -58,12 +124,12 @@ textarea { width: 100%; resize: vertical; }
 
 .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg); padding: 4px; border-radius: var(--radius); }
 .tab { font: inherit; border: 0; background: transparent; padding: 7px; border-radius: 6px; cursor: pointer; color: var(--muted); }
-.tab.active { background: #fff; color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.tab.active { background: var(--field); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px var(--shadow); }
 
 .palette { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 .palette button {
   font: inherit; font-size: 12px; display: flex; align-items: center; gap: 6px; text-align: left;
-  padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: #fff; cursor: pointer; line-height: 1.15;
+  padding: 5px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--field); cursor: pointer; line-height: 1.15;
 }
 .palette button:hover { border-color: var(--accent); background: var(--accent-soft); }
 .palette svg { flex: none; width: 26px; height: 20px; }
@@ -81,13 +147,13 @@ textarea { width: 100%; resize: vertical; }
 .student-list { list-style: none; margin: 0; padding: 0; min-height: 60px; border-radius: 6px; }
 .student-list.drop-target { outline: 2px dashed var(--accent); background: var(--accent-soft); }
 .student-list li {
-  display: flex; align-items: center; gap: 4px; padding: 2px 0; border-bottom: 1px solid #efece6;
+  display: flex; align-items: center; gap: 4px; padding: 2px 0; border-bottom: 1px solid var(--line-soft);
 }
 .student-list .handle { cursor: grab; color: var(--muted); padding: 4px; user-select: none; touch-action: none; }
 .student-list li.seated .handle { visibility: hidden; }
 .student-list li.seated input { color: var(--muted); }
 .student-list input { flex: 1; min-width: 0; border-color: transparent; background: transparent; }
-.student-list input:focus { border-color: var(--line); background: #fff; }
+.student-list input:focus { border-color: var(--line); background: var(--field); }
 .student-list .seat-mark { color: var(--accent); width: 14px; text-align: center; }
 .student-list .del { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 16px; }
 .student-list .del:hover { color: var(--danger); }
@@ -95,29 +161,29 @@ textarea { width: 100%; resize: vertical; }
 
 #drag-ghost {
   position: fixed; z-index: 1000; pointer-events: none; padding: 4px 9px; border-radius: 6px;
-  background: var(--accent); color: #fff; font-size: 13px; transform: translate(-50%, -120%); box-shadow: 0 3px 8px rgba(0,0,0,.25);
+  background: var(--accent); color: var(--on-accent); font-size: 13px; transform: translate(-50%, -120%); box-shadow: 0 3px 8px var(--shadow);
 }
 
 /* Menú del botón derecho */
 .context-menu {
-  position: fixed; z-index: 1100; min-width: 220px; padding: 5px; background: #fff;
-  border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  position: fixed; z-index: 1100; min-width: 220px; padding: 5px; background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px var(--shadow);
 }
 .context-menu button {
   font: inherit; display: flex; justify-content: space-between; gap: 18px; width: 100%;
   padding: 6px 10px; border: 0; border-radius: 5px; background: none; color: var(--ink); text-align: left; cursor: pointer;
 }
 .context-menu button:hover:not(:disabled) { background: var(--accent-soft); }
-.context-menu button:disabled { color: #b5b1aa; cursor: default; }
+.context-menu button:disabled { color: var(--disabled); cursor: default; }
 .context-menu button.danger { color: var(--danger); }
-.context-menu button.danger:hover { background: #f8e6e3; }
+.context-menu button.danger:hover { background: var(--danger-soft); }
 .context-menu kbd { font: inherit; font-size: 12px; color: var(--muted); }
-.context-menu hr { border: 0; border-top: 1px solid #efece6; margin: 4px 2px; }
+.context-menu hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; }
 @media print { .context-menu { display: none !important; } }
 
 /* Lienzo */
 .canvas-wrap { position: relative; min-width: 0; min-height: 0; display: flex; }
-.canvas { flex: 1; overflow: auto; background: #e9e6df; }
+.canvas { flex: 1; overflow: auto; background: var(--canvas-bg); }
 #room-svg { display: block; margin: 0 auto; touch-action: none; user-select: none; }
 .zoom-bar { position: absolute; right: 14px; bottom: 14px; z-index: 5; display: flex; gap: 4px; }
 
@@ -132,7 +198,7 @@ textarea { width: 100%; resize: vertical; }
 .canvas.panning, .canvas.panning #room-svg, .canvas.panning #room-svg * { cursor: grabbing !important; }
 #room-svg [data-wall=left], #room-svg [data-wall=right] { cursor: ew-resize; }
 #room-svg [data-wall=top], #room-svg [data-wall=bottom] { cursor: ns-resize; }
-#room-svg .wall-grip:hover { fill: #e3efe9; stroke: #2f6f5e; }
+#room-svg .wall-grip:hover { fill: var(--accent-soft); stroke: var(--accent); }
 
 /* Propiedades */
 .props-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -146,8 +212,11 @@ textarea { width: 100%; resize: vertical; }
 .footer a { color: var(--muted); }
 
 /* Diálogos */
-dialog { border: 0; border-radius: 12px; padding: 0; box-shadow: 0 10px 40px rgba(0,0,0,.25); width: min(440px, calc(100vw - 32px)); }
-dialog::backdrop { background: rgba(20, 24, 28, .4); }
+dialog {
+  border: 0; border-radius: 12px; padding: 0; box-shadow: 0 10px 40px var(--shadow);
+  width: min(440px, calc(100vw - 32px)); background: var(--panel); color: var(--ink);
+}
+dialog::backdrop { background: rgba(10, 12, 14, .5); }
 .dialog-form { padding: 18px 20px; }
 .dialog-form h2 { margin: 0 0 6px; font-size: 17px; }
 .dialog-form .field-row { margin-top: 10px; }
@@ -167,6 +236,8 @@ dialog::backdrop { background: rgba(20, 24, 28, .4); }
 /* Impresión: solo el plano */
 @page { size: A4 landscape; margin: 10mm; }
 @media print {
+  /* En papel el plano va siempre sobre blanco, sea cual sea el tema. */
+  :root { --floor: #ffffff; --grid: #ffffff; --wall: #55504a; }
   body { background: #fff; }
   #app, dialog, #drag-ghost { display: none !important; }
   #print-area { display: block; }

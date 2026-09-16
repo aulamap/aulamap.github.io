@@ -8,6 +8,14 @@
   const MARGIN = 60;
   const SNAP = 5;
 
+  // Colores que dependen del tema (modo claro u oscuro). Se leen de las
+  // variables CSS de :root, así que basta con volver a dibujar el plano
+  // cuando cambia el tema.
+  function themeColor(name, fallback) {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
+  }
+
   /* ---------- Catálogo de elementos ---------- */
 
   const DESK_TYPES = {
@@ -59,7 +67,10 @@
       obj.rows = base.rows;
       obj.seats = new Array(base.cols * base.rows).fill(null);
     } else {
-      obj.label = t('label_' + type);
+      // labelKey recuerda que el texto es el de serie: así se traduce solo al
+      // cambiar de idioma. En cuanto alguien lo edita, se queda como esté.
+      obj.labelKey = 'label_' + type;
+      obj.label = t(obj.labelKey);
     }
     return obj;
   }
@@ -96,6 +107,11 @@
 
   function cls() {
     return state.classes.find(c => c.id === state.current) || state.classes[0];
+  }
+
+  // Texto de un elemento: el de serie se traduce; el editado a mano, no.
+  function labelOf(obj) {
+    return obj.labelKey ? t(obj.labelKey) : (obj.label || '');
   }
 
   function findObj(id) { return cls().objects.find(o => o.id === id); }
@@ -324,11 +340,12 @@
       default:
         el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: obj.type === 'board' ? 1 : 3, ...common }, g);
     }
-    if (obj.label) {
+    const label = labelOf(obj);
+    if (label) {
       const thin = h < 25;
-      const size = obj.type === 'text' ? Math.max(8, Math.min(h * 0.6, w / (obj.label.length * 0.55))) : Math.max(8, Math.min(15, w / (obj.label.length * 0.6)));
+      const size = obj.type === 'text' ? Math.max(8, Math.min(h * 0.6, w / (label.length * 0.55))) : Math.max(8, Math.min(15, w / (label.length * 0.6)));
       const labelInside = !thin || obj.type === 'board';
-      addText(g, obj.label, 0, 0, size, {
+      addText(g, label, 0, 0, size, {
         flip,
         fill: labelInside ? (def.labelColor || '#23262b') : '#23262b',
         weight: obj.type === 'text' ? 600 : 'normal',
@@ -348,11 +365,13 @@
     if (!opts.print) {
       const defs = el('defs', {}, svg);
       const pat = el('pattern', { id: 'grid', width: 50, height: 50, patternUnits: 'userSpaceOnUse' }, defs);
-      el('path', { d: 'M 50 0 L 0 0 0 50', fill: 'none', stroke: '#ece8e0', 'stroke-width': 1 }, pat);
+      el('rect', { x: 0, y: 0, width: 50, height: 50, fill: themeColor('--floor', '#f3f0ea') }, pat);
+      el('path', { d: 'M 50 0 L 0 0 0 50', fill: 'none', stroke: themeColor('--grid', '#e4e0d6'), 'stroke-width': 1 }, pat);
       svg.insertBefore(defs, root);
     }
+    const wallColor = opts.print ? '#55504a' : themeColor('--wall', '#55504a');
     el('rect', { x: 0, y: 0, width: RW, height: RH, fill: opts.print ? '#fff' : 'url(#grid)', stroke: 'none' }, root);
-    el('rect', { x: 0, y: 0, width: RW, height: RH, fill: 'none', stroke: '#55504a', 'stroke-width': 6 }, root);
+    el('rect', { x: 0, y: 0, width: RW, height: RH, fill: 'none', stroke: wallColor, 'stroke-width': 6 }, root);
 
     // Zonas para arrastrar las paredes: debajo de los objetos, para que la
     // pizarra o la puerta pegadas a la pared se sigan pudiendo coger.
@@ -381,7 +400,7 @@
         bottom: [RW / 2, RH + gap + thick / 2, long, thick]
       };
       for (const [wall, [cx, cy, w, h]] of Object.entries(grips)) {
-        el('rect', { class: 'wall-grip', 'data-wall': wall, x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: Math.min(w, h) / 2, fill: '#fff', stroke: '#55504a', 'stroke-width': 1.5 / zoom }, root);
+        el('rect', { class: 'wall-grip', 'data-wall': wall, x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: Math.min(w, h) / 2, fill: '#fff', stroke: wallColor, 'stroke-width': 1.5 / zoom }, root);
       }
     }
 
@@ -605,7 +624,7 @@
     grid.className = 'props-grid';
     const update = (fn) => (v) => { checkpoint(); fn(v); commit(); };
     if (!isDesk(obj)) {
-      grid.append(numberInput(t('prop_label'), obj.label || '', update(v => { obj.label = v; }), { type: 'text', full: true }));
+      grid.append(numberInput(t('prop_label'), labelOf(obj), update(v => { obj.label = v; delete obj.labelKey; }), { type: 'text', full: true }));
     }
     grid.append(
       numberInput(t('prop_width'), Math.round(obj.w), update(v => { obj.w = clamp(+v, 5, 2000); }), { min: 5 }),
@@ -658,10 +677,15 @@
     return icon;
   }
 
+  // Se vuelve a ejecutar al cambiar de idioma, así que primero se vacía todo.
   function buildPalettes() {
     const desks = document.getElementById('palette-desks');
     const furniture = document.getElementById('palette-furniture');
     const blockType = document.getElementById('block-type');
+    desks.innerHTML = '';
+    furniture.innerHTML = '';
+    blockType.innerHTML = '';
+    document.querySelectorAll('select.name-format').forEach(s => { s.innerHTML = ''; });
     for (const type of Object.keys(DESK_TYPES)) {
       desks.appendChild(paletteButton(type));
       const opt = document.createElement('option');
@@ -1711,6 +1735,27 @@
     }
     setTimeout(() => window.print(), 50);
   });
+
+  /* ---------- Idioma y apariencia ---------- */
+
+  const langSelect = document.getElementById('lang-select');
+  const themeSelect = document.getElementById('theme-select');
+
+  langSelect.value = window.i18n.preference;
+  themeSelect.value = window.theme.preference;
+
+  langSelect.addEventListener('change', () => window.i18n.setPreference(langSelect.value));
+  themeSelect.addEventListener('change', () => window.theme.setPreference(themeSelect.value));
+
+  // Al cambiar de idioma hay que rehacer también los textos que crea la app
+  // (paletas, listas, propiedades y etiquetas del plano).
+  window.i18n.onChange(() => {
+    buildPalettes();
+    renderAll();
+  });
+
+  // El plano lleva los colores del tema incrustados en el SVG: se redibuja.
+  window.addEventListener('themechange', () => render());
 
   /* ---------- Arranque ---------- */
 

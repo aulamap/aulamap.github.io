@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Plano de clase">
+  <title>Plano de clase</title>
+  <!-- Vista cenital de un aula: la pizarra arriba y cuatro mesas repartidas. -->
+  <rect width="32" height="32" rx="7" fill="#2f6f5e"/>
+  <rect x="8" y="5.5" width="16" height="3" rx="1.5" fill="#ffffff"/>
+  <g fill="#ffffff" fill-opacity=".92">
+    <rect x="5.5" y="13" width="8.5" height="6" rx="1.6"/>
+    <rect x="18" y="13" width="8.5" height="6" rx="1.6"/>
+    <rect x="5.5" y="22" width="8.5" height="6" rx="1.6"/>
+    <rect x="18" y="22" width="8.5" height="6" rx="1.6"/>
+  </g>
+</svg>
