@@ -189,24 +189,79 @@
     }
   }
 
-  // Elige entre una línea o dos (partiendo por cualquier espacio) la opción
-  // que permite la letra más grande dentro del puesto.
-  function fitName(text, width, height) {
-    const sizeFor = (lines) => Math.min(14, width / (Math.max(...lines.map(l => l.length)) * 0.62), height / (lines.length * 1.2));
-    let best = { lines: [text], size: sizeFor([text]) };
-    const words = text.split(' ');
-    for (let i = 1; i < words.length; i++) {
-      const options = [[words.slice(0, i).join(' '), words.slice(i).join(' ')]];
-      for (let j = i + 1; j < words.length; j++) {
-        options.push([words.slice(0, i).join(' '), words.slice(i, j).join(' '), words.slice(j).join(' ')]);
-      }
-      for (const lines of options) {
-        const size = sizeFor(lines);
-        if (size > best.size) best = { lines, size };
-      }
+  // Ancho real del texto con la fuente del plano. Se mide a cuerpo 100 y se
+  // guarda el resultado, de modo que el ancho a cualquier tamaño es
+  // textWidth(t) * tamaño. Medirlo (en vez de contar letras) es lo que evita
+  // que un nombre largo se salga de su sitio.
+  const measureCtx = document.createElement('canvas').getContext('2d');
+  const widthCache = new Map();
+  function textWidth(str, weight = 600) {
+    const key = weight + '|' + str;
+    let value = widthCache.get(key);
+    if (value === undefined) {
+      measureCtx.font = `${weight} 100px system-ui, sans-serif`;
+      value = measureCtx.measureText(str).width / 100;
+      widthCache.set(key, value);
     }
-    best.size = Math.max(5, best.size);
-    return best;
+    return value;
+  }
+
+  // Recorta con puntos suspensivos lo que no quepa en «maxWidth» unidades de
+  // ancho por cada unidad de tamaño de letra.
+  function clipText(line, maxWidth, weight = 600) {
+    if (textWidth(line, weight) <= maxWidth) return line;
+    let cut = line;
+    while (cut.length > 1 && textWidth(cut + '…', weight) > maxWidth) cut = cut.slice(0, -1);
+    return cut + '…';
+  }
+
+  // Reparte las palabras en «count» renglones procurando que el más ancho sea
+  // lo más estrecho posible.
+  function splitLines(words, count) {
+    const n = words.length;
+    const width = (i, j) => textWidth(words.slice(i, j).join(' '));
+    const memo = new Map();
+    const rec = (i, k) => {
+      const key = i + ':' + k;
+      if (memo.has(key)) return memo.get(key);
+      let out;
+      if (k === 1) out = { max: width(i, n), cuts: [n] };
+      else {
+        out = { max: Infinity, cuts: [n] };
+        for (let j = i + 1; j <= n - k + 1; j++) {
+          const rest = rec(j, k - 1);
+          const max = Math.max(width(i, j), rest.max);
+          if (max < out.max) out = { max, cuts: [j, ...rest.cuts] };
+        }
+      }
+      memo.set(key, out);
+      return out;
+    };
+    const cuts = rec(0, Math.min(count, n)).cuts;
+    const lines = [];
+    let start = 0;
+    for (const cut of cuts) { lines.push(words.slice(start, cut).join(' ')); start = cut; }
+    return lines;
+  }
+
+  const NAME_MIN_SIZE = 5;   // por debajo no se lee: mejor recortar el nombre
+  const LINE_HEIGHT = 1.45;
+
+  // Busca el mayor tamaño de letra con el que el nombre cabe en el hueco,
+  // probando a partirlo hasta en cuatro renglones. Si ni así cabe, se recorta.
+  function fitName(text, width, height, max = 14) {
+    const words = String(text).trim().split(/\s+/).filter(Boolean);
+    if (!words.length) return { lines: [''], size: max };
+    let best = null;
+    for (let k = 1; k <= Math.min(4, words.length); k++) {
+      const lines = splitLines(words, k);
+      const size = Math.min(max, width / Math.max(...lines.map(l => textWidth(l))), height / (lines.length * LINE_HEIGHT));
+      if (!best || size > best.size) best = { lines, size };
+    }
+    if (best.size >= NAME_MIN_SIZE) return best;
+    const maxLines = Math.max(1, Math.floor(height / (NAME_MIN_SIZE * LINE_HEIGHT)));
+    const lines = splitLines(words, Math.min(maxLines, words.length)).slice(0, maxLines);
+    return { lines: lines.map(l => clipText(l, width / NAME_MIN_SIZE)), size: NAME_MIN_SIZE };
   }
 
   /* ---------- Dibujo del plano ---------- */
@@ -273,7 +328,7 @@
         if (col > 0) el('line', { x1: sx, y1: sy + 4, x2: sx, y2: sy + sh - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (r > 0 && col === 0) el('line', { x1: -w / 2 + 4, y1: sy, x2: w / 2 - 4, y2: sy, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (student) {
-          const { lines, size } = fitName(formatName(student.name, opts.nameFormat), sw - 8, sh - 4);
+          const { lines, size } = fitName(formatName(student.name, opts.nameFormat), sw - 8, sh - 8);
           addText(g, lines, sx + sw / 2, sy + sh / 2, size, { flip, weight: 600 });
         }
       }
@@ -418,12 +473,14 @@
     const label = labelOf(obj);
     if (label) {
       const thin = h < 25;
-      const size = obj.type === 'text' ? Math.max(8, Math.min(h * 0.6, w / (label.length * 0.55))) : Math.max(8, Math.min(15, w / (label.length * 0.6)));
+      const weight = obj.type === 'text' ? 600 : 'normal';
+      const maxSize = obj.type === 'text' ? h * 0.6 : 15;
+      const size = Math.max(NAME_MIN_SIZE, Math.min(maxSize, (w - 6) / textWidth(label, weight)));
       const labelInside = !thin || obj.type === 'board';
-      addText(g, label, 0, 0, size, {
+      addText(g, clipText(label, (w - 6) / size, weight), 0, 0, size, {
         flip,
         fill: labelInside ? (def.labelColor || '#23262b') : '#23262b',
-        weight: obj.type === 'text' ? 600 : 'normal',
+        weight,
         halo: labelInside ? null : 'rgba(255,255,255,.9)'
       });
     }
@@ -747,7 +804,8 @@
       let w = 22, h = Math.max(3, 22 / ratio);
       if (h > 16) { h = 16; w = 16 * ratio; }
       if (type === 'text') {
-        addText(icon, 'Aa', 13, 10, 11, { weight: 700 });
+        // currentColor: en modo oscuro tiene que verse igual que el rótulo del botón.
+        addText(icon, 'Aa', 13, 10, 11, { weight: 700, fill: 'currentColor' });
       } else if (type === 'computer') {
         el('ellipse', { cx: 12.5, cy: 3.4, rx: 2.6, ry: 1.2, fill: '#b6bcc3', stroke: f.stroke, 'stroke-width': .5 }, icon);
         el('rect', { x: 6, y: 3.4, width: 13, height: 3.2, rx: .8, fill: '#3a4046' }, icon);
@@ -1743,6 +1801,33 @@
 
   /* ---------- Exportar e importar ---------- */
 
+  // Clases utilizables de un archivo o de un enlace.
+  function validClasses(data) {
+    return (data && Array.isArray(data.classes) ? data.classes : [])
+      .filter(c => c && c.room && Array.isArray(c.objects));
+  }
+
+  // Las añade a las que ya hay, con identificadores nuevos para no chocar.
+  function addClasses(classes) {
+    for (const c of classes) {
+      const studentIds = new Map();
+      c.students = (c.students || []).map(s => { const id = uid(); studentIds.set(s.id, id); return { id, name: String(s.name || '') }; });
+      c.objects.forEach(o => {
+        o.id = uid();
+        if (o.seats) o.seats = o.seats.map(s => studentIds.get(s) || null);
+      });
+      c.id = uid();
+      c.name = String(c.name || t('class_default_name'));
+      c.nameFormat = NAME_FORMATS.includes(c.nameFormat) ? c.nameFormat : 'first1';
+      state.classes.push(c);
+    }
+    state.current = classes[0].id;
+    selection.clear();
+    saveState();
+    renderAll();
+    fitZoom();
+  }
+
   document.getElementById('btn-export').addEventListener('click', () => {
     const data = JSON.stringify({ app: 'classe', version: 1, classes: state.classes }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
@@ -1761,32 +1846,144 @@
     e.target.value = '';
     if (!file) return;
     try {
-      const data = JSON.parse(await file.text());
-      const classes = (data.classes || []).filter(c => c && c.room && Array.isArray(c.objects));
+      const classes = validClasses(JSON.parse(await file.text()));
       if (!classes.length) throw new Error('sin clases');
-      for (const c of classes) {
-        // Identificadores nuevos para no chocar con las clases que ya hay.
-        const studentIds = new Map();
-        c.students = (c.students || []).map(s => { const id = uid(); studentIds.set(s.id, id); return { id, name: String(s.name || '') }; });
-        c.objects.forEach(o => {
-          o.id = uid();
-          if (o.seats) o.seats = o.seats.map(s => studentIds.get(s) || null);
-        });
-        c.id = uid();
-        c.nameFormat = NAME_FORMATS.includes(c.nameFormat) ? c.nameFormat : 'first1';
-        state.classes.push(c);
-      }
-      state.current = classes[0].id;
-      selection.clear();
-      saveState();
-      renderAll();
-      fitZoom();
+      addClasses(classes);
       alert(t('import_done', { count: classes.length }));
     } catch (err) {
       console.warn(err);
       alert(t('import_error'));
     }
   });
+
+  /* ---------- Compartir por enlace ---------- */
+
+  // Los datos viajan detrás de la almohadilla del enlace, así que no se envían
+  // a ningún servidor: se quedan en el navegador de quien lo abre.
+  const SHARE_LIMIT = 8000; // caracteres; por encima, mejor el archivo
+
+  function toBase64url(bytes) {
+    let bin = '';
+    for (const b of bytes) bin += String.fromCharCode(b);
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  function fromBase64url(text) {
+    const bin = atob(text.replace(/-/g, '+').replace(/_/g, '/'));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  // Marca «z»: comprimido; «j»: JSON en claro, para los navegadores sin
+  // CompressionStream (Safari anterior al 16.4).
+  async function packClasses(classes) {
+    const bytes = new TextEncoder().encode(JSON.stringify({ app: 'classe', version: 1, classes }));
+    if (!window.CompressionStream) return 'j' + toBase64url(bytes);
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+    return 'z' + toBase64url(new Uint8Array(await new Response(stream).arrayBuffer()));
+  }
+
+  async function unpackClasses(text) {
+    const bytes = fromBase64url(text.slice(1));
+    if (text[0] !== 'z') return JSON.parse(new TextDecoder().decode(bytes));
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return JSON.parse(new TextDecoder().decode(await new Response(stream).arrayBuffer()));
+  }
+
+  // Copia de la clase lista para enviar; sin alumnado deja las mesas vacías.
+  function shareCopy(c, withoutStudents) {
+    const copy = JSON.parse(JSON.stringify(c));
+    if (withoutStudents) {
+      copy.students = [];
+      copy.objects.forEach(o => { if (o.seats) o.seats = o.seats.map(() => null); });
+    }
+    return copy;
+  }
+
+  const dlgShare = document.getElementById('dlg-share');
+  const shareUrl = document.getElementById('share-url');
+  const shareInfo = document.getElementById('share-info');
+  const shareCopyBtn = document.getElementById('btn-share-copy');
+  const shareNoStudents = document.getElementById('share-no-students');
+
+  async function updateShareLink() {
+    const ids = [...dlgShare.querySelectorAll('#share-classes input:checked')].map(i => i.value);
+    const withoutStudents = shareNoStudents.checked;
+    if (!ids.length) {
+      shareUrl.value = '';
+      shareInfo.textContent = t('share_pick');
+      shareInfo.classList.remove('warn');
+      shareCopyBtn.disabled = true;
+      return;
+    }
+    const classes = state.classes.filter(c => ids.includes(c.id)).map(c => shareCopy(c, withoutStudents));
+    const url = location.href.split('#')[0] + '#c=' + await packClasses(classes);
+    const names = !withoutStudents && classes.some(c => c.students.length);
+    shareUrl.value = url;
+    shareCopyBtn.disabled = false;
+    shareInfo.textContent = url.length > SHARE_LIMIT ? t('share_too_long', { count: url.length })
+      : t(names ? 'share_length_names' : 'share_length', { count: url.length });
+    shareInfo.classList.toggle('warn', url.length > SHARE_LIMIT);
+  }
+
+  document.getElementById('btn-share').addEventListener('click', () => {
+    const list = document.getElementById('share-classes');
+    list.innerHTML = '';
+    for (const c of state.classes) {
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.value = c.id;
+      check.checked = c.id === state.current;
+      check.addEventListener('change', updateShareLink);
+      const span = document.createElement('span');
+      span.textContent = c.name;
+      label.append(check, span);
+      li.appendChild(label);
+      list.appendChild(li);
+    }
+    shareCopyBtn.textContent = t('share_copy');
+    updateShareLink();
+    dlgShare.showModal();
+  });
+
+  shareNoStudents.addEventListener('change', updateShareLink);
+
+  shareCopyBtn.addEventListener('click', async () => {
+    if (!shareUrl.value) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl.value);
+    } catch (e) {
+      // Sin permiso para el portapapeles: al menos queda seleccionado.
+      shareUrl.focus();
+      shareUrl.select();
+      return;
+    }
+    shareCopyBtn.textContent = t('share_copied');
+    setTimeout(() => { shareCopyBtn.textContent = t('share_copy'); }, 1800);
+  });
+
+  // Al abrir un enlace compartido: se pregunta antes de añadir nada y se
+  // limpia la barra de direcciones para no reenviarlo sin querer.
+  async function readSharedLink() {
+    const match = location.hash.match(/^#c=(.+)$/);
+    if (!match) return;
+    window.history.replaceState(null, '', location.href.split('#')[0]);
+    try {
+      const classes = validClasses(await unpackClasses(decodeURIComponent(match[1])));
+      if (!classes.length) throw new Error('sin clases');
+      const dlg = document.getElementById('dlg-receive');
+      document.getElementById('receive-text').textContent =
+        t('receive_text', { names: classes.map(c => c.name).join(', ') });
+      dlg.addEventListener('close', () => { if (dlg.returnValue === 'ok') addClasses(classes); }, { once: true });
+      dlg.showModal();
+    } catch (err) {
+      console.warn(err);
+      alert(t('share_error'));
+    }
+  }
 
   /* ---------- Imprimir ---------- */
 
@@ -1860,6 +2057,7 @@
   window.i18n.apply();
   buildPalettes();
   renderAll();
+  readSharedLink();
   requestAnimationFrame(fitZoom);
   window.addEventListener('resize', () => { if (window.innerWidth > 0) fitZoom(); });
 })();

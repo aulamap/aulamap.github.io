@@ -34,10 +34,11 @@
       <div class="topbar-actions">
         <button id="btn-undo" class="btn icon" data-i18n-title="undo" title="Deshacer">↶</button>
         <button id="btn-redo" class="btn icon" data-i18n-title="redo" title="Rehacer">↷</button>
-        <button id="btn-export" class="btn" data-i18n="export" data-i18n-title="export_title">Exportar</button>
-        <button id="btn-import" class="btn" data-i18n="import" data-i18n-title="import_title">Importar</button>
+        <button id="btn-export" class="btn" data-i18n-title="export_title"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v7.5"/><path d="M5 6.5 8 9.5l3-3"/><path d="M2.5 12.5h11"/></svg><span data-i18n="export">Exportar</span></button>
+        <button id="btn-import" class="btn" data-i18n-title="import_title"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9.5V2"/><path d="M5 5 8 2l3 3"/><path d="M2.5 12.5h11"/></svg><span data-i18n="import">Importar</span></button>
         <input id="import-file" type="file" accept=".json,application/json" hidden>
-        <button id="btn-print" class="btn primary" data-i18n="print">Imprimir</button>
+        <button id="btn-share" class="btn" data-i18n-title="share_title"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="3.5" r="1.7"/><circle cx="4" cy="8" r="1.7"/><circle cx="12" cy="12.5" r="1.7"/><path d="M5.5 7.1 10.5 4.4"/><path d="M5.5 8.9l5 2.7"/></svg><span data-i18n="share">Compartir</span></button>
+        <button id="btn-print" class="btn primary" data-i18n-title="print"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 6.5V2.5h7v4"/><path d="M4.5 12h-1a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1V11a1 1 0 0 1-1 1h-1"/><path d="M4.5 9.5h7v4h-7z"/></svg><span data-i18n="print">Imprimir</span></button>
       </div>
       <div class="topbar-settings">
         <select id="lang-select" class="mini-select" data-i18n-title="language" data-i18n-aria="language" title="Idioma">
@@ -173,6 +174,33 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn" formnovalidate data-i18n="cancel">Cancelar</button>
         <button value="ok" class="btn primary" data-i18n="accept">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-share">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="share_dialog_title">Compartir por enlace</h2>
+      <p class="hint" data-i18n="share_help"></p>
+      <ul id="share-classes" class="share-classes"></ul>
+      <label class="check"><input id="share-no-students" type="checkbox"> <span data-i18n="share_without_students"></span></label>
+      <label class="stack"><span data-i18n="share_link">Enlace</span>
+        <textarea id="share-url" rows="3" readonly></textarea></label>
+      <p id="share-info" class="hint"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" data-i18n="close">Cerrar</button>
+        <button type="button" id="btn-share-copy" class="btn primary" data-i18n="share_copy">Copiar enlace</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-receive">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="receive_title">Clases compartidas</h2>
+      <p id="receive-text"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
+        <button value="ok" class="btn primary" data-i18n="receive_add">Añadirlas</button>
       </div>
     </form>
   </dialog>

@@ -159,6 +159,23 @@ window.CLASSE_LOCALES.es = {
   theme_light: 'Claro',
   theme_dark: 'Oscuro',
 
+  share: 'Compartir',
+  share_title: 'Crear un enlace para enviar clases a otra persona',
+  share_dialog_title: 'Compartir por enlace',
+  share_help: 'Elige las clases que quieres enviar. Los datos van dentro del propio enlace: no se sube nada a ningún servidor.',
+  share_without_students: 'Solo el plano, sin el alumnado',
+  share_link: 'Enlace',
+  share_pick: 'Marca al menos una clase.',
+  share_length: 'El enlace ocupa {count} caracteres.',
+  share_length_names: 'El enlace ocupa {count} caracteres y lleva los nombres del alumnado: ten cuidado por dónde lo envías.',
+  share_too_long: 'El enlace ocupa {count} caracteres y puede cortarse al enviarlo. Comparte menos clases, márcalo sin alumnado o usa Exportar.',
+  share_copy: 'Copiar enlace',
+  share_copied: 'Enlace copiado',
+  share_error: 'El enlace no trae un plano de clase válido.',
+  close: 'Cerrar',
+  receive_title: 'Clases compartidas',
+  receive_text: 'Te han compartido esto: {names}. Se añadirá a tus clases sin tocar las que ya tienes.',
+  receive_add: 'Añadirlas',
   footer_code: 'Código bajo licencia',
   footer_content: 'contenidos bajo'
 };

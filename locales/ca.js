@@ -159,6 +159,23 @@ window.CLASSE_LOCALES.ca = {
   theme_light: 'Clar',
   theme_dark: 'Fosc',
 
+  share: 'Compartir',
+  share_title: 'Crear un enllaç per enviar classes a una altra persona',
+  share_dialog_title: 'Compartir per enllaç',
+  share_help: 'Tria les classes que vols enviar. Les dades van dins del mateix enllaç: no es puja res a cap servidor.',
+  share_without_students: 'Només el plànol, sense l\'alumnat',
+  share_link: 'Enllaç',
+  share_pick: 'Marca com a mínim una classe.',
+  share_length: 'L\'enllaç ocupa {count} caràcters.',
+  share_length_names: 'L\'enllaç ocupa {count} caràcters i porta els noms de l\'alumnat: ves amb compte per on l\'envies.',
+  share_too_long: 'L\'enllaç ocupa {count} caràcters i es pot tallar en enviar-lo. Comparteix menys classes, marca\'l sense alumnat o fes servir Exportar.',
+  share_copy: 'Copiar l\'enllaç',
+  share_copied: 'Enllaç copiat',
+  share_error: 'L\'enllaç no porta un plànol de classe vàlid.',
+  close: 'Tancar',
+  receive_title: 'Classes compartides',
+  receive_text: 'T\'han compartit això: {names}. S\'afegirà a les teves classes sense tocar les que ja tens.',
+  receive_add: 'Afegir-les',
   footer_code: 'Codi amb llicència',
   footer_content: 'continguts amb'
 };
