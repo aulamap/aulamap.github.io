@@ -287,9 +287,8 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   :root { --floor: #ffffff; --grid: #ffffff; --wall: #55504a; }
   body { background: #fff; }
   #app, dialog, #drag-ghost { display: none !important; }
-  /* La hoja entera (100vh en impresión es el alto útil de la página, ya
-     descontados los márgenes que aplique el navegador). El plano se encoge
-     hasta lo que sobre, así que nunca se va a una segunda página. */
-  #print-area { display: flex; flex-direction: column; height: 100vh; }
-  #print-area svg { flex: 0 1 auto; min-height: 0; }
+  /* Nada de estirar el bloque al alto de la hoja: Firefox cuenta el 100vh de
+     otra manera y colaba una página en blanco. Lo que limita el plano es el
+     alto que le calcula la app justo antes de imprimir. */
+  #print-area { display: block; }
 }
