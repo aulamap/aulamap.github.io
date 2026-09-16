@@ -105,8 +105,14 @@ window.CLASSE_LOCALES.ca = {
   align_bottom: 'Alinear per baix',
   align_distx: 'Igualar l\'espai horitzontal',
   align_disty: 'Igualar l\'espai vertical',
+  align_roomx: 'Centrar a l\'aula, en horitzontal',
+  align_roomy: 'Centrar a l\'aula, en vertical',
+  align_title_menu: 'Alinear',
+  menu_distribute: 'Igualar l\'espai',
+  menu_center_room: 'Centrar a l\'aula',
   align_hint: 'Alinea o reparteix els elements seleccionats. Els dels extrems no es mouen; cada grup es mou sencer.',
   align_hint_three: 'Alinea els elements seleccionats. Per igualar l\'espai en calen tres o més.',
+  align_hint_one: 'Centra a l\'aula el que hagis seleccionat. Per alinear o repartir, selecciona dos elements o més.',
   block_title: 'Bloc de taules',
   block_type: 'Tipus de taula',
   block_rows: 'Files',
@@ -160,6 +166,8 @@ window.CLASSE_LOCALES.ca = {
   print_show_unseated: 'Afegir la llista d\'alumnat sense lloc',
   print_unseated: 'Sense lloc',
   print_go: 'Imprimir',
+
+  seats_summary: 'Llocs: {total} · ocupats: {taken} · lliures: {free}',
 
   zoom_in: 'Acostar',
   zoom_out: 'Allunyar',

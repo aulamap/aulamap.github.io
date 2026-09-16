@@ -105,8 +105,14 @@ window.CLASSE_LOCALES.es = {
   align_bottom: 'Alinear por abajo',
   align_distx: 'Igualar el espacio horizontal',
   align_disty: 'Igualar el espacio vertical',
+  align_roomx: 'Centrar en el aula, en horizontal',
+  align_roomy: 'Centrar en el aula, en vertical',
+  align_title_menu: 'Alinear',
+  menu_distribute: 'Igualar el espacio',
+  menu_center_room: 'Centrar en el aula',
   align_hint: 'Alinea o reparte los elementos seleccionados. Los de los extremos no se mueven; cada grupo se mueve entero.',
   align_hint_three: 'Alinea los elementos seleccionados. Para igualar el espacio hacen falta tres o más.',
+  align_hint_one: 'Centra lo seleccionado en el aula. Para alinear o repartir, selecciona dos o más elementos.',
   block_title: 'Bloque de mesas',
   block_type: 'Tipo de mesa',
   block_rows: 'Filas',
@@ -160,6 +166,8 @@ window.CLASSE_LOCALES.es = {
   print_show_unseated: 'Añadir la lista de alumnado sin sitio',
   print_unseated: 'Sin sitio',
   print_go: 'Imprimir',
+
+  seats_summary: 'Puestos: {total} · ocupados: {taken} · libres: {free}',
 
   zoom_in: 'Acercar',
   zoom_out: 'Alejar',

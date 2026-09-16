@@ -671,8 +671,19 @@
     svg.setAttribute('width', (frame ? frame.w : c.room.w + 2 * MARGIN) * zoom);
     svg.setAttribute('height', (frame ? frame.h : c.room.h + 2 * MARGIN) * zoom);
     svg.classList.toggle('students-mode', mode === 'students');
+    renderSeatCount();
     renderProps();
     updateUndoButtons();
+  }
+
+  // Cuántos puestos hay en el aula y cuántos están ocupados. Se ve siempre,
+  // se esté en la pestaña del aula o en la del alumnado.
+  function renderSeatCount() {
+    const desks = cls().objects.filter(isDesk);
+    const total = desks.reduce((n, o) => n + o.seats.length, 0);
+    const taken = desks.reduce((n, o) => n + o.seats.filter(Boolean).length, 0);
+    document.getElementById('seat-count').textContent =
+      total ? t('seats_summary', { total, taken, free: total - taken }) : '';
   }
 
   function fitZoom() {
@@ -795,7 +806,13 @@
     vcenter: '<path d="M2 8h12"/><rect x="4" y="3.2" width="3" height="9.6"/><rect x="9" y="5.2" width="3" height="5.6"/>',
     bottom: '<path d="M2 13.5h12"/><rect x="4" y="2" width="3" height="9.5"/><rect x="9" y="6" width="3" height="5.5"/>',
     distx: '<rect x="1.5" y="3" width="2.5" height="10"/><rect x="6.8" y="3" width="2.5" height="10"/><rect x="12" y="3" width="2.5" height="10"/>',
-    disty: '<rect x="3" y="1.5" width="10" height="2.5"/><rect x="3" y="6.8" width="10" height="2.5"/><rect x="3" y="12" width="10" height="2.5"/>'
+    disty: '<rect x="3" y="1.5" width="10" height="2.5"/><rect x="3" y="6.8" width="10" height="2.5"/><rect x="3" y="12" width="10" height="2.5"/>',
+    // El recuadro es el aula y las flechas, el hueco igual a cada lado: así la
+    // dirección de la flecha coincide con lo que dice el rótulo.
+    roomx: '<rect x="1.5" y="2.5" width="13" height="11" rx="1" fill="none"/><rect x="5.6" y="6" width="4.8" height="4" rx=".6"/>'
+      + '<path d="M3.1 8h2.1M10.8 8h2.1M4.2 6.9 3.1 8l1.1 1.1M11.7 6.9 12.8 8l-1.1 1.1" fill="none"/>',
+    roomy: '<rect x="1.5" y="2.5" width="13" height="11" rx="1" fill="none"/><rect x="6" y="6.1" width="4" height="3.8" rx=".6"/>'
+      + '<path d="M8 3.3v2.1M8 10.6v2.1M6.9 4.4 8 3.3l1.1 1.1M6.9 11.6 8 12.7l1.1-1.1" fill="none"/>'
   };
 
   function alignTools() {
@@ -821,9 +838,11 @@
     add('bottom', () => alignSelection('bottom'), units > 1);
     add('distx', () => distributeSelection('x'), units > 2);
     add('disty', () => distributeSelection('y'), units > 2);
+    add('roomx', () => centerInRoom('x'), units > 0);
+    add('roomy', () => centerInRoom('y'), units > 0);
     const hint = document.createElement('p');
     hint.className = 'hint';
-    hint.textContent = t(units > 2 ? 'align_hint' : 'align_hint_three');
+    hint.textContent = t(units > 2 ? 'align_hint' : units > 1 ? 'align_hint_three' : 'align_hint_one');
     box.append(title, grid, hint);
     return box;
   }
@@ -893,7 +912,7 @@
         numberInput(t('prop_rows'), obj.rows, update(v => resizeSeats(obj, obj.cols, clamp(Math.round(+v), 1, 8))), { min: 1, max: 8 })
       );
     }
-    body.append(title, grid, actions);
+    body.append(title, grid, alignTools(), actions);
   }
 
   function clamp(v, min, max) { return Math.min(max, Math.max(min, Number.isFinite(v) ? v : min)); }
@@ -1114,6 +1133,23 @@
         case 'vcenter': moveUnit(u, 0, (y0 + y1 - u.y0 - u.y1) / 2); break;
       }
     }
+    commit();
+  }
+
+  // Centra en el aula todo lo seleccionado, moviéndolo en bloque: lo que está
+  // junto sigue junto, solo se desplaza el conjunto.
+  function centerInRoom(axis) {
+    const sel = selectedObjects();
+    const units = selectionUnits();
+    if (!sel.length) return;
+    const room = cls().room;
+    const x0 = Math.min(...units.map(u => u.x0)), x1 = Math.max(...units.map(u => u.x1));
+    const y0 = Math.min(...units.map(u => u.y0)), y1 = Math.max(...units.map(u => u.y1));
+    const dx = axis === 'x' ? room.w / 2 - (x0 + x1) / 2 : 0;
+    const dy = axis === 'y' ? room.h / 2 - (y0 + y1) / 2 : 0;
+    if (!dx && !dy) return;
+    checkpoint();
+    sel.forEach(o => { o.x += dx; o.y += dy; });
     commit();
   }
 
@@ -1344,34 +1380,49 @@
 
   function hideMenu() { menu.hidden = true; }
 
+  function menuButton(item) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = item.danger ? 'danger' : '';
+    b.disabled = !!item.disabled;
+    const label = document.createElement('span');
+    label.textContent = item.label;
+    b.appendChild(label);
+    if (item.keys || item.items) {
+      const keys = document.createElement('kbd');
+      keys.textContent = item.items ? '▸' : item.keys;
+      b.appendChild(keys);
+    }
+    if (item.action) b.addEventListener('click', () => { hideMenu(); item.action(); });
+    return b;
+  }
+
+  // Un elemento con «items» abre un submenú al pasar por encima.
+  function fillMenu(container, items) {
+    for (const item of items) {
+      if (item === '-') { container.appendChild(document.createElement('hr')); continue; }
+      if (!item.items) { container.appendChild(menuButton(item)); continue; }
+      const wrap = document.createElement('div');
+      wrap.className = 'has-sub' + (item.disabled ? ' disabled' : '');
+      const sub = document.createElement('div');
+      sub.className = 'submenu';
+      fillMenu(sub, item.items);
+      wrap.append(menuButton(item), sub);
+      container.appendChild(wrap);
+    }
+  }
+
   function showMenu(x, y, items) {
     menu.innerHTML = '';
-    for (const item of items) {
-      if (item === '-') {
-        menu.appendChild(document.createElement('hr'));
-        continue;
-      }
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = item.danger ? 'danger' : '';
-      b.disabled = !!item.disabled;
-      const label = document.createElement('span');
-      label.textContent = item.label;
-      b.appendChild(label);
-      if (item.keys) {
-        const keys = document.createElement('kbd');
-        keys.textContent = item.keys;
-        b.appendChild(keys);
-      }
-      b.addEventListener('click', () => { hideMenu(); item.action(); });
-      menu.appendChild(b);
-    }
+    fillMenu(menu, items);
     menu.hidden = false;
-    // Que no se salga de la ventana.
+    // Que no se salga de la ventana, ni el menú ni sus submenús.
     const r = menu.getBoundingClientRect();
     menu.style.left = Math.min(x, window.innerWidth - r.width - 8) + 'px';
     menu.style.top = Math.min(y, window.innerHeight - r.height - 8) + 'px';
+    menu.classList.toggle('flip', menu.getBoundingClientRect().right + 230 > window.innerWidth);
   }
+
 
   svg.addEventListener('contextmenu', (e) => {
     e.preventDefault();
@@ -1408,6 +1459,36 @@
     if (gs.canGroup) items.push({ label: t('group'), keys: 'Ctrl+G', action: groupSelection });
     if (gs.canUngroup) items.push({ label: t('ungroup'), keys: 'Ctrl+Mayús+G', action: ungroupSelection });
     if (gs.canGroup || gs.canUngroup) items.push('-');
+    const units = selectionUnits().length;
+    items.push(
+      {
+        label: t('align_title_menu'), disabled: units < 2,
+        items: [
+          { label: t('align_left'), action: () => alignSelection('left') },
+          { label: t('align_hcenter'), action: () => alignSelection('hcenter') },
+          { label: t('align_right'), action: () => alignSelection('right') },
+          '-',
+          { label: t('align_top'), action: () => alignSelection('top') },
+          { label: t('align_vcenter'), action: () => alignSelection('vcenter') },
+          { label: t('align_bottom'), action: () => alignSelection('bottom') }
+        ]
+      },
+      {
+        label: t('menu_distribute'), disabled: units < 3,
+        items: [
+          { label: t('align_distx'), action: () => distributeSelection('x') },
+          { label: t('align_disty'), action: () => distributeSelection('y') }
+        ]
+      },
+      {
+        label: t('menu_center_room'),
+        items: [
+          { label: t('align_roomx'), action: () => centerInRoom('x') },
+          { label: t('align_roomy'), action: () => centerInRoom('y') }
+        ]
+      },
+      '-'
+    );
     items.push(
       { label: t('rotate_left'), keys: 'Mayús+R', action: () => rotateSelection(-15) },
       { label: t('rotate_right'), keys: 'R', action: () => rotateSelection(15) },

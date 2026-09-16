@@ -180,6 +180,16 @@ textarea { width: 100%; resize: vertical; }
 .context-menu button.danger { color: var(--danger); }
 .context-menu button.danger:hover { background: var(--danger-soft); }
 .context-menu kbd { font: inherit; font-size: 12px; color: var(--muted); }
+.context-menu .has-sub { position: relative; }
+.context-menu .submenu {
+  position: absolute; left: calc(100% - 4px); top: -5px; z-index: 1; display: none;
+  min-width: 210px; padding: 5px; background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px var(--shadow);
+}
+.context-menu.flip .submenu { left: auto; right: calc(100% - 4px); }
+.context-menu .has-sub:hover > .submenu { display: block; }
+.context-menu .has-sub.disabled:hover > .submenu { display: none; }
+.context-menu .has-sub:hover > button:not(:disabled) { background: var(--accent-soft); }
 .context-menu hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; }
 @media print { .context-menu { display: none !important; } }
 
@@ -188,6 +198,12 @@ textarea { width: 100%; resize: vertical; }
 .canvas { flex: 1; overflow: auto; background: var(--canvas-bg); }
 #room-svg { display: block; margin: 0 auto; touch-action: none; user-select: none; }
 .zoom-bar { position: absolute; right: 14px; bottom: 14px; z-index: 5; display: flex; gap: 4px; }
+.seat-count {
+  position: absolute; left: 14px; bottom: 16px; z-index: 5; margin: 0;
+  font-size: 12px; color: var(--muted); background: var(--panel);
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 5px 10px;
+}
+.seat-count:empty { display: none; }
 
 #room-svg .obj { cursor: move; }
 #room-svg.students-mode .obj { cursor: default; }
