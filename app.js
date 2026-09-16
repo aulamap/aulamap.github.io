@@ -565,20 +565,6 @@
       else drawFurniture(g, obj, opts);
     }
 
-    // Tiradores visibles, por fuera de cada pared.
-    if (walls) {
-      const long = 40 / zoom, thick = 10 / zoom, gap = 14 / zoom;
-      const grips = {
-        left: [-gap - thick / 2, RH / 2, thick, long],
-        right: [RW + gap + thick / 2, RH / 2, thick, long],
-        top: [RW / 2, -gap - thick / 2, long, thick],
-        bottom: [RW / 2, RH + gap + thick / 2, long, thick]
-      };
-      for (const [wall, [cx, cy, w, h]] of Object.entries(grips)) {
-        el('rect', { class: 'wall-grip', 'data-wall': wall, x: cx - w / 2, y: cy - h / 2, width: w, height: h, rx: Math.min(w, h) / 2, fill: '#fff', stroke: wallColor, 'stroke-width': 1.5 / zoom }, root);
-      }
-    }
-
     if (!opts.print && mode === 'room') drawSelection(root, c);
     return root;
   }
@@ -747,6 +733,48 @@
     return lab;
   }
 
+  // Iconos de la botonera de ordenación: la barra marca por dónde se alinea.
+  const ALIGN_ICONS = {
+    left: '<path d="M2.5 2v12"/><rect x="4.5" y="4" width="9.5" height="3"/><rect x="4.5" y="9" width="5.5" height="3"/>',
+    hcenter: '<path d="M8 2v12"/><rect x="3.2" y="4" width="9.6" height="3"/><rect x="5.2" y="9" width="5.6" height="3"/>',
+    right: '<path d="M13.5 2v12"/><rect x="2.5" y="4" width="9.5" height="3"/><rect x="6.5" y="9" width="5.5" height="3"/>',
+    top: '<path d="M2 2.5h12"/><rect x="4" y="4.5" width="3" height="9.5"/><rect x="9" y="4.5" width="3" height="5.5"/>',
+    vcenter: '<path d="M2 8h12"/><rect x="4" y="3.2" width="3" height="9.6"/><rect x="9" y="5.2" width="3" height="5.6"/>',
+    bottom: '<path d="M2 13.5h12"/><rect x="4" y="2" width="3" height="9.5"/><rect x="9" y="6" width="3" height="5.5"/>',
+    distx: '<rect x="1.5" y="3" width="2.5" height="10"/><rect x="6.8" y="3" width="2.5" height="10"/><rect x="12" y="3" width="2.5" height="10"/>',
+    disty: '<rect x="3" y="1.5" width="10" height="2.5"/><rect x="3" y="6.8" width="10" height="2.5"/><rect x="3" y="12" width="10" height="2.5"/>'
+  };
+
+  function alignTools() {
+    const box = document.createElement('div');
+    const title = document.createElement('h2');
+    title.textContent = t('align_title');
+    const grid = document.createElement('div');
+    grid.className = 'align-grid';
+    const units = selectionUnits().length;
+    const add = (key, onClick, enabled) => {
+      const b = button('', onClick, 'icon');
+      b.innerHTML = `<svg class="ico" viewBox="0 0 16 16" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true">${ALIGN_ICONS[key]}</svg>`;
+      b.title = t('align_' + key);
+      b.setAttribute('aria-label', b.title);
+      b.disabled = !enabled;
+      grid.appendChild(b);
+    };
+    add('left', () => alignSelection('left'), units > 1);
+    add('hcenter', () => alignSelection('hcenter'), units > 1);
+    add('right', () => alignSelection('right'), units > 1);
+    add('top', () => alignSelection('top'), units > 1);
+    add('vcenter', () => alignSelection('vcenter'), units > 1);
+    add('bottom', () => alignSelection('bottom'), units > 1);
+    add('distx', () => distributeSelection('x'), units > 2);
+    add('disty', () => distributeSelection('y'), units > 2);
+    const hint = document.createElement('p');
+    hint.className = 'hint';
+    hint.textContent = t(units > 2 ? 'align_hint' : 'align_hint_three');
+    box.append(title, grid, hint);
+    return box;
+  }
+
   function button(label, onClick, cls = '') {
     const b = document.createElement('button');
     b.className = 'btn ' + cls;
@@ -787,7 +815,7 @@
       p.textContent = t(gs.single ? 'props_group' : 'props_multi', { count: sel.length });
       if (gs.canGroup) actions.prepend(button(t('group'), groupSelection));
       if (gs.canUngroup) actions.prepend(button(t('ungroup'), ungroupSelection));
-      body.append(p, actions);
+      body.append(p, alignTools(), actions);
       return;
     }
 
@@ -980,6 +1008,76 @@
     });
     cls().objects.push(...copies);
     selection = new Set(copies.map(o => o.id));
+    commit();
+  }
+
+  /* ---------- Alinear y repartir ---------- */
+
+  // La selección se reparte en «unidades»: cada grupo cuenta como una sola
+  // pieza y se mueve entero, y cada objeto suelto va por su cuenta. De cada
+  // unidad se toma su rectángulo (sin las sillas: lo que se alinea son las
+  // mesas y el mobiliario, no el sitio que ocupa quien se sienta).
+  function selectionUnits() {
+    const units = new Map();
+    for (const o of selectedObjects()) {
+      const key = o.groupId || o.id;
+      if (!units.has(key)) units.set(key, []);
+      units.get(key).push(o);
+    }
+    return [...units.values()].map(objs => {
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const o of objs) {
+        const { halfW, halfH } = extent(o);
+        x0 = Math.min(x0, o.x - halfW); x1 = Math.max(x1, o.x + halfW);
+        y0 = Math.min(y0, o.y - halfH); y1 = Math.max(y1, o.y + halfH);
+      }
+      return { objs, x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 };
+    });
+  }
+
+  // Al alinear no se redondea a la rejilla: si no, cada elemento caería en una
+  // casilla distinta y la fila volvería a quedar desigual.
+  function moveUnit(unit, dx, dy) {
+    unit.objs.forEach(o => { o.x += dx; o.y += dy; });
+  }
+
+  function alignSelection(mode) {
+    const units = selectionUnits();
+    if (units.length < 2) return;
+    const x0 = Math.min(...units.map(u => u.x0)), x1 = Math.max(...units.map(u => u.x1));
+    const y0 = Math.min(...units.map(u => u.y0)), y1 = Math.max(...units.map(u => u.y1));
+    checkpoint();
+    for (const u of units) {
+      switch (mode) {
+        case 'left': moveUnit(u, x0 - u.x0, 0); break;
+        case 'right': moveUnit(u, x1 - u.x1, 0); break;
+        case 'hcenter': moveUnit(u, (x0 + x1 - u.x0 - u.x1) / 2, 0); break;
+        case 'top': moveUnit(u, 0, y0 - u.y0); break;
+        case 'bottom': moveUnit(u, 0, y1 - u.y1); break;
+        case 'vcenter': moveUnit(u, 0, (y0 + y1 - u.y0 - u.y1) / 2); break;
+      }
+    }
+    commit();
+  }
+
+  // Deja el mismo hueco entre unidades consecutivas sin mover las de los
+  // extremos, que son las que marcan el espacio disponible.
+  function distributeSelection(axis) {
+    const units = selectionUnits();
+    if (units.length < 3) return;
+    const horiz = axis === 'x';
+    units.sort((a, b) => (horiz ? a.x0 - b.x0 : a.y0 - b.y0));
+    const first = units[0], last = units[units.length - 1];
+    const span = horiz ? last.x1 - first.x0 : last.y1 - first.y0;
+    const busy = units.reduce((sum, u) => sum + (horiz ? u.w : u.h), 0);
+    const gap = (span - busy) / (units.length - 1);
+    checkpoint();
+    let cursor = (horiz ? first.x1 : first.y1) + gap;
+    for (let i = 1; i < units.length - 1; i++) {
+      const u = units[i];
+      if (horiz) moveUnit(u, cursor - u.x0, 0); else moveUnit(u, 0, cursor - u.y0);
+      cursor += (horiz ? u.w : u.h) + gap;
+    }
     commit();
   }
 

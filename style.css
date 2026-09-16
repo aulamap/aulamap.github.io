@@ -200,7 +200,6 @@ textarea { width: 100%; resize: vertical; }
 .canvas.panning, .canvas.panning #room-svg, .canvas.panning #room-svg * { cursor: grabbing !important; }
 #room-svg [data-wall=left], #room-svg [data-wall=right] { cursor: ew-resize; }
 #room-svg [data-wall=top], #room-svg [data-wall=bottom] { cursor: ns-resize; }
-#room-svg .wall-grip:hover { fill: var(--accent-soft); stroke: var(--accent); }
 
 /* Propiedades */
 .props-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -208,6 +207,10 @@ textarea { width: 100%; resize: vertical; }
 .props-grid label.full { grid-column: 1 / -1; }
 .props-grid input { width: 100%; }
 .props-actions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.align-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+.align-grid .btn { min-width: 0; padding: 5px 0; }
+.align-grid .ico { width: 16px; height: 16px; }
+.align-grid .btn:disabled .ico { opacity: .5; }
 .props-type { font-weight: 600; margin: 0 0 10px; }
 
 .footer { font-size: 11px; color: var(--muted); text-align: center; padding: 5px; background: var(--panel); border-top: 1px solid var(--line); }
