@@ -461,14 +461,15 @@
   function drawFigure(parent, px, py, angle, edge, seated) {
     const W = Math.min(46, edge * 0.8);
     const k = W / 46;
-    const fig = el('g', { class: 'person', transform: `translate(${px} ${py}) rotate(${angle}) scale(${k})` }, parent);
+    const fig = el('g', { class: seated ? 'person seated' : 'person', transform: `translate(${px} ${py}) rotate(${angle}) scale(${k})` }, parent);
     const line = { stroke: '#6b6258', 'stroke-width': 1.4 };
     el('rect', { x: -21, y: 30, width: 42, height: 8, rx: 3, fill: '#e6e0d5', ...line }, fig);
-    if (!seated) return;
+    if (!seated) return fig;
     el('rect', { x: -21, y: -6, width: 8, height: 26, rx: 4, fill: '#fff', ...line }, fig);
     el('rect', { x: 13, y: -6, width: 8, height: 26, rx: 4, fill: '#fff', ...line }, fig);
     el('ellipse', { cx: 0, cy: 21, rx: 20, ry: 9, fill: '#fff', ...line }, fig);
     el('circle', { cx: 0, cy: 17, r: 9, fill: '#fff', ...line }, fig);
+    return fig;
   }
 
   // Una hoja con su nervio, apuntando hacia fuera. «off» es lo que se separa
@@ -568,7 +569,10 @@
       case 'teacher':
         el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 3, ...common }, g);
         // El docente se sienta entre la mesa y la pizarra, mirando a la clase.
-        if (opts.showPeople) drawFigure(g, 0, -h / 2, 180, w, true);
+        if (opts.showPeople) {
+          const fig = drawFigure(g, 0, -h / 2, 180, w, true);
+          fig.querySelector('circle').setAttribute('data-teacher-head', '');
+        }
         break;
       default:
         el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: obj.type === 'board' ? 1 : 3, ...common }, g);
@@ -1316,7 +1320,8 @@
   }
 
   svg.addEventListener('pointerdown', (e) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || leavingClass) return;
+    if (onTeacherHead(e) && tapTeacher()) return;
     const p = clientToSvg(e.clientX, e.clientY);
     const c = cls();
 
@@ -2141,6 +2146,81 @@
     c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); });
     commit();
   });
+
+  /* ---------- Un guiño ---------- */
+
+  // Tres toques seguidos en la cabeza del docente y la clase entera se levanta
+  // y se va por la puerta. Es solo una broma: no toca el plano, que se vuelve a
+  // dibujar tal cual al terminar.
+  let teacherTaps = [];
+  let leavingClass = false;
+
+  // Se mira por posición y no por el elemento pulsado: al primer toque la mesa
+  // queda seleccionada y su tirador de girar tapa justo la cabeza.
+  function onTeacherHead(e) {
+    return [...svg.querySelectorAll('[data-teacher-head]')].some(head => {
+      const r = head.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    });
+  }
+
+  function tapTeacher() {
+    const now = Date.now();
+    teacherTaps = teacherTaps.filter(t => now - t < 1200);
+    teacherTaps.push(now);
+    if (teacherTaps.length < 3) return false;
+    teacherTaps = [];
+    return leaveClass();
+  }
+
+  function leaveClass() {
+    const c = cls();
+    const root = svg.querySelector(':scope > g');
+    const people = [...svg.querySelectorAll('.person.seated')].filter(f => !f.querySelector('[data-teacher-head]'));
+    if (!root || !people.length) return false;
+    leavingClass = true;
+    drag = null;
+
+    // Salen por la puerta; si el aula no tiene, por el centro de la pared de abajo.
+    const door = c.objects.find(o => o.type === 'door');
+    const exit = door ? { x: door.x, y: door.y } : { x: c.room.w / 2, y: c.room.h };
+    const toRoot = root.getCTM().inverse();
+
+    // Cada figura pasa a colgar del plano para llevarla hasta la puerta en
+    // coordenadas del aula. Conserva su propio transform, así que el grupo que
+    // la recoge lleva solo el de su padre; su posición real mide el camino.
+    const walkers = people.map(fig => {
+      const parent = toRoot.multiply(fig.parentNode.getCTM());
+      const at = toRoot.multiply(fig.getCTM());
+      return { fig, parent, from: { x: at.e, y: at.f }, dist: Math.hypot(exit.x - at.e, exit.y - at.f) };
+    }).sort((a, b) => a.dist - b.dist);
+
+    const gap = Math.min(90, 2200 / walkers.length);
+    const walk = 1300;
+    walkers.forEach(({ fig, parent: m, from }, i) => {
+      // La silla se queda en su sitio: solo se levanta quien estaba sentado.
+      const chair = fig.cloneNode(false);
+      chair.setAttribute('class', 'person');
+      chair.appendChild(fig.firstElementChild);
+      fig.parentNode.insertBefore(chair, fig);
+
+      const outer = el('g', {}, root);
+      const inner = el('g', { transform: `matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})` }, outer);
+      inner.appendChild(fig);
+      const delay = i * gap;
+      outer.style.transition = `transform ${walk}ms cubic-bezier(.5,0,.7,1) ${delay}ms, opacity 350ms ease-in ${delay + walk - 350}ms`;
+      outer.getBoundingClientRect();   // fija el punto de partida antes de moverla
+      outer.style.transform = `translate(${exit.x - from.x}px, ${exit.y - from.y}px)`;
+      outer.style.opacity = '0';
+    });
+
+    // Un momento con el aula vacía y todo vuelve a su sitio.
+    setTimeout(() => {
+      leavingClass = false;
+      render();
+    }, (walkers.length - 1) * gap + walk + 900);
+    return true;
+  }
 
   /* ---------- Modos ---------- */
 
