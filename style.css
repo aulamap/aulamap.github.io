@@ -268,18 +268,28 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   .topbar-actions { margin-left: 0; }
 }
 
-/* Impresión: solo el plano */
-@page { size: A4 landscape; margin: 6mm; }   /* lo cambia la app al imprimir */
+/* Impresión: solo el plano.
+   El aspecto del bloque va fuera de @media print para que la app pueda medir
+   antes de imprimir cuánto ocupan el título, la fecha y la lista, y darle al
+   plano el alto que sobra. En pantalla el bloque está oculto. */
+@page { size: A4 landscape; margin: 10mm; }   /* lo cambia la app al imprimir */
+
+#print-area { display: none; break-inside: avoid; color: #23262b; }
+#print-area h1 { font-size: 16pt; margin: 0 0 2mm; }
+#print-area .print-date { font-size: 10pt; color: #444; margin: 0 0 3mm; }
+#print-area .unseated { font-size: 10pt; margin-top: 3mm; }
+/* El alto máximo lo pone la app: depende del papel, de los márgenes y de lo
+   que ocupe el texto. */
+#print-area svg { width: 100%; height: auto; display: block; break-inside: avoid; }
+
 @media print {
   /* En papel el plano va siempre sobre blanco, sea cual sea el tema. */
   :root { --floor: #ffffff; --grid: #ffffff; --wall: #55504a; }
   body { background: #fff; }
   #app, dialog, #drag-ghost { display: none !important; }
-  #print-area { display: block; }
-  #print-area h1 { font-size: 16pt; margin: 0 0 2mm; }
-  #print-area .print-date { font-size: 10pt; color: #444; margin: 0 0 3mm; }
-  /* El alto máximo lo pone la app al imprimir: depende del papel, de los
-     márgenes elegidos y de lo que ocupen el título, la fecha y la lista. */
-  #print-area svg { width: 100%; height: auto; display: block; }
-  #print-area .unseated { font-size: 10pt; margin-top: 3mm; }
+  /* La hoja entera (100vh en impresión es el alto útil de la página, ya
+     descontados los márgenes que aplique el navegador). El plano se encoge
+     hasta lo que sobre, así que nunca se va a una segunda página. */
+  #print-area { display: flex; flex-direction: column; height: 100vh; }
+  #print-area svg { flex: 0 1 auto; min-height: 0; }
 }

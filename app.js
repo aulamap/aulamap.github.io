@@ -2317,7 +2317,7 @@
   // La orientación del papel no se puede cambiar desde una clase CSS: hay que
   // reescribir la regla @page antes de imprimir.
   let lastPaper = 'landscape';
-  let lastMargin = 6;
+  let lastMargin = 10;
   function setPaper(paper, margin) {
     lastPaper = paper === 'portrait' ? 'portrait' : 'landscape';
     lastMargin = clamp(Math.round(+margin), 0, 30);
@@ -2330,11 +2330,32 @@
     style.textContent = `@page { size: A4 ${lastPaper}; margin: ${lastMargin}mm; }`;
   }
 
-  // Alto que le queda al plano en la hoja, descontando márgenes y lo que
-  // ocupan el título, la fecha y la lista de quien se queda sin sitio.
-  function printHeight(hasDate, hasUnseated) {
+  // Alto que le queda al plano en la hoja. El título, la fecha y la lista se
+  // miden de verdad en vez de estimarlos. Para los márgenes se toma el mayor
+  // entre los elegidos y 10 mm, porque el navegador puede imponer los suyos
+  // (Chrome usa 10 mm si no acepta los de la página) y, si nos quedamos
+  // cortos, el plano se va a una segunda hoja.
+  function printHeight(area) {
     const page = lastPaper === 'portrait' ? 297 : 210;
-    return Math.max(60, page - 2 * lastMargin - 10 - (hasDate ? 7 : 0) - (hasUnseated ? 8 : 0));
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:absolute;left:-9999px;top:0;width:100mm';
+    document.body.appendChild(probe);
+    const pxPerMm = probe.getBoundingClientRect().width / 100;
+    probe.remove();
+    // Se mide el bloque de texto con el ancho que tendrá en el papel.
+    const width = (lastPaper === 'portrait' ? 210 : 297) - 2 * Math.max(lastMargin, 10);
+    const before = area.style.cssText;
+    area.style.cssText = `display:block;position:absolute;left:-9999px;top:0;width:${width}mm`;
+    let used = 0;
+    area.querySelectorAll('h1, .print-date, .unseated').forEach(el => {
+      const st = getComputedStyle(el);
+      used += el.getBoundingClientRect().height + parseFloat(st.marginTop) + parseFloat(st.marginBottom);
+    });
+    area.style.cssText = before;
+    // 13 mm es el margen más ancho que suelen imponer los navegadores cuando
+    // no aceptan el de la página (media pulgada); con ese suelo, la clase cabe
+    // en una hoja aunque el navegador no haga caso de los márgenes pedidos.
+    return Math.max(60, page - 2 * Math.max(lastMargin, 13) - used / pxPerMm - 2);
   }
 
   document.getElementById('dlg-print').addEventListener('close', (e) => {
@@ -2381,10 +2402,7 @@
         area.appendChild(p);
       }
     }
-    printSvg.style.maxHeight = printHeight(
-      document.getElementById('print-date').checked,
-      !!area.querySelector('.unseated')
-    ) + 'mm';
+    printSvg.style.maxHeight = printHeight(area) + 'mm';
     setTimeout(() => window.print(), 50);
   });
 
