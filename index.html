@@ -45,6 +45,9 @@
           <option value="auto" data-i18n="lang_auto">Automático</option>
           <option value="es">Español</option>
           <option value="ca">Català</option>
+          <option value="gl">Galego</option>
+          <option value="eu">Euskara</option>
+          <option value="en">English</option>
         </select>
         <select id="theme-select" class="mini-select" data-i18n-title="theme" data-i18n-aria="theme" title="Apariencia">
           <option value="system" data-i18n="theme_system">Sistema</option>
@@ -69,13 +72,6 @@
           <h2 data-i18n="add_furniture">Mobiliario</h2>
           <div class="palette" id="palette-furniture"></div>
 
-          <h2 data-i18n="room_size">Tamaño del aula</h2>
-          <div class="field-row">
-            <label><span data-i18n="room_width">Ancho (m)</span>
-              <input id="room-w" type="number" min="2" max="40" step="0.1"></label>
-            <label><span data-i18n="room_depth">Fondo (m)</span>
-              <input id="room-h" type="number" min="2" max="40" step="0.1"></label>
-          </div>
           <p class="hint" data-i18n="hint_room"></p>
         </section>
 
@@ -102,6 +98,15 @@
       </aside>
 
       <section class="canvas-wrap">
+        <div class="room-bar" id="room-bar" role="group" data-i18n-aria="tab_room">
+          <h2 data-i18n="tab_room">Aula</h2>
+          <label><span data-i18n="room_width">Ancho (m)</span>
+            <input id="room-w" type="number" min="2" max="40" step="0.1"></label>
+          <label><span data-i18n="room_depth">Fondo (m)</span>
+            <input id="room-h" type="number" min="2" max="40" step="0.1"></label>
+          <span class="room-bar-sep" aria-hidden="true"></span>
+          <div class="room-tools" id="room-tools"></div>
+        </div>
         <div class="zoom-bar">
           <button id="btn-zoom-out" class="btn icon" data-i18n-title="zoom_out" title="Alejar">−</button>
           <button id="btn-zoom-fit" class="btn icon" data-i18n-title="zoom_fit" title="Ajustar">⤢</button>
@@ -124,7 +129,7 @@
       <span data-i18n="footer_code">Código bajo licencia</span>
       <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3</a> ·
       <span data-i18n="footer_content">contenidos bajo</span>
-      <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" data-i18n-href="link_cc" target="_blank" rel="noopener">CC BY-SA 4.0</a>
     </footer>
   </div>
 
@@ -241,6 +246,9 @@
 
   <script src="locales/es.js"></script>
   <script src="locales/ca.js"></script>
+  <script src="locales/gl.js"></script>
+  <script src="locales/eu.js"></script>
+  <script src="locales/en.js"></script>
   <script src="i18n.js"></script>
   <script src="theme.js"></script>
   <script src="app.js"></script>

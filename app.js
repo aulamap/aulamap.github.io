@@ -355,7 +355,8 @@
       text.setAttribute('stroke-width', size * 0.25);
       text.setAttribute('paint-order', 'stroke');
     }
-    if (opts.flip) text.setAttribute('transform', `rotate(180 ${x} ${y})`);
+    const turn = opts.rotate != null ? opts.rotate : (opts.flip ? 180 : 0);
+    if (turn) text.setAttribute('transform', `rotate(${turn} ${x} ${y})`);
     const lh = size * (opts.lineHeight || 1.15);
     lines.forEach((line, i) => {
       const tspan = el('tspan', { x, y: y + (i - (lines.length - 1) / 2) * lh }, text);
@@ -488,6 +489,10 @@
     return leaf;
   }
 
+  function objTransform(obj) {
+    return `translate(${obj.x} ${obj.y}) rotate(${obj.rot})`;
+  }
+
   function drawFurniture(g, obj, opts) {
     const def = FURNITURE_TYPES[obj.type] || FURNITURE_TYPES.table;
     const { w, h } = obj;
@@ -570,13 +575,19 @@
     }
     const label = labelOf(obj);
     if (label) {
-      const thin = h < 25;
+      // El texto corre siempre por el lado más largo: en un elemento más alto
+      // que ancho (una ventana en vertical, por ejemplo) se gira 90° en vez de
+      // quedarse horizontal y diminuto.
+      const upright = h > w;
+      const along = upright ? h : w;
+      const across = upright ? w : h;
+      const thin = across < 25;
       const weight = obj.type === 'text' ? 600 : 'normal';
-      const maxSize = obj.type === 'text' ? h * 0.6 : 15;
-      const size = Math.max(NAME_MIN_SIZE, Math.min(maxSize, (w - 6) / textWidth(label, weight)));
+      const maxSize = obj.type === 'text' ? across * 0.6 : 15;
+      const size = Math.max(NAME_MIN_SIZE, Math.min(maxSize, (along - 6) / textWidth(label, weight)));
       const labelInside = !thin || obj.type === 'board';
-      addText(g, clipText(label, (w - 6) / size, weight), 0, 0, size, {
-        flip,
+      addText(g, clipText(label, (along - 6) / size, weight), 0, 0, size, {
+        rotate: upright ? (flip ? 90 : -90) : (flip ? 180 : 0),
         fill: labelInside ? (def.labelColor || '#23262b') : '#23262b',
         weight,
         halo: labelInside ? null : 'rgba(255,255,255,.9)'
@@ -615,7 +626,7 @@
     }
 
     for (const obj of c.objects) {
-      const g = el('g', { class: 'obj', 'data-id': obj.id, transform: `translate(${obj.x} ${obj.y}) rotate(${obj.rot})` }, root);
+      const g = el('g', { class: 'obj', 'data-id': obj.id, transform: objTransform(obj) }, root);
       if (isDesk(obj)) drawDesk(g, obj, c, opts);
       else drawFurniture(g, obj, opts);
     }
@@ -627,7 +638,7 @@
   function drawSelection(root, c) {
     const sel = c.objects.filter(o => selection.has(o.id));
     for (const obj of sel) {
-      const g = el('g', { transform: `translate(${obj.x} ${obj.y}) rotate(${obj.rot})` }, root);
+      const g = el('g', { transform: objTransform(obj) }, root);
       el('rect', { x: -obj.w / 2 - 4, y: -obj.h / 2 - 4, width: obj.w + 8, height: obj.h + 8, fill: 'none', stroke: '#2f6f5e', 'stroke-width': 2, 'stroke-dasharray': '6 4', 'pointer-events': 'none' }, g);
       if (sel.length === 1 && mode === 'room') {
         const hs = 9 / zoom;
@@ -2003,6 +2014,41 @@
 
   /* ---------- Aula ---------- */
 
+  // Gira el aula entera un cuarto de vuelta, con todo lo que hay dentro: el
+  // ancho y el fondo se intercambian y cada elemento acompaña el giro.
+  function rotateRoom(dir) {
+    const c = cls();
+    const { w: RW, h: RH } = c.room;
+    checkpoint();
+    for (const o of c.objects) {
+      const { x, y } = o;
+      if (dir > 0) { o.x = RH - y; o.y = x; }
+      else { o.x = y; o.y = RW - x; }
+      o.rot = normAngle(o.rot + 90 * dir);
+    }
+    c.room = { w: RH, h: RW };
+    commit();
+    fitZoom();
+  }
+
+  // Los botones para colocar el plano: girarlo a un lado o al otro.
+  const ROOM_TOOLS = [
+    ['room_rot_left', 'rotate_left', () => rotateRoom(-1)],
+    ['room_rot_right', 'rotate_right', () => rotateRoom(1)]
+  ];
+
+  function renderRoomTools() {
+    const box = document.getElementById('room-tools');
+    box.innerHTML = '';
+    for (const [key, icon, action] of ROOM_TOOLS) {
+      const b = button('', action, 'icon');
+      b.appendChild(svgIcon(MENU_ICONS[icon], false));
+      b.title = t(key);
+      b.setAttribute('aria-label', b.title);
+      box.appendChild(b);
+    }
+  }
+
   function onRoomSize() {
     const c = cls();
     const w = clamp(parseFloat(document.getElementById('room-w').value) * 100, 200, 4000);
@@ -2103,6 +2149,8 @@
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === tab));
       document.getElementById('panel-room').hidden = mode !== 'room';
       document.getElementById('panel-students').hidden = mode !== 'students';
+      // El tamaño del aula y la colocación del plano solo se tocan en «Aula».
+      document.getElementById('room-bar').hidden = mode !== 'room';
       if (mode === 'students') selection.clear();
       render();
     });
@@ -2421,6 +2469,7 @@
   // (paletas, listas, propiedades y etiquetas del plano).
   window.i18n.onChange(() => {
     buildPalettes();
+    renderRoomTools();
     renderAll();
   });
 
@@ -2431,6 +2480,7 @@
 
   window.i18n.apply();
   buildPalettes();
+  renderRoomTools();
   renderAll();
   readSharedLink();
   requestAnimationFrame(fitZoom);

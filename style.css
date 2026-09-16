@@ -140,6 +140,7 @@ textarea { width: 100%; resize: vertical; }
 .field-row label, .stack { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
 .stack { margin-top: 10px; }
 .field-row input { width: 100%; }
+
 .check { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
 .hint { font-size: 12px; color: var(--muted); line-height: 1.4; }
 .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
@@ -202,6 +203,22 @@ textarea { width: 100%; resize: vertical; }
 .canvas { flex: 1; overflow: auto; background: var(--canvas-bg); }
 #room-svg { display: block; margin: 0 auto; touch-action: none; user-select: none; }
 .zoom-bar { position: absolute; right: 14px; bottom: 14px; z-index: 5; display: flex; gap: 4px; }
+
+/* Tamaño del aula y colocación del plano, sobre el propio lienzo */
+/* En columna: las pantallas son más anchas que altas, así que a los lados del
+   plano es donde sobra sitio. */
+.room-bar {
+  position: absolute; left: 14px; top: 14px; z-index: 5;
+  display: flex; flex-direction: column; gap: 7px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 7px 8px;
+}
+.room-bar h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0; }
+.room-bar label { display: flex; flex-direction: column; gap: 2px; font-size: 11px; color: var(--muted); }
+.room-bar input { width: 74px; }
+.room-bar[hidden] { display: none; }
+.room-bar-sep { height: 1px; background: var(--line); }
+.room-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.room-tools .btn { min-width: 0; padding: 4px 0; }
 .seat-count {
   position: absolute; left: 14px; bottom: 16px; z-index: 5; margin: 0;
   font-size: 12px; color: var(--muted); background: var(--panel);
@@ -264,6 +281,17 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   #app { height: auto; min-height: 100vh; }
   .layout, .layout.no-props { grid-template-columns: 1fr; }
   .canvas-wrap { height: 70vh; order: -1; }
+  /* En el móvil el plano es estrecho: la barra va en horizontal y encima del
+     lienzo, no flotando, para no taparlo. */
+  .canvas-wrap { flex-direction: column; }
+  .room-bar {
+    position: static; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 8px;
+    border-width: 0 0 1px; border-radius: 0;
+  }
+  .room-bar label { flex-direction: row; align-items: center; gap: 5px; }
+  .room-bar input { width: 58px; }
+  .room-bar-sep { width: 1px; height: auto; align-self: stretch; }
+  .room-tools { display: flex; }
   .sidebar, .props { border: 0; border-top: 1px solid var(--line); }
   .topbar-actions { margin-left: 0; }
 }

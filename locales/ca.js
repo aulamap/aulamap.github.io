@@ -26,9 +26,10 @@ window.CLASSE_LOCALES.ca = {
   tab_room: 'Aula',
   tab_students: 'Alumnat',
 
-  room_size: 'Mida de l\'aula',
   room_width: 'Amplada (m)',
   room_depth: 'Fondària (m)',
+  room_rot_left: 'Girar l\'aula a l\'esquerra',
+  room_rot_right: 'Girar l\'aula a la dreta',
   add_desks: 'Taules',
   add_furniture: 'Mobiliari',
   desk_block: 'Bloc de taules…',
@@ -201,6 +202,7 @@ window.CLASSE_LOCALES.ca = {
   receive_title: 'Classes compartides',
   receive_text: 'T\'han compartit això: {names}. S\'afegirà a les teves classes sense tocar les que ja tens.',
   receive_add: 'Afegir-les',
+  link_cc: 'https://creativecommons.org/licenses/by-sa/4.0/deed.ca',
   footer_code: 'Codi amb llicència',
   footer_content: 'continguts amb'
 };

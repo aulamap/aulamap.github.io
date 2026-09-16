@@ -23,19 +23,22 @@ No hay que instalar nada ni crear ninguna cuenta.
 - **Varias clases** en la misma aplicación, cada una con su plano y su lista.
 - **Ordenar.** Alinear, igualar el espacio entre mesas y centrar la selección en
   el aula, para que las filas queden cuadradas.
+- **Girar el aula entera**, con todo lo que hay dentro, para verla desde donde
+  te convenga.
 - **Imprimir** en A4 apaisado, con el título, la fecha y, si se quiere, la lista
   de quien se ha quedado sin sitio.
-- **Español y catalán**, con el idioma del navegador detectado solo, y
-  apariencia clara u oscura.
+- **Español, catalán, gallego, euskera e inglés**, con el idioma del navegador
+  detectado solo, y apariencia clara u oscura.
 
 ## Cómo se usa
 
-1. **Monta el aula.** En la pestaña *Aula*, pon las medidas reales en «Tamaño del
-   aula» y pincha en las mesas y el mobiliario que necesites. Para una fila
-   entera de golpe, usa «Bloque de mesas…».
+1. **Monta el aula.** En la pestaña *Aula*, pon las medidas reales en el recuadro
+   «Aula» que hay sobre el plano y pincha en las mesas y el mobiliario que
+   necesites. Para una fila entera de golpe, usa «Bloque de mesas…».
 2. **Colócalo todo.** Arrastra cada elemento; con el botón derecho puedes
    duplicarlo, girarlo, agruparlo o alinearlo con los demás. Para cambiar el
-   tamaño del aula, arrastra una pared.
+   tamaño del aula, arrastra una pared. Los dos botones del recuadro «Aula»
+   giran el plano entero un cuarto de vuelta a un lado o al otro.
 3. **Añade al alumnado.** En la pestaña *Alumnado*, pega la lista con un nombre
    por línea. Valen tanto «Nombre Apellidos» como «Apellidos, Nombre» (esta
    segunda forma es la buena si hay nombres compuestos, como «Fernández
@@ -110,9 +113,8 @@ También funciona abriendo `index.html` directamente desde el disco.
 | `locales/` | Los textos de cada idioma |
 
 **Para traducirlo a otro idioma**, copia `locales/es.js` con el código del idioma
-(`gl.js`, `eu.js`, `en.js`…), traduce solo los valores, añádelo en `index.html`
-junto a los demás y súmalo a la lista del selector de idioma. El resto funciona
-solo.
+(`fr.js`, `pt.js`…), traduce solo los valores, añádelo en `index.html` junto a
+los demás y súmalo a la lista del selector de idioma. El resto funciona solo.
 
 ## Licencia
 

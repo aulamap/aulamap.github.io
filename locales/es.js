@@ -26,9 +26,10 @@ window.CLASSE_LOCALES.es = {
   tab_room: 'Aula',
   tab_students: 'Alumnado',
 
-  room_size: 'Tamaño del aula',
   room_width: 'Ancho (m)',
   room_depth: 'Fondo (m)',
+  room_rot_left: 'Girar el aula a la izquierda',
+  room_rot_right: 'Girar el aula a la derecha',
   add_desks: 'Mesas',
   add_furniture: 'Mobiliario',
   desk_block: 'Bloque de mesas…',
@@ -201,6 +202,7 @@ window.CLASSE_LOCALES.es = {
   receive_title: 'Clases compartidas',
   receive_text: 'Te han compartido esto: {names}. Se añadirá a tus clases sin tocar las que ya tienes.',
   receive_add: 'Añadirlas',
+  link_cc: 'https://creativecommons.org/licenses/by-sa/4.0/deed.es',
   footer_code: 'Código bajo licencia',
   footer_content: 'contenidos bajo'
 };
