@@ -1380,11 +1380,43 @@
 
   function hideMenu() { menu.hidden = true; }
 
+  // Iconos del menú del botón derecho, de trazo, como los de la barra de arriba.
+  const MENU_ICONS = {
+    duplicate: '<rect x="2.3" y="2.3" width="8" height="8" rx="1.4"/><rect x="5.7" y="5.7" width="8" height="8" rx="1.4"/>',
+    group: '<path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/>',
+    ungroup: '<path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/><path d="M3.6 12.4 12.4 3.6"/>',
+    rotate_left: '<path d="M3.4 7A5 5 0 1 1 3.2 9.8"/><path d="M6.6 6.8H3.2V3.4"/>',
+    rotate_right: '<path d="M12.6 7A5 5 0 1 0 12.8 9.8"/><path d="M9.4 6.8h3.4V3.4"/>',
+    rotate_90: '<rect x="2.4" y="8" width="6.2" height="5.6" rx="1"/><path d="M11.2 13.2a2.6 2.6 0 0 0 2.6-2.6V5.4"/><path d="M11.9 7.1 13.8 5.2l1.9 1.9"/>',
+    bring_front: '<rect x="3" y="6" width="10" height="7.5" rx="1"/><path d="M8 4.6V1.8M6.4 3.4 8 1.8l1.6 1.6"/>',
+    send_back: '<rect x="3" y="2.5" width="10" height="7.5" rx="1"/><path d="M8 11.4v2.8M6.4 12.6 8 14.2l1.6-1.6"/>',
+    free_seat: '<circle cx="8" cy="5.4" r="2.3"/><path d="M4 12.8a4 4 0 0 1 8 0"/><path d="M2.6 13.4 13.4 2.6"/>',
+    select_all: '<rect x="2.5" y="2.5" width="11" height="11" rx="1.2" stroke-dasharray="2.4 1.7"/><rect x="6" y="6" width="4" height="4" rx=".6"/>',
+    delete: '<path d="M3.2 4.4h9.6M6.4 4.4V2.8h3.2v1.6M4.8 4.4l.7 9h5l.7-9"/>'
+  };
+
+  // Devuelve el icono listo para meter en un botón. «solid» es para los de
+  // ordenación, que son siluetas rellenas; el resto van de trazo.
+  function svgIcon(markup, solid) {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'ico');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('fill', solid ? 'currentColor' : 'none');
+    svg.setAttribute('stroke', 'currentColor');
+    svg.setAttribute('stroke-width', solid ? 1.2 : 1.4);
+    svg.setAttribute('stroke-linecap', 'round');
+    svg.setAttribute('stroke-linejoin', 'round');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = markup;
+    return svg;
+  }
+
   function menuButton(item) {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = item.danger ? 'danger' : '';
     b.disabled = !!item.disabled;
+    if (item.icon) b.appendChild(svgIcon(item.icon, item.solid));
     const label = document.createElement('span');
     label.textContent = item.label;
     b.appendChild(label);
@@ -1433,14 +1465,14 @@
       const index = seat ? +seat.dataset.seat : -1;
       if (!obj || !obj.seats[index]) { hideMenu(); return; }
       showMenu(e.clientX, e.clientY, [{
-        label: t('menu_free_seat'),
+        label: t('menu_free_seat'), icon: MENU_ICONS.free_seat,
         action: () => { checkpoint(); obj.seats[index] = null; commit(); }
       }]);
       return;
     }
     if (!g) {
       showMenu(e.clientX, e.clientY, [{
-        label: t('menu_select_all'), keys: 'Ctrl+A', disabled: !cls().objects.length,
+        label: t('menu_select_all'), icon: MENU_ICONS.select_all, keys: 'Ctrl+A', disabled: !cls().objects.length,
         action: () => { selection = new Set(cls().objects.map(o => o.id)); render(); }
       }]);
       return;
@@ -1453,54 +1485,54 @@
     const hasStudents = sel.some(o => isDesk(o) && o.seats.some(Boolean));
     const gs = groupState();
     const items = [
-      { label: t('duplicate'), keys: 'Ctrl+D', action: duplicateSelection },
+      { label: t('duplicate'), icon: MENU_ICONS.duplicate, keys: 'Ctrl+D', action: duplicateSelection },
       '-'
     ];
-    if (gs.canGroup) items.push({ label: t('group'), keys: 'Ctrl+G', action: groupSelection });
-    if (gs.canUngroup) items.push({ label: t('ungroup'), keys: 'Ctrl+Mayús+G', action: ungroupSelection });
+    if (gs.canGroup) items.push({ label: t('group'), icon: MENU_ICONS.group, keys: 'Ctrl+G', action: groupSelection });
+    if (gs.canUngroup) items.push({ label: t('ungroup'), icon: MENU_ICONS.ungroup, keys: 'Ctrl+Mayús+G', action: ungroupSelection });
     if (gs.canGroup || gs.canUngroup) items.push('-');
     const units = selectionUnits().length;
     items.push(
       {
-        label: t('align_title_menu'), disabled: units < 2,
+        label: t('align_title_menu'), icon: ALIGN_ICONS.left, solid: true, disabled: units < 2,
         items: [
-          { label: t('align_left'), action: () => alignSelection('left') },
-          { label: t('align_hcenter'), action: () => alignSelection('hcenter') },
-          { label: t('align_right'), action: () => alignSelection('right') },
+          { label: t('align_left'), icon: ALIGN_ICONS.left, solid: true, action: () => alignSelection('left') },
+          { label: t('align_hcenter'), icon: ALIGN_ICONS.hcenter, solid: true, action: () => alignSelection('hcenter') },
+          { label: t('align_right'), icon: ALIGN_ICONS.right, solid: true, action: () => alignSelection('right') },
           '-',
-          { label: t('align_top'), action: () => alignSelection('top') },
-          { label: t('align_vcenter'), action: () => alignSelection('vcenter') },
-          { label: t('align_bottom'), action: () => alignSelection('bottom') }
+          { label: t('align_top'), icon: ALIGN_ICONS.top, solid: true, action: () => alignSelection('top') },
+          { label: t('align_vcenter'), icon: ALIGN_ICONS.vcenter, solid: true, action: () => alignSelection('vcenter') },
+          { label: t('align_bottom'), icon: ALIGN_ICONS.bottom, solid: true, action: () => alignSelection('bottom') }
         ]
       },
       {
-        label: t('menu_distribute'), disabled: units < 3,
+        label: t('menu_distribute'), icon: ALIGN_ICONS.distx, solid: true, disabled: units < 3,
         items: [
-          { label: t('align_distx'), action: () => distributeSelection('x') },
-          { label: t('align_disty'), action: () => distributeSelection('y') }
+          { label: t('align_distx'), icon: ALIGN_ICONS.distx, solid: true, action: () => distributeSelection('x') },
+          { label: t('align_disty'), icon: ALIGN_ICONS.disty, solid: true, action: () => distributeSelection('y') }
         ]
       },
       {
-        label: t('menu_center_room'),
+        label: t('menu_center_room'), icon: ALIGN_ICONS.roomx, solid: true,
         items: [
-          { label: t('align_roomx'), action: () => centerInRoom('x') },
-          { label: t('align_roomy'), action: () => centerInRoom('y') }
+          { label: t('align_roomx'), icon: ALIGN_ICONS.roomx, solid: true, action: () => centerInRoom('x') },
+          { label: t('align_roomy'), icon: ALIGN_ICONS.roomy, solid: true, action: () => centerInRoom('y') }
         ]
       },
       '-'
     );
     items.push(
-      { label: t('rotate_left'), keys: 'Mayús+R', action: () => rotateSelection(-15) },
-      { label: t('rotate_right'), keys: 'R', action: () => rotateSelection(15) },
-      { label: t('rotate_90'), action: () => rotateSelection(90) },
+      { label: t('rotate_left'), icon: MENU_ICONS.rotate_left, keys: 'Mayús+R', action: () => rotateSelection(-15) },
+      { label: t('rotate_right'), icon: MENU_ICONS.rotate_right, keys: 'R', action: () => rotateSelection(15) },
+      { label: t('rotate_90'), icon: MENU_ICONS.rotate_90, action: () => rotateSelection(90) },
       '-',
-      { label: t('bring_front'), action: () => reorderSelection(true) },
-      { label: t('send_back'), action: () => reorderSelection(false) }
+      { label: t('bring_front'), icon: MENU_ICONS.bring_front, action: () => reorderSelection(true) },
+      { label: t('send_back'), icon: MENU_ICONS.send_back, action: () => reorderSelection(false) }
     );
     if (sel.some(isDesk)) {
-      items.push('-', { label: t('menu_free_desks'), disabled: !hasStudents, action: clearSeatsOfSelection });
+      items.push('-', { label: t('menu_free_desks'), icon: MENU_ICONS.free_seat, disabled: !hasStudents, action: clearSeatsOfSelection });
     }
-    items.push('-', { label: sel.length > 1 ? t('delete_count', { count: sel.length }) : t('delete'), keys: 'Supr', danger: true, action: deleteSelection });
+    items.push('-', { label: sel.length > 1 ? t('delete_count', { count: sel.length }) : t('delete'), icon: MENU_ICONS.delete, keys: 'Supr', danger: true, action: deleteSelection });
     showMenu(e.clientX, e.clientY, items);
   });
 

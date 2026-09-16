@@ -172,9 +172,13 @@ textarea { width: 100%; resize: vertical; }
   border: 1px solid var(--line); border-radius: var(--radius); box-shadow: 0 8px 24px var(--shadow);
 }
 .context-menu button {
-  font: inherit; display: flex; justify-content: space-between; gap: 18px; width: 100%;
+  font: inherit; display: flex; align-items: center; gap: 10px; width: 100%;
   padding: 6px 10px; border: 0; border-radius: 5px; background: none; color: var(--ink); text-align: left; cursor: pointer;
 }
+.context-menu button > span { flex: 1; }
+.context-menu button > .ico { width: 15px; height: 15px; flex: none; color: var(--muted); }
+.context-menu button:disabled > .ico { opacity: .6; }
+.context-menu button.danger > .ico { color: var(--danger); }
 .context-menu button:hover:not(:disabled) { background: var(--accent-soft); }
 .context-menu button:disabled { color: var(--disabled); cursor: default; }
 .context-menu button.danger { color: var(--danger); }
