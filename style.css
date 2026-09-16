@@ -293,6 +293,12 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   .room-bar-sep { width: 1px; height: auto; align-self: stretch; }
   .room-tools { display: flex; }
   .sidebar, .props { border: 0; border-top: 1px solid var(--line); }
+  /* Las pestañas van encima del plano: debajo quedaban fuera de la pantalla y
+     no se veía que hubiera modo Alumnado. Sus paneles siguen tras el plano. */
+  .sidebar { display: contents; }
+  .sidebar > .tabs { order: -2; margin: 8px 12px; }
+  .sidebar > .panel { background: var(--panel); padding: 0 12px 12px; border-top: 1px solid var(--line); }
+  .sidebar > .panel[hidden] { display: none; }
   .topbar-actions { margin-left: 0; }
 }
 
