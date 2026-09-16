@@ -51,6 +51,7 @@ window.CLASSE_LOCALES.es = {
   type_sink: 'Pica',
   type_column: 'Columna',
   type_bin: 'Papelera',
+  type_plant: 'Planta',
   type_text: 'Texto',
 
   label_teacher: 'Docente',
@@ -62,10 +63,11 @@ window.CLASSE_LOCALES.es = {
   label_cabinet: 'Armario',
   label_shelf: 'Estantería',
   label_table: 'Mesa',
-  label_computer: 'Ordenador',
-  label_sink: 'Pica',
+  label_computer: '',
+  label_sink: '',
   label_column: '',
   label_bin: '',
+  label_plant: '',
   label_text: 'Texto',
 
   props_title: 'Propiedades',

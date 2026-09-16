@@ -51,6 +51,7 @@ window.CLASSE_LOCALES.ca = {
   type_sink: 'Pica',
   type_column: 'Columna',
   type_bin: 'Paperera',
+  type_plant: 'Planta',
   type_text: 'Text',
 
   label_teacher: 'Docent',
@@ -62,10 +63,11 @@ window.CLASSE_LOCALES.ca = {
   label_cabinet: 'Armari',
   label_shelf: 'Prestatgeria',
   label_table: 'Taula',
-  label_computer: 'Ordinador',
-  label_sink: 'Pica',
+  label_computer: '',
+  label_sink: '',
   label_column: '',
   label_bin: '',
+  label_plant: '',
   label_text: 'Text',
 
   props_title: 'Propietats',

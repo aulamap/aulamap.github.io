@@ -39,6 +39,7 @@
     sink: { w: 60, h: 45, fill: '#e1eef2', stroke: '#5b88a8' },
     column: { w: 40, h: 40, fill: '#c9c4bb', stroke: '#7d776d' },
     bin: { w: 35, h: 35, fill: '#e9e6df', stroke: '#7d776d' },
+    plant: { w: 45, h: 45, fill: '#cfe3c6', stroke: '#5b8a55' },
     text: { w: 120, h: 30, fill: 'none', stroke: 'none' }
   };
 
@@ -325,10 +326,37 @@
           el('path', { d: `M ${-w / 2} ${-h / 2} L ${w / 2} ${h / 2} M ${w / 2} ${-h / 2} L ${-w / 2} ${h / 2}`, stroke: def.stroke, 'stroke-width': 1 }, g);
         }
         break;
-      case 'sink':
-        el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 4, ...common }, g);
-        el('ellipse', { cx: 0, cy: 2, rx: w * 0.32, ry: h * 0.28, fill: '#fff', stroke: def.stroke, 'stroke-width': 1 }, g);
+      // Ordenador visto desde arriba: pantalla, teclado y ratón.
+      case 'computer': {
+        el('rect', { x: -w * 0.3, y: -h * 0.42, width: w * 0.6, height: h * 0.15, rx: 1.5, fill: '#454b52', stroke: def.stroke, 'stroke-width': 1.2 }, g);
+        el('line', { x1: 0, y1: -h * 0.27, x2: 0, y2: -h * 0.16, stroke: def.stroke, 'stroke-width': 2 }, g);
+        el('rect', { x: -w * 0.33, y: -h * 0.14, width: w * 0.58, height: h * 0.3, rx: 2, ...common }, g);
+        for (const y of [-h * 0.04, h * 0.06]) {
+          el('line', { x1: -w * 0.28, y1: y, x2: w * 0.2, y2: y, stroke: def.stroke, 'stroke-width': 1, 'stroke-opacity': .6 }, g);
+        }
+        el('ellipse', { cx: w * 0.36, cy: h * 0.02, rx: w * 0.055, ry: h * 0.075, ...common, 'stroke-width': 1.2 }, g);
         break;
+      }
+      // Planta vista desde arriba: las hojas alrededor y la maceta en medio.
+      case 'plant': {
+        const R = Math.min(w, h) / 2;
+        for (let i = 0; i < 8; i++) {
+          el('ellipse', { cx: 0, cy: -R * 0.55, rx: R * 0.3, ry: R * 0.45, transform: `rotate(${i * 45})`, ...common, 'stroke-width': 1.2 }, g);
+        }
+        el('circle', { cx: 0, cy: 0, r: R * 0.34, fill: '#d9b88a', stroke: '#8a6d3b', 'stroke-width': 1.2 }, g);
+        break;
+      }
+      // Pica vista desde arriba: encimera, seno, desagüe y grifo.
+      case 'sink': {
+        const drain = Math.min(w, h) * 0.07;
+        el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 4, ...common }, g);
+        el('rect', { x: -w * 0.36, y: -h * 0.2, width: w * 0.72, height: h * 0.56, rx: Math.min(w, h) * 0.12, fill: '#ffffff', stroke: def.stroke, 'stroke-width': 1.2 }, g);
+        el('circle', { cx: 0, cy: h * 0.08, r: drain, fill: 'none', stroke: def.stroke, 'stroke-width': 1.2 }, g);
+        el('circle', { cx: 0, cy: h * 0.08, r: drain * 0.35, fill: def.stroke }, g);
+        el('rect', { x: -w * 0.08, y: -h * 0.42, width: w * 0.16, height: h * 0.12, rx: 2, fill: '#d6d8dc', stroke: def.stroke, 'stroke-width': 1.2 }, g);
+        el('line', { x1: 0, y1: -h * 0.36, x2: 0, y2: -h * 0.08, stroke: def.stroke, 'stroke-width': 2.4, 'stroke-linecap': 'round' }, g);
+        break;
+      }
       case 'text':
         el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, fill: 'transparent', stroke: opts.print ? 'none' : '#c9c4bb', 'stroke-dasharray': '3 3' }, g);
         break;
@@ -671,8 +699,25 @@
       const ratio = f.w / f.h;
       let w = 22, h = Math.max(3, 22 / ratio);
       if (h > 16) { h = 16; w = 16 * ratio; }
-      if (type === 'text') addText(icon, 'Aa', 13, 10, 11, { weight: 700 });
-      else el(type === 'bin' ? 'ellipse' : 'rect', type === 'bin' ? { cx: 13, cy: 10, rx: 7, ry: 7, fill: f.fill, stroke: f.stroke } : { x: 13 - w / 2, y: 10 - h / 2, width: w, height: h, fill: f.fill, stroke: f.stroke }, icon);
+      if (type === 'text') {
+        addText(icon, 'Aa', 13, 10, 11, { weight: 700 });
+      } else if (type === 'computer') {
+        el('rect', { x: 7, y: 4, width: 12, height: 3, rx: .8, fill: '#454b52', stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('rect', { x: 6.5, y: 10, width: 12, height: 6, rx: 1, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('ellipse', { cx: 21, cy: 13, rx: 1.6, ry: 2.2, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+      } else if (type === 'sink') {
+        el('rect', { x: 13 - w / 2, y: 10 - h / 2, width: w, height: h, rx: 2, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('rect', { x: 13 - w * 0.36, y: 11 - h * 0.3, width: w * 0.72, height: h * 0.56, rx: 1.5, fill: '#fff', stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('circle', { cx: 13, cy: 12, r: 1, fill: 'none', stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('line', { x1: 13, y1: 5.5, x2: 13, y2: 9, stroke: f.stroke, 'stroke-width': 1.4, 'stroke-linecap': 'round' }, icon);
+      } else if (type === 'plant') {
+        for (let i = 0; i < 8; i++) {
+          el('ellipse', { cx: 13, cy: 5.5, rx: 2.1, ry: 3.2, transform: `rotate(${i * 45} 13 10)`, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        }
+        el('circle', { cx: 13, cy: 10, r: 2.4, fill: '#d9b88a', stroke: '#8a6d3b', 'stroke-width': .8 }, icon);
+      } else {
+        el(type === 'bin' ? 'ellipse' : 'rect', type === 'bin' ? { cx: 13, cy: 10, rx: 7, ry: 7, fill: f.fill, stroke: f.stroke } : { x: 13 - w / 2, y: 10 - h / 2, width: w, height: h, fill: f.fill, stroke: f.stroke }, icon);
+      }
     }
     return icon;
   }
