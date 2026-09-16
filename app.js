@@ -440,7 +440,9 @@
     const common = { fill: def.fill, stroke: def.stroke, 'stroke-width': 1.5 };
     switch (obj.type) {
       case 'door':
-        el('path', { d: `M ${-w / 2} ${-h / 2} A ${w} ${w} 0 0 0 ${w / 2} ${-h / 2 - w}`, fill: 'none', stroke: '#b9a98f', 'stroke-dasharray': '4 4', 'stroke-width': 1 }, g);
+        // El arco es el recorrido de la punta de la hoja, centrado en la
+        // bisagra (la esquina derecha): por eso se abomba hacia fuera.
+        el('path', { d: `M ${-w / 2} ${-h / 2} A ${w} ${w} 0 0 1 ${w / 2} ${-h / 2 - w}`, fill: 'none', stroke: '#b9a98f', 'stroke-dasharray': '4 4', 'stroke-width': 1 }, g);
         el('line', { x1: w / 2, y1: -h / 2, x2: w / 2, y2: -h / 2 - w, stroke: def.stroke, 'stroke-width': 2 }, g);
         el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, ...common }, g);
         break;
