@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plano de clase</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <h1 data-i18n="app_title">Plano de clase</h1>
+      <div class="class-picker">
+        <label for="class-select" data-i18n="class_label">Clase</label>
+        <select id="class-select"></select>
+        <button id="btn-class-new" class="btn" data-i18n="class_new">Nueva clase</button>
+        <button id="btn-class-rename" class="btn" data-i18n="class_rename">Cambiar nombre</button>
+        <button id="btn-class-delete" class="btn danger" data-i18n="class_delete">Eliminar clase</button>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-undo" class="btn icon" data-i18n-title="undo" title="Deshacer">↶</button>
+        <button id="btn-redo" class="btn icon" data-i18n-title="redo" title="Rehacer">↷</button>
+        <button id="btn-export" class="btn" data-i18n="export" data-i18n-title="export_title">Exportar</button>
+        <button id="btn-import" class="btn" data-i18n="import" data-i18n-title="import_title">Importar</button>
+        <input id="import-file" type="file" accept=".json,application/json" hidden>
+        <button id="btn-print" class="btn primary" data-i18n="print">Imprimir</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-mode="room" role="tab" data-i18n="tab_room">Aula</button>
+          <button class="tab" data-mode="students" role="tab" data-i18n="tab_students">Alumnado</button>
+        </div>
+
+        <section id="panel-room" class="panel">
+          <h2 data-i18n="add_desks">Mesas</h2>
+          <div class="palette" id="palette-desks"></div>
+          <button id="btn-block" class="btn wide" data-i18n="desk_block">Bloque de mesas…</button>
+
+          <h2 data-i18n="add_furniture">Mobiliario</h2>
+          <div class="palette" id="palette-furniture"></div>
+
+          <h2 data-i18n="room_size">Tamaño del aula</h2>
+          <div class="field-row">
+            <label><span data-i18n="room_width">Ancho (m)</span>
+              <input id="room-w" type="number" min="2" max="40" step="0.1"></label>
+            <label><span data-i18n="room_depth">Fondo (m)</span>
+              <input id="room-h" type="number" min="2" max="40" step="0.1"></label>
+          </div>
+          <p class="hint" data-i18n="hint_room"></p>
+        </section>
+
+        <section id="panel-students" class="panel" hidden>
+          <h2 data-i18n="students_add">Añadir alumnado</h2>
+          <textarea id="students-paste" rows="5" data-i18n-placeholder="students_paste_placeholder"></textarea>
+          <button id="btn-students-add" class="btn wide" data-i18n="students_add_btn">Añadir a la lista</button>
+
+          <label class="stack"><span data-i18n="name_format">Nombre que se muestra</span>
+            <select id="name-format" class="name-format"></select></label>
+          <label class="check"><input id="show-people" type="checkbox" checked> <span data-i18n="show_people">Dibujar al alumnado</span></label>
+
+          <div class="btn-grid">
+            <button id="btn-random" class="btn" data-i18n="students_random" data-i18n-title="students_random_title">Repartir al azar</button>
+            <button id="btn-clear-seats" class="btn" data-i18n="students_clear_seats" data-i18n-title="students_clear_title">Levantar a todos</button>
+            <button id="btn-sort" class="btn" data-i18n="students_sort">Ordenar</button>
+            <button id="btn-delete-students" class="btn danger" data-i18n="students_delete_all">Borrar lista</button>
+          </div>
+
+          <h2 id="students-count"></h2>
+          <ul id="student-list" class="student-list"></ul>
+          <p class="hint" data-i18n="hint_students"></p>
+        </section>
+      </aside>
+
+      <section class="canvas-wrap">
+        <div class="zoom-bar">
+          <button id="btn-zoom-out" class="btn icon" data-i18n-title="zoom_out" title="Alejar">−</button>
+          <button id="btn-zoom-fit" class="btn icon" data-i18n-title="zoom_fit" title="Ajustar">⤢</button>
+          <button id="btn-zoom-in" class="btn icon" data-i18n-title="zoom_in" title="Acercar">+</button>
+        </div>
+        <div id="canvas" class="canvas">
+          <svg id="room-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </section>
+
+      <aside id="props" class="props">
+        <h2 data-i18n="props_title">Propiedades</h2>
+        <div id="props-body"></div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      © 2026 <a href="https://bilateria.org" target="_blank" rel="noopener">Juan José de Haro</a> ·
+      <span data-i18n="footer_code">Código bajo licencia</span>
+      <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL v3</a> ·
+      <span data-i18n="footer_content">contenidos bajo</span>
+      <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener">CC BY-SA 4.0</a>
+    </footer>
+  </div>
+
+  <!-- Diálogos -->
+  <dialog id="dlg-block">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="block_title">Bloque de mesas</h2>
+      <label class="stack"><span data-i18n="block_type">Tipo de mesa</span>
+        <select id="block-type"></select></label>
+      <div class="field-row">
+        <label><span data-i18n="block_rows">Filas</span><input id="block-rows" type="number" min="1" max="20" value="5"></label>
+        <label><span data-i18n="block_cols">Columnas</span><input id="block-cols" type="number" min="1" max="20" value="6"></label>
+      </div>
+      <div class="field-row">
+        <label><span data-i18n="block_gap_x">Separación entre columnas (cm)</span><input id="block-gap-x" type="number" min="0" max="500" value="40"></label>
+        <label><span data-i18n="block_gap_y">Separación entre filas (cm)</span><input id="block-gap-y" type="number" min="0" max="500" value="60"></label>
+      </div>
+      <label class="stack"><span data-i18n="block_angle">Giro del bloque (°)</span>
+        <input id="block-angle" type="number" min="-180" max="180" step="5" value="0"></label>
+      <p class="hint" data-i18n="block_angle_help"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
+        <button value="ok" class="btn primary" data-i18n="block_create">Crear</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-class">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="new_class_title">Nueva clase</h2>
+      <label class="stack"><span data-i18n="new_class_name">Nombre</span>
+        <input id="new-class-name" type="text" required></label>
+      <label class="stack"><span data-i18n="new_class_base">Plano</span>
+        <select id="new-class-base"></select></label>
+      <p class="hint" data-i18n="new_class_copy_help"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" formnovalidate data-i18n="cancel">Cancelar</button>
+        <button value="ok" class="btn primary" data-i18n="new_class_create">Crear clase</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-rename">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="class_rename">Cambiar nombre</h2>
+      <label class="stack"><span data-i18n="prompt_class_name">Nombre de la clase</span>
+        <input id="rename-input" type="text" required></label>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" formnovalidate data-i18n="cancel">Cancelar</button>
+        <button value="ok" class="btn primary" data-i18n="accept">Aceptar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-print">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="print_title">Imprimir</h2>
+      <label class="stack"><span data-i18n="print_heading">Título</span>
+        <input id="print-heading" type="text"></label>
+      <label class="stack"><span data-i18n="print_orientation">Orientación</span>
+        <select id="print-orientation">
+          <option value="0" data-i18n="print_board_top"></option>
+          <option value="180" data-i18n="print_board_bottom"></option>
+        </select></label>
+      <label class="stack"><span data-i18n="name_format">Nombre que se muestra</span>
+        <select id="print-name-format" class="name-format"></select></label>
+      <label class="check"><input id="print-people" type="checkbox" checked> <span data-i18n="show_people"></span></label>
+      <label class="check"><input id="print-date" type="checkbox" checked> <span data-i18n="print_show_date"></span></label>
+      <label class="check"><input id="print-unseated" type="checkbox"> <span data-i18n="print_show_unseated"></span></label>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
+        <button value="ok" class="btn primary" data-i18n="print_go">Imprimir</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="print-area"></div>
+  <div id="drag-ghost" hidden></div>
+  <div id="context-menu" class="context-menu" role="menu" hidden></div>
+
+  <script src="locales/es.js"></script>
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
