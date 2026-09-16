@@ -178,12 +178,30 @@
     return { given: parts[0] || '', surnames: parts.slice(1).join(' ') };
   }
 
+  // Partículas que van pegadas al apellido: «de la Torre» es un apellido, no
+  // tres. Sin esto, «Ana de la Torre Pérez» se quedaba en «Ana de».
+  const NAME_PARTICLES = new Set(['de', 'del', 'la', 'las', 'lo', 'los', 'y', 'i',
+    'da', 'das', 'do', 'dos', 'di', 'van', 'von', 'der', 'den', 'le', 'saint', 'san', 'santa']);
+
+  function firstSurname(surnames) {
+    const parts = surnames.split(' ').filter(Boolean);
+    const out = [];
+    let i = 0;
+    while (i < parts.length && NAME_PARTICLES.has(parts[i].toLowerCase())) out.push(parts[i++]);
+    if (i < parts.length) out.push(parts[i]);
+    return out.join(' ');
+  }
+
   function formatName(raw, format) {
     const { given, surnames } = splitName(raw);
-    const first = surnames.split(' ')[0] || '';
+    const first = firstSurname(surnames);
     switch (format) {
       case 'full': return (given + ' ' + surnames).trim();
-      case 'initial': return first ? `${given} ${first[0]}.` : given;
+      // La inicial es la de la palabra que cuenta, no la de la partícula.
+      case 'initial': {
+        const word = first.split(' ').pop() || '';
+        return word ? `${given} ${word[0]}.` : given;
+      }
       case 'given': return given;
       default: return (given + ' ' + first).trim();
     }
@@ -195,7 +213,7 @@
   // que un nombre largo se salga de su sitio.
   const measureCtx = document.createElement('canvas').getContext('2d');
   const widthCache = new Map();
-  function textWidth(str, weight = 600) {
+  function textWidth(str, weight = NAME_WEIGHT) {
     const key = weight + '|' + str;
     let value = widthCache.get(key);
     if (value === undefined) {
@@ -208,7 +226,7 @@
 
   // Recorta con puntos suspensivos lo que no quepa en «maxWidth» unidades de
   // ancho por cada unidad de tamaño de letra.
-  function clipText(line, maxWidth, weight = 600) {
+  function clipText(line, maxWidth, weight = NAME_WEIGHT) {
     if (textWidth(line, weight) <= maxWidth) return line;
     let cut = line;
     while (cut.length > 1 && textWidth(cut + '…', weight) > maxWidth) cut = cut.slice(0, -1);
@@ -244,22 +262,45 @@
     return lines;
   }
 
-  const NAME_MIN_SIZE = 5;   // por debajo no se lee: mejor recortar el nombre
-  const LINE_HEIGHT = 1.45;
+  // Parte el texto por letras en «count» trozos parecidos.
+  function chunkText(text, count) {
+    const each = Math.ceil(text.length / count);
+    const out = [];
+    for (let i = 0; i < text.length; i += each) out.push(text.slice(i, i + each).trim());
+    return out.filter(Boolean);
+  }
+
+  const NAME_MIN_SIZE = 5;    // por debajo no se lee: mejor recortar el nombre
+  const NAME_MAX_SIZE = 12;   // tope, para que no cante en las mesas grandes
+  const NAME_WEIGHT = 'normal'; // sin negrita: la misma letra ocupa menos ancho
+  const NAME_LINE_GAP = 1.05;   // renglones juntos: así cabe más nombre
+
+  // Alto que ocupa un bloque de «n» renglones, en múltiplos del tamaño de
+  // letra: los saltos entre renglones más los trazos altos y bajos del último.
+  const blockHeight = (n) => (n - 1) * NAME_LINE_GAP + 1.4;
 
   // Busca el mayor tamaño de letra con el que el nombre cabe en el hueco,
   // probando a partirlo hasta en cuatro renglones. Si ni así cabe, se recorta.
-  function fitName(text, width, height, max = 14) {
+  function fitName(text, width, height, max = NAME_MAX_SIZE) {
     const words = String(text).trim().split(/\s+/).filter(Boolean);
     if (!words.length) return { lines: [''], size: max };
     let best = null;
     for (let k = 1; k <= Math.min(4, words.length); k++) {
       const lines = splitLines(words, k);
-      const size = Math.min(max, width / Math.max(...lines.map(l => textWidth(l))), height / (lines.length * LINE_HEIGHT));
+      const size = Math.min(max, width / Math.max(...lines.map(l => textWidth(l))), height / blockHeight(lines.length));
       if (!best || size > best.size) best = { lines, size };
     }
     if (best.size >= NAME_MIN_SIZE) return best;
-    const maxLines = Math.max(1, Math.floor(height / (NAME_MIN_SIZE * LINE_HEIGHT)));
+    // Una palabra sola demasiado larga no se puede partir por espacios: antes
+    // de recortarla se prueba a partirla por letras, que se lee mejor.
+    const flat = words.join(' ');
+    for (let k = 2; k <= 4; k++) {
+      const lines = chunkText(flat, k);
+      const size = Math.min(max, width / Math.max(...lines.map(l => textWidth(l))), height / blockHeight(lines.length));
+      if (size > best.size) best = { lines, size };
+    }
+    if (best.size >= NAME_MIN_SIZE) return best;
+    const maxLines = Math.max(1, Math.floor((height / NAME_MIN_SIZE - 1.4) / NAME_LINE_GAP) + 1);
     const lines = splitLines(words, Math.min(maxLines, words.length)).slice(0, maxLines);
     return { lines: lines.map(l => clipText(l, width / NAME_MIN_SIZE)), size: NAME_MIN_SIZE };
   }
@@ -298,7 +339,7 @@
       text.setAttribute('paint-order', 'stroke');
     }
     if (opts.flip) text.setAttribute('transform', `rotate(180 ${x} ${y})`);
-    const lh = size * 1.15;
+    const lh = size * (opts.lineHeight || 1.15);
     lines.forEach((line, i) => {
       const tspan = el('tspan', { x, y: y + (i - (lines.length - 1) / 2) * lh }, text);
       tspan.textContent = line;
@@ -328,8 +369,8 @@
         if (col > 0) el('line', { x1: sx, y1: sy + 4, x2: sx, y2: sy + sh - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (r > 0 && col === 0) el('line', { x1: -w / 2 + 4, y1: sy, x2: w / 2 - 4, y2: sy, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (student) {
-          const { lines, size } = fitName(formatName(student.name, opts.nameFormat), sw - 8, sh - 8);
-          addText(g, lines, sx + sw / 2, sy + sh / 2, size, { flip, weight: 600 });
+          const { lines, size } = fitName(formatName(student.name, opts.nameFormat), sw - 10, sh - 10);
+          addText(g, lines, sx + sw / 2, sy + sh / 2, size, { flip, weight: NAME_WEIGHT, lineHeight: NAME_LINE_GAP });
         }
       }
     }
