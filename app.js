@@ -1958,7 +1958,8 @@
       opt.textContent = t('new_class_base_copy', { name: c.name });
       base.appendChild(opt);
     }
-    base.value = state.current;
+    // De partida, el aula vacía: copiar el plano de otra clase se elige a mano.
+    base.value = '';
     document.getElementById('new-class-name').value = '';
     document.getElementById('dlg-class').showModal();
   });
