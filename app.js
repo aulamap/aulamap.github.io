@@ -43,6 +43,22 @@
     text: { w: 120, h: 30, fill: 'none', stroke: 'none' }
   };
 
+  // Hojas de la planta: [ángulo, largo, arranque, curvatura, tono]. El largo y
+  // el arranque van en fracción del radio. La lista es fija (así la planta se
+  // dibuja siempre igual) y deliberadamente irregular: ángulos desiguales,
+  // hojas de distinto tamaño y algún hueco, para que sea una mata y no una flor.
+  const PLANT_LEAVES = [
+    [4, 1, 0.06, -0.25, 0], [27, 0.71, 0.14, 0.3, 1], [58, 0.93, 0.08, -0.15, 2],
+    [96, 0.63, 0.18, 0.35, 1], [119, 0.97, 0.05, 0.2, 0], [141, 0.79, 0.12, -0.3, 2],
+    [176, 1, 0.07, 0.15, 1], [199, 0.66, 0.16, -0.35, 0], [215, 0.87, 0.1, 0.25, 2],
+    [247, 0.74, 0.13, -0.2, 1], [268, 0.95, 0.06, 0.3, 0], [297, 0.6, 0.19, -0.3, 2],
+    [318, 0.88, 0.09, 0.2, 1], [351, 0.77, 0.15, -0.25, 0],
+    [44, 0.42, 0.22, 0.4, 2], [131, 0.38, 0.26, -0.4, 0],
+    [232, 0.44, 0.21, 0.35, 1], [306, 0.4, 0.24, -0.35, 2]
+  ];
+
+  const PLANT_GREENS = ['#cfe3c6', '#b3d2a3', '#9cc48c'];
+
   const NAME_FORMATS = ['first1', 'full', 'initial', 'given'];
   const NAME_FORMAT_LABEL = { full: 'name_full', first1: 'name_first_surname', initial: 'name_initial', given: 'name_given' };
 
@@ -303,6 +319,24 @@
     el('circle', { cx: 0, cy: 17, r: 9, fill: '#fff', ...line }, fig);
   }
 
+  // Una hoja con su nervio, apuntando hacia fuera. «off» es lo que se separa
+  // del centro y «bend», cuánto se tuerce la punta hacia un lado.
+  function drawLeaf(parent, len, angle, off, bend, fill, stroke, width) {
+    const wide = len * 0.44;
+    const bx = bend * len * 0.3;
+    const leaf = el('g', { transform: `rotate(${angle}) translate(0 ${-off})` }, parent);
+    el('path', {
+      d: `M 0 0 C ${wide * 0.65} ${-len * 0.3} ${wide * 0.5 + bx} ${-len * 0.76} ${bx} ${-len}`
+        + ` C ${-wide * 0.5 + bx} ${-len * 0.76} ${-wide * 0.65} ${-len * 0.3} 0 0 Z`,
+      fill, stroke, 'stroke-width': width, 'stroke-linejoin': 'round'
+    }, leaf);
+    el('path', {
+      d: `M 0 ${-len * 0.08} Q ${bx * 0.4} ${-len * 0.5} ${bx * 0.85} ${-len * 0.85}`,
+      fill: 'none', stroke, 'stroke-width': width * 0.6, 'stroke-opacity': .5
+    }, leaf);
+    return leaf;
+  }
+
   function drawFurniture(g, obj, opts) {
     const def = FURNITURE_TYPES[obj.type] || FURNITURE_TYPES.table;
     const { w, h } = obj;
@@ -326,24 +360,37 @@
           el('path', { d: `M ${-w / 2} ${-h / 2} L ${w / 2} ${h / 2} M ${w / 2} ${-h / 2} L ${-w / 2} ${h / 2}`, stroke: def.stroke, 'stroke-width': 1 }, g);
         }
         break;
-      // Ordenador visto desde arriba: pantalla, teclado y ratón.
+      // Ordenador visto desde arriba, con medidas reales en centímetros dentro
+      // de un puesto de 60 × 50: monitor de 24" (54 de ancho y 5 de canto) con
+      // la peana asomando por detrás, teclado de 44 × 15 y ratón de 6,5 × 11.
+      // El pie que une pantalla y peana no se ve: lo tapa la propia pantalla.
       case 'computer': {
-        el('rect', { x: -w * 0.3, y: -h * 0.42, width: w * 0.6, height: h * 0.15, rx: 1.5, fill: '#454b52', stroke: def.stroke, 'stroke-width': 1.2 }, g);
-        el('line', { x1: 0, y1: -h * 0.27, x2: 0, y2: -h * 0.16, stroke: def.stroke, 'stroke-width': 2 }, g);
-        el('rect', { x: -w * 0.33, y: -h * 0.14, width: w * 0.58, height: h * 0.3, rx: 2, ...common }, g);
-        for (const y of [-h * 0.04, h * 0.06]) {
-          el('line', { x1: -w * 0.28, y1: y, x2: w * 0.2, y2: y, stroke: def.stroke, 'stroke-width': 1, 'stroke-opacity': .6 }, g);
+        const k = Math.min(w / 60, h / 50);
+        const pc = el('g', { transform: `scale(${k})` }, g);
+        el('rect', { x: -11, y: -25, width: 22, height: 14, rx: 5, fill: '#b6bcc3', stroke: def.stroke, 'stroke-width': 1 }, pc);
+        el('rect', { x: -27, y: -14, width: 54, height: 5, rx: 1, fill: '#3a4046', stroke: '#23262b', 'stroke-width': 1 }, pc);
+        // Franja clara: la cara de la pantalla, que mira hacia el teclado.
+        el('rect', { x: -26, y: -10.4, width: 52, height: 1.2, fill: '#8fc3e8' }, pc);
+        el('rect', { x: -29, y: 4, width: 44, height: 15, rx: 2, ...common, 'stroke-width': 1 }, pc);
+        // Tres filas de teclas, cada una de un trazo de puntos, y el espaciador.
+        for (let i = 0; i < 3; i++) {
+          el('line', {
+            x1: -27, y1: 7.5 + i * 3.2, x2: 13, y2: 7.5 + i * 3.2,
+            stroke: def.stroke, 'stroke-width': 2, 'stroke-dasharray': '2.2 1.1', 'stroke-opacity': .45
+          }, pc);
         }
-        el('ellipse', { cx: w * 0.36, cy: h * 0.02, rx: w * 0.055, ry: h * 0.075, ...common, 'stroke-width': 1.2 }, g);
+        el('rect', { x: -17, y: 16, width: 20, height: 1.6, rx: .6, fill: 'none', stroke: def.stroke, 'stroke-width': .8, 'stroke-opacity': .5 }, pc);
+        el('ellipse', { cx: 21.5, cy: 11, rx: 3.25, ry: 5.5, ...common, 'stroke-width': 1 }, pc);
+        el('line', { x1: 21.5, y1: 6.5, x2: 21.5, y2: 10, stroke: def.stroke, 'stroke-width': .8, 'stroke-opacity': .7 }, pc);
         break;
       }
-      // Planta vista desde arriba: las hojas alrededor y la maceta en medio.
+      // Planta vista desde arriba: mata de hojas y, en medio, la maceta.
       case 'plant': {
         const R = Math.min(w, h) / 2;
-        for (let i = 0; i < 8; i++) {
-          el('ellipse', { cx: 0, cy: -R * 0.55, rx: R * 0.3, ry: R * 0.45, transform: `rotate(${i * 45})`, ...common, 'stroke-width': 1.2 }, g);
+        el('circle', { cx: 0, cy: 0, r: R * 0.3, fill: '#c98f63', stroke: '#8a5a3b', 'stroke-width': 1.2 }, g);
+        for (const [a, len, off, bend, tone] of PLANT_LEAVES) {
+          drawLeaf(g, R * len, a, R * off, bend, PLANT_GREENS[tone], def.stroke, 1.1);
         }
-        el('circle', { cx: 0, cy: 0, r: R * 0.34, fill: '#d9b88a', stroke: '#8a6d3b', 'stroke-width': 1.2 }, g);
         break;
       }
       // Pica vista desde arriba: encimera, seno, desagüe y grifo.
@@ -702,19 +749,25 @@
       if (type === 'text') {
         addText(icon, 'Aa', 13, 10, 11, { weight: 700 });
       } else if (type === 'computer') {
-        el('rect', { x: 7, y: 4, width: 12, height: 3, rx: .8, fill: '#454b52', stroke: f.stroke, 'stroke-width': .8 }, icon);
-        el('rect', { x: 6.5, y: 10, width: 12, height: 6, rx: 1, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
-        el('ellipse', { cx: 21, cy: 13, rx: 1.6, ry: 2.2, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        el('ellipse', { cx: 12.5, cy: 3.4, rx: 2.6, ry: 1.2, fill: '#b6bcc3', stroke: f.stroke, 'stroke-width': .5 }, icon);
+        el('rect', { x: 6, y: 3.4, width: 13, height: 3.2, rx: .8, fill: '#3a4046' }, icon);
+        el('rect', { x: 6.6, y: 5.5, width: 11.8, height: .8, fill: '#8fc3e8' }, icon);
+        el('rect', { x: 5.5, y: 10.5, width: 13, height: 6, rx: 1, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        for (let i = 0; i < 3; i++) {
+          el('line', { x1: 6.6, y1: 11.8 + i * 1.5, x2: 17.4, y2: 11.8 + i * 1.5, stroke: f.stroke, 'stroke-width': .9, 'stroke-dasharray': '1 .7', 'stroke-opacity': .5 }, icon);
+        }
+        el('ellipse', { cx: 21.3, cy: 13, rx: 1.5, ry: 2.2, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
       } else if (type === 'sink') {
         el('rect', { x: 13 - w / 2, y: 10 - h / 2, width: w, height: h, rx: 2, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
         el('rect', { x: 13 - w * 0.36, y: 11 - h * 0.3, width: w * 0.72, height: h * 0.56, rx: 1.5, fill: '#fff', stroke: f.stroke, 'stroke-width': .8 }, icon);
         el('circle', { cx: 13, cy: 12, r: 1, fill: 'none', stroke: f.stroke, 'stroke-width': .8 }, icon);
         el('line', { x1: 13, y1: 5.5, x2: 13, y2: 9, stroke: f.stroke, 'stroke-width': 1.4, 'stroke-linecap': 'round' }, icon);
       } else if (type === 'plant') {
-        for (let i = 0; i < 8; i++) {
-          el('ellipse', { cx: 13, cy: 5.5, rx: 2.1, ry: 3.2, transform: `rotate(${i * 45} 13 10)`, fill: f.fill, stroke: f.stroke, 'stroke-width': .8 }, icon);
+        const mata = el('g', { transform: 'translate(13 10)' }, icon);
+        el('circle', { cx: 0, cy: 0, r: 2.4, fill: '#c98f63', stroke: '#8a5a3b', 'stroke-width': .6 }, mata);
+        for (const [a, len, off, bend, tone] of PLANT_LEAVES) {
+          drawLeaf(mata, 8 * len, a, 8 * off, bend, PLANT_GREENS[tone], f.stroke, .6);
         }
-        el('circle', { cx: 13, cy: 10, r: 2.4, fill: '#d9b88a', stroke: '#8a6d3b', 'stroke-width': .8 }, icon);
       } else {
         el(type === 'bin' ? 'ellipse' : 'rect', type === 'bin' ? { cx: 13, cy: 10, rx: 7, ry: 7, fill: f.fill, stroke: f.stroke } : { x: 13 - w / 2, y: 10 - h / 2, width: w, height: h, fill: f.fill, stroke: f.stroke }, icon);
       }
