@@ -279,5 +279,7 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   #print-area h1 { font-size: 16pt; margin: 0 0 2mm; }
   #print-area .print-date { font-size: 10pt; color: #444; margin: 0 0 3mm; }
   #print-area svg { width: 100%; height: auto; max-height: 165mm; display: block; }
+  /* En vertical cabe mucho más alto. */
+  .print-portrait #print-area svg { max-height: 240mm; }
   #print-area .unseated { font-size: 10pt; margin-top: 3mm; }
 }

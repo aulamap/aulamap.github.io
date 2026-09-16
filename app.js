@@ -406,10 +406,12 @@
     for (const cell of cells) {
       const studentId = obj.seats[cell.i];
       const student = studentId ? c.students.find(s => s.id === studentId) : null;
-      const seatG = el('g', { 'data-obj': obj.id, 'data-seat': cell.i }, g);
+      // El tablero va antes que el puesto: si no, taparía el blanco de la
+      // mesa ocupada.
       if (propia) {
         el('rect', { x: cell.x, y: cell.y, width: cell.w, height: cell.h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
       }
+      const seatG = el('g', { 'data-obj': obj.id, 'data-seat': cell.i }, g);
       el('rect', {
         class: 'seat', x: cell.x + 1.5, y: cell.y + 1.5, width: cell.w - 3, height: cell.h - 3, rx: 2,
         fill: student ? '#ffffff' : '#fbf8f2', stroke: 'none'
@@ -2307,11 +2309,28 @@
     document.getElementById('print-heading').value = c.name;
     document.getElementById('print-name-format').value = c.nameFormat;
     document.getElementById('print-people').checked = c.showPeople !== false;
+    document.getElementById('print-paper').value = lastPaper;
     document.getElementById('dlg-print').showModal();
   });
 
+  // La orientación del papel no se puede cambiar desde una clase CSS: hay que
+  // reescribir la regla @page antes de imprimir.
+  let lastPaper = 'landscape';
+  function setPaper(paper) {
+    lastPaper = paper === 'portrait' ? 'portrait' : 'landscape';
+    document.documentElement.classList.toggle('print-portrait', lastPaper === 'portrait');
+    let style = document.getElementById('page-size');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'page-size';
+      document.head.appendChild(style);
+    }
+    style.textContent = `@page { size: A4 ${lastPaper}; margin: 10mm; }`;
+  }
+
   document.getElementById('dlg-print').addEventListener('close', (e) => {
     if (e.target.returnValue !== 'ok') return;
+    setPaper(document.getElementById('print-paper').value);
     const c = cls();
     const area = document.getElementById('print-area');
     area.innerHTML = '';

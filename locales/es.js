@@ -159,7 +159,10 @@ window.CLASSE_LOCALES.es = {
 
   print_title: 'Imprimir',
   print_heading: 'Título',
-  print_orientation: 'Orientación',
+  print_paper: 'Papel',
+  print_paper_landscape: 'Horizontal (apaisado)',
+  print_paper_portrait: 'Vertical',
+  print_orientation: 'Vista del plano',
   print_board_top: 'Pizarra arriba (vista desde el fondo)',
   print_board_bottom: 'Pizarra abajo (vista desde la mesa del docente)',
   print_show_date: 'Añadir la fecha',

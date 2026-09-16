@@ -159,7 +159,10 @@ window.CLASSE_LOCALES.ca = {
 
   print_title: 'Imprimir',
   print_heading: 'Títol',
-  print_orientation: 'Orientació',
+  print_paper: 'Paper',
+  print_paper_landscape: 'Horitzontal (apaïsat)',
+  print_paper_portrait: 'Vertical',
+  print_orientation: 'Vista del plànol',
   print_board_top: 'Pissarra a dalt (vista des del fons)',
   print_board_bottom: 'Pissarra a baix (vista des de la taula del docent)',
   print_show_date: 'Afegir la data',
