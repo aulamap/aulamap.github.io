@@ -280,7 +280,7 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
 @media (max-width: 900px) {
   #app { height: auto; min-height: 100vh; }
   .layout, .layout.no-props { grid-template-columns: 1fr; }
-  .canvas-wrap { height: 70vh; order: -1; }
+  .canvas-wrap { height: 62vh; order: -1; }
   /* En el móvil el plano es estrecho: la barra va en horizontal y encima del
      lienzo, no flotando, para no taparlo. */
   .canvas-wrap { flex-direction: column; }
@@ -293,11 +293,16 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   .room-bar-sep { width: 1px; height: auto; align-self: stretch; }
   .room-tools { display: flex; }
   .sidebar, .props { border: 0; border-top: 1px solid var(--line); }
-  /* Las pestañas van encima del plano: debajo quedaban fuera de la pantalla y
-     no se veía que hubiera modo Alumnado. Sus paneles siguen tras el plano. */
+  /* Las pestañas y su contenido van encima del plano: debajo quedaban fuera de
+     la pantalla. El contenido tiene altura limitada y se desplaza por dentro
+     para que el plano siga a la vista. */
   .sidebar { display: contents; }
-  .sidebar > .tabs { order: -2; margin: 8px 12px; }
-  .sidebar > .panel { background: var(--panel); padding: 0 12px 12px; border-top: 1px solid var(--line); }
+  .sidebar > .tabs { order: -3; margin: 8px 12px; }
+  .sidebar > .panel {
+    order: -2; background: var(--panel); padding: 0 12px 10px;
+    max-height: 32vh; overflow-y: auto; border-bottom: 1px solid var(--line);
+  }
+  .sidebar > .panel > h2:first-child { margin-top: 4px; }
   .sidebar > .panel[hidden] { display: none; }
   .topbar-actions { margin-left: 0; }
 }
