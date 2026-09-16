@@ -27,8 +27,8 @@ No hay que instalar nada ni crear ninguna cuenta.
   te convenga.
 - **Imprimir** en A4 apaisado, con el título, la fecha y, si se quiere, la lista
   de quien se ha quedado sin sitio.
-- **Español, catalán, gallego, euskera e inglés**, con el idioma del navegador
-  detectado solo, y apariencia clara u oscura.
+- **Español, catalán, gallego, euskera, portugués, francés, alemán e inglés**,
+  con el idioma del navegador detectado solo, y apariencia clara u oscura.
 
 ## Cómo se usa
 
@@ -113,7 +113,7 @@ También funciona abriendo `index.html` directamente desde el disco.
 | `locales/` | Los textos de cada idioma |
 
 **Para traducirlo a otro idioma**, copia `locales/es.js` con el código del idioma
-(`fr.js`, `pt.js`…), traduce solo los valores, añádelo en `index.html` junto a
+(`it.js`, `nl.js`…), traduce solo los valores, añádelo en `index.html` junto a
 los demás y súmalo a la lista del selector de idioma. El resto funciona solo.
 
 ## Licencia
