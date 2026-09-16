@@ -36,6 +36,8 @@ window.CLASSE_LOCALES.es = {
 
   type_desk1: 'Mesa individual',
   type_desk2: 'Mesa doble',
+  type_facing2: 'Cara a cara',
+  type_group3: 'Grupo de 3',
   type_group4: 'Grupo de 4',
   type_group6: 'Grupo de 6',
   type_teacher: 'Mesa del docente',

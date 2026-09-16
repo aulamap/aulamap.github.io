@@ -18,9 +18,25 @@
 
   /* ---------- Catálogo de elementos ---------- */
 
+  // Casi todas las mesas son una rejilla de cols × rows puestos iguales.
+  // «sides» dice en qué lado se sienta cada alumno cuando no es el de siempre
+  // («cara a cara»). Un grupo que no es un rectángulo, como el de tres, se
+  // describe mesa a mesa en «cells»: centro, tamaño y lado, en centímetros de
+  // la medida de serie, que se escalan si se cambia el tamaño del conjunto.
   const DESK_TYPES = {
     desk1: { w: 70, h: 50, cols: 1, rows: 1 },
     desk2: { w: 140, h: 50, cols: 2, rows: 1 },
+    // Dos mesas unidas por el lado largo, cada alumno a un lado, de cara.
+    facing2: { w: 100, h: 70, cols: 2, rows: 1, sides: ['left', 'right'] },
+    // Las dos de «cara a cara» más una tercera perpendicular y centrada.
+    group3: {
+      w: 100, h: 120,
+      cells: [
+        { x: -25, y: -25, w: 50, h: 70, side: 'left' },
+        { x: 25, y: -25, w: 50, h: 70, side: 'right' },
+        { x: 0, y: 35, w: 70, h: 50, side: 'bottom' }
+      ]
+    },
     group4: { w: 140, h: 100, cols: 2, rows: 2 },
     group6: { w: 210, h: 100, cols: 3, rows: 2 }
   };
@@ -80,9 +96,10 @@
     const base = DESK_TYPES[type] || FURNITURE_TYPES[type];
     const obj = { id: uid(), type, x, y, w: base.w, h: base.h, rot: 0 };
     if (isDesk(obj)) {
-      obj.cols = base.cols;
-      obj.rows = base.rows;
-      obj.seats = new Array(base.cols * base.rows).fill(null);
+      obj.cols = base.cols || 1;
+      obj.rows = base.rows || 1;
+      if (base.sides) obj.sides = [...base.sides];
+      obj.seats = new Array(base.cells ? base.cells.length : obj.cols * obj.rows).fill(null);
     } else {
       // labelKey recuerda que el texto es el de serie: así se traduce solo al
       // cambiar de idioma. En cuanto alguien lo edita, se queda como esté.
@@ -347,39 +364,74 @@
     return text;
   }
 
-  function drawDesk(g, obj, c, opts) {
-    const { w, h } = obj;
-    el('rect', { x: -w / 2, y: -h / 2, width: w, height: h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
-    const sw = w / obj.cols;
-    const sh = h / obj.rows;
-    const flip = uprightFix(obj.rot, opts.viewRot) === 180;
+  // Los puestos de una mesa: su recuadro y el lado por el que se sienta cada
+  // alumno. Vale igual para la rejilla de siempre y para los grupos descritos
+  // mesa a mesa.
+  function deskCells(obj) {
+    const def = DESK_TYPES[obj.type];
+    if (def && def.cells) {
+      const kx = obj.w / def.w, ky = obj.h / def.h;
+      return def.cells.map((cell, i) => ({
+        x: cell.x * kx - cell.w * kx / 2, y: cell.y * ky - cell.h * ky / 2,
+        w: cell.w * kx, h: cell.h * ky, side: cell.side, i, own: true
+      }));
+    }
+    const sw = obj.w / obj.cols, sh = obj.h / obj.rows;
+    const cells = [];
     for (let r = 0; r < obj.rows; r++) {
       for (let col = 0; col < obj.cols; col++) {
-        const i = r * obj.cols + col;
-        const sx = -w / 2 + col * sw;
-        const sy = -h / 2 + r * sh;
-        const studentId = obj.seats[i];
-        const student = studentId ? c.students.find(s => s.id === studentId) : null;
-        const seatG = el('g', { 'data-obj': obj.id, 'data-seat': i }, g);
-        el('rect', {
-          class: 'seat', x: sx + 1.5, y: sy + 1.5, width: sw - 3, height: sh - 3, rx: 2,
-          fill: student ? '#ffffff' : '#fbf8f2', stroke: 'none'
-        }, seatG);
-        if (opts.showPeople) drawPerson(seatG, obj, r, col, sx, sy, sw, sh, !!student);
-        if (col > 0) el('line', { x1: sx, y1: sy + 4, x2: sx, y2: sy + sh - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
-        if (r > 0 && col === 0) el('line', { x1: -w / 2 + 4, y1: sy, x2: w / 2 - 4, y2: sy, stroke: '#c9b894', 'stroke-width': 1 }, g);
-        if (student) {
-          const { lines, size } = fitName(formatName(student.name, opts.nameFormat), sw - 10, sh - 10);
-          addText(g, lines, sx + sw / 2, sy + sh / 2, size, { flip, weight: NAME_WEIGHT, lineHeight: NAME_LINE_GAP });
-        }
+        cells.push({
+          x: -obj.w / 2 + col * sw, y: -obj.h / 2 + r * sh, w: sw, h: sh,
+          side: seatSide(obj, r, col, cells.length), r, col, i: cells.length, own: false
+        });
+      }
+    }
+    return cells;
+  }
+
+  // Lados por los que hay alguien sentado: es lo que ocupa sitio alrededor.
+  function deskSides(obj) {
+    return new Set(deskCells(obj).map(cell => cell.side));
+  }
+
+  function drawDesk(g, obj, c, opts) {
+    const cells = deskCells(obj);
+    const propia = cells.length && cells[0].own;   // cada mesa con su contorno
+    const flip = uprightFix(obj.rot, opts.viewRot) === 180;
+    // La rejilla de siempre es un tablero único con sus divisiones; un grupo
+    // descrito mesa a mesa se dibuja con el contorno de cada mesa.
+    if (!propia) {
+      el('rect', { x: -obj.w / 2, y: -obj.h / 2, width: obj.w, height: obj.h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
+    }
+    for (const cell of cells) {
+      const studentId = obj.seats[cell.i];
+      const student = studentId ? c.students.find(s => s.id === studentId) : null;
+      const seatG = el('g', { 'data-obj': obj.id, 'data-seat': cell.i }, g);
+      if (propia) {
+        el('rect', { x: cell.x, y: cell.y, width: cell.w, height: cell.h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
+      }
+      el('rect', {
+        class: 'seat', x: cell.x + 1.5, y: cell.y + 1.5, width: cell.w - 3, height: cell.h - 3, rx: 2,
+        fill: student ? '#ffffff' : '#fbf8f2', stroke: 'none'
+      }, seatG);
+      if (opts.showPeople) drawFigureAt(seatG, cell, !!student);
+      if (!propia) {
+        if (cell.col > 0) el('line', { x1: cell.x, y1: cell.y + 4, x2: cell.x, y2: cell.y + cell.h - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
+        if (cell.r > 0 && cell.col === 0) el('line', { x1: -obj.w / 2 + 4, y1: cell.y, x2: obj.w / 2 - 4, y2: cell.y, stroke: '#c9b894', 'stroke-width': 1 }, g);
+      }
+      if (student) {
+        const { lines, size } = fitName(formatName(student.name, opts.nameFormat), cell.w - 10, cell.h - 10);
+        addText(g, lines, cell.x + cell.w / 2, cell.y + cell.h / 2, size, { flip, weight: NAME_WEIGHT, lineHeight: NAME_LINE_GAP });
       }
     }
   }
 
+
   // Lado de la mesa en el que se sienta cada puesto: una sola fila mira hacia
   // la pizarra (se sienta abajo); con varias filas, la primera arriba, la última
   // abajo y las intermedias a los lados.
-  function seatSide(obj, r, col) {
+  function seatSide(obj, r, col, seatIndex) {
+    if (obj.sides && obj.sides[seatIndex]) return obj.sides[seatIndex];
     if (obj.rows === 1 || r === obj.rows - 1) return 'bottom';
     if (r === 0) return 'top';
     if (col === 0) return 'left';
@@ -389,16 +441,17 @@
 
   // Figura esquemática vista desde arriba: silla, cuerpo, cabeza y brazos sobre
   // la mesa. Sin nombre asignado solo se dibuja la silla vacía.
-  function drawPerson(parent, obj, r, col, sx, sy, sw, sh, seated) {
-    const side = seatSide(obj, r, col);
+  // Coloca la figura en el borde del puesto por el que se sienta.
+  function drawFigureAt(parent, cell, seated) {
     const pos = {
-      bottom: [sx + sw / 2, sy + sh, 0, sw],
-      top: [sx + sw / 2, sy, 180, sw],
-      left: [sx, sy + sh / 2, 90, sh],
-      right: [sx + sw, sy + sh / 2, -90, sh]
-    }[side];
+      bottom: [cell.x + cell.w / 2, cell.y + cell.h, 0, cell.w],
+      top: [cell.x + cell.w / 2, cell.y, 180, cell.w],
+      left: [cell.x, cell.y + cell.h / 2, 90, cell.h],
+      right: [cell.x + cell.w, cell.y + cell.h / 2, -90, cell.h]
+    }[cell.side] || [cell.x + cell.w / 2, cell.y + cell.h, 0, cell.w];
     drawFigure(parent, ...pos, seated);
   }
+
 
   // (px, py) es el punto medio del borde de la mesa; la figura queda fuera,
   // mirando hacia la mesa. angle 0 = sentada abajo; 180 = arriba.
@@ -834,7 +887,7 @@
       numberInput(t('prop_depth'), Math.round(obj.h), update(v => { obj.h = clamp(+v, 3, 2000); }), { min: 3 }),
       numberInput(t('prop_rotation'), Math.round(normAngle(obj.rot)), update(v => { obj.rot = normAngle(+v || 0); }), { step: 5, full: true })
     );
-    if (isDesk(obj)) {
+    if (isDesk(obj) && !DESK_TYPES[obj.type].cells) {
       grid.append(
         numberInput(t('prop_cols'), obj.cols, update(v => resizeSeats(obj, clamp(Math.round(+v), 1, 8), obj.rows)), { min: 1, max: 8 }),
         numberInput(t('prop_rows'), obj.rows, update(v => resizeSeats(obj, obj.cols, clamp(Math.round(+v), 1, 8))), { min: 1, max: 8 })
@@ -863,11 +916,15 @@
     icon.setAttribute('viewBox', '0 0 26 20');
     const def = DESK_TYPES[type];
     if (def) {
-      const cw = 22 / Math.max(def.cols, 2) * (def.cols === 1 ? 1 : 1);
-      const ch = def.rows === 1 ? 10 : 7;
-      const totalW = cw * def.cols, totalH = ch * def.rows;
-      for (let r = 0; r < def.rows; r++) for (let c = 0; c < def.cols; c++) {
-        el('rect', { x: 13 - totalW / 2 + c * cw + .5, y: 10 - totalH / 2 + r * ch + .5, width: cw - 1, height: ch - 1, fill: '#fbf8f2', stroke: '#8a6d3b' }, icon);
+      // El icono se saca de la misma geometría que la mesa, encogida al hueco.
+      const muestra = { type, w: def.w, h: def.h, cols: def.cols || 1, rows: def.rows || 1, sides: def.sides };
+      const k = Math.min(22 / def.w, 16 / def.h);
+      for (const cell of deskCells(muestra)) {
+        el('rect', {
+          x: 13 + cell.x * k + .4, y: 10 + cell.y * k + .4,
+          width: cell.w * k - .8, height: cell.h * k - .8, rx: .8,
+          fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': .8
+        }, icon);
       }
     } else {
       const f = FURNITURE_TYPES[type];
@@ -1125,9 +1182,13 @@
       let l = -o.w / 2, r = o.w / 2, t = -o.h / 2, b = o.h / 2;
       if (isDesk(o) && people) {
         const chair = 40;
-        b += chair;
-        if (o.rows > 1) t -= chair;
-        if (o.rows > 2) { l -= chair; r += chair; }
+        // Las sillas ocupan sitio por los lados donde de verdad se sienta
+        // alguien, que en «cara a cara» o en el grupo de tres no son los de siempre.
+        const sides = deskSides(o);
+        if (sides.has('bottom')) b += chair;
+        if (sides.has('top')) t -= chair;
+        if (sides.has('left')) l -= chair;
+        if (sides.has('right')) r += chair;
       }
       if (o.type === 'teacher' && people) t -= 40;
       const rad = o.rot * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);

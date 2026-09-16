@@ -36,6 +36,8 @@ window.CLASSE_LOCALES.ca = {
 
   type_desk1: 'Taula individual',
   type_desk2: 'Taula doble',
+  type_facing2: 'Cara a cara',
+  type_group3: 'Grup de 3',
   type_group4: 'Grup de 4',
   type_group6: 'Grup de 6',
   type_teacher: 'Taula del docent',
