@@ -159,6 +159,7 @@ window.CLASSE_LOCALES.ca = {
 
   print_title: 'Imprimir',
   print_heading: 'Títol',
+  print_margin: 'Marges (mm)',
   print_paper: 'Paper',
   print_paper_landscape: 'Horitzontal (apaïsat)',
   print_paper_portrait: 'Vertical',

@@ -269,7 +269,7 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
 }
 
 /* Impresión: solo el plano */
-@page { size: A4 landscape; margin: 10mm; }
+@page { size: A4 landscape; margin: 6mm; }   /* lo cambia la app al imprimir */
 @media print {
   /* En papel el plano va siempre sobre blanco, sea cual sea el tema. */
   :root { --floor: #ffffff; --grid: #ffffff; --wall: #55504a; }
@@ -278,8 +278,8 @@ dialog::backdrop { background: rgba(10, 12, 14, .5); }
   #print-area { display: block; }
   #print-area h1 { font-size: 16pt; margin: 0 0 2mm; }
   #print-area .print-date { font-size: 10pt; color: #444; margin: 0 0 3mm; }
-  #print-area svg { width: 100%; height: auto; max-height: 165mm; display: block; }
-  /* En vertical cabe mucho más alto. */
-  .print-portrait #print-area svg { max-height: 240mm; }
+  /* El alto máximo lo pone la app al imprimir: depende del papel, de los
+     márgenes elegidos y de lo que ocupen el título, la fecha y la lista. */
+  #print-area svg { width: 100%; height: auto; display: block; }
   #print-area .unseated { font-size: 10pt; margin-top: 3mm; }
 }

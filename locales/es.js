@@ -159,6 +159,7 @@ window.CLASSE_LOCALES.es = {
 
   print_title: 'Imprimir',
   print_heading: 'Título',
+  print_margin: 'Márgenes (mm)',
   print_paper: 'Papel',
   print_paper_landscape: 'Horizontal (apaisado)',
   print_paper_portrait: 'Vertical',

@@ -2310,27 +2310,36 @@
     document.getElementById('print-name-format').value = c.nameFormat;
     document.getElementById('print-people').checked = c.showPeople !== false;
     document.getElementById('print-paper').value = lastPaper;
+    document.getElementById('print-margin').value = lastMargin;
     document.getElementById('dlg-print').showModal();
   });
 
   // La orientación del papel no se puede cambiar desde una clase CSS: hay que
   // reescribir la regla @page antes de imprimir.
   let lastPaper = 'landscape';
-  function setPaper(paper) {
+  let lastMargin = 6;
+  function setPaper(paper, margin) {
     lastPaper = paper === 'portrait' ? 'portrait' : 'landscape';
-    document.documentElement.classList.toggle('print-portrait', lastPaper === 'portrait');
+    lastMargin = clamp(Math.round(+margin), 0, 30);
     let style = document.getElementById('page-size');
     if (!style) {
       style = document.createElement('style');
       style.id = 'page-size';
       document.head.appendChild(style);
     }
-    style.textContent = `@page { size: A4 ${lastPaper}; margin: 10mm; }`;
+    style.textContent = `@page { size: A4 ${lastPaper}; margin: ${lastMargin}mm; }`;
+  }
+
+  // Alto que le queda al plano en la hoja, descontando márgenes y lo que
+  // ocupan el título, la fecha y la lista de quien se queda sin sitio.
+  function printHeight(hasDate, hasUnseated) {
+    const page = lastPaper === 'portrait' ? 297 : 210;
+    return Math.max(60, page - 2 * lastMargin - 10 - (hasDate ? 7 : 0) - (hasUnseated ? 8 : 0));
   }
 
   document.getElementById('dlg-print').addEventListener('close', (e) => {
     if (e.target.returnValue !== 'ok') return;
-    setPaper(document.getElementById('print-paper').value);
+    setPaper(document.getElementById('print-paper').value, document.getElementById('print-margin').value);
     const c = cls();
     const area = document.getElementById('print-area');
     area.innerHTML = '';
@@ -2345,10 +2354,20 @@
     }
     const printSvg = document.createElementNS(SVG_NS, 'svg');
     area.appendChild(printSvg);
+    // En papel el plano se ciñe al contorno del aula, no al aire que se deja en
+    // pantalla. Si algo sobresale de las paredes (una silla pegada a la pared,
+    // el barrido de la puerta), el encuadre crece solo lo justo para que no se
+    // corte: el espacio vacío no cuenta.
+    const pad = 5;
+    const showPeople = document.getElementById('print-people').checked;
+    const b = boundsOf(c.objects, { showPeople }, 0);
+    const x0 = Math.min(0, b.x0) - pad, y0 = Math.min(0, b.y0) - pad;
+    const x1 = Math.max(c.room.w, b.x1) + pad, y1 = Math.max(c.room.h, b.y1) + pad;
     drawRoom(printSvg, c, {
       viewRot: +document.getElementById('print-orientation').value,
       nameFormat: document.getElementById('print-name-format').value,
-      showPeople: document.getElementById('print-people').checked,
+      showPeople,
+      viewBox: [x0, y0, x1 - x0, y1 - y0],
       print: true
     });
     if (document.getElementById('print-unseated').checked) {
@@ -2362,6 +2381,10 @@
         area.appendChild(p);
       }
     }
+    printSvg.style.maxHeight = printHeight(
+      document.getElementById('print-date').checked,
+      !!area.querySelector('.unseated')
+    ) + 'mm';
     setTimeout(() => window.print(), 50);
   });
 
