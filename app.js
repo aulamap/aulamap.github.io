@@ -851,6 +851,7 @@
     const seatedIds = new Set();
     c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(id => id && seatedIds.add(id)); });
     const seatedStudents = c.students.filter(s => seatedIds.has(s.id));
+    document.getElementById('btn-room-clear').hidden = !c.objects.some(isDesk);
     document.getElementById('show-people').closest('label').hidden = !seatedStudents.length;
     document.getElementById('show-teams').closest('label').hidden = !seatedStudents.some(s => s.team);
     document.getElementById('show-types').closest('label').hidden = !seatedStudents.some(s => s.type);
