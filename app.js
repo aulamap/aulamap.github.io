@@ -2378,6 +2378,12 @@
 
   /* ---------- Alumnado ---------- */
 
+  // Con texto pegado, el botón de añadir se pone en verde para que se vea
+  // que falta pulsarlo.
+  document.getElementById('students-paste').addEventListener('input', (e) => {
+    document.getElementById('btn-students-add').classList.toggle('primary', !!e.target.value.trim());
+  });
+
   document.getElementById('btn-students-add').addEventListener('click', () => {
     const area = document.getElementById('students-paste');
     const names = area.value.split(/\r?\n/)
@@ -2387,6 +2393,7 @@
     checkpoint();
     cls().students.push(...names.map(name => ({ id: uid(), name })));
     area.value = '';
+    document.getElementById('btn-students-add').classList.remove('primary');
     commit();
   });
 
