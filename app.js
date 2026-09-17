@@ -2370,13 +2370,14 @@
     commit();
     fitZoom();
   }
-  // Vaciar el aula: fuera mesas y mobiliario; la lista de alumnado se queda,
+  // Vaciar el aula: fuera las mesas del alumnado; el mobiliario (pizarra,
+  // mesa del docente, puerta…) se queda. La lista de alumnado se mantiene,
   // aunque nadie tiene sitio, y los equipos siguen formados.
   document.getElementById('btn-room-clear').addEventListener('click', () => {
     const c = cls();
-    if (!c.objects.length || !confirm(t('confirm_room_clear'))) return;
+    if (!c.objects.some(isDesk) || !confirm(t('confirm_room_clear'))) return;
     checkpoint();
-    c.objects = [];
+    c.objects = c.objects.filter(o => !isDesk(o));
     selection.clear();
     commit();
   });
