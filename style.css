@@ -121,6 +121,13 @@ textarea { width: 100%; resize: vertical; }
 .sidebar, .props { background: var(--panel); overflow-y: auto; padding: 12px; }
 .sidebar { border-right: 1px solid var(--line); }
 .props { border-left: 1px solid var(--line); }
+.with-help { display: flex; align-items: center; gap: 6px; }
+.help {
+  font: inherit; font-size: 11px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--field); color: var(--muted); cursor: pointer; padding: 0; line-height: 1;
+}
+.help:hover, .help[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+#desks-help { margin: 0 0 8px; }
 .sidebar h2, .props h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 6px; }
 .props h2 { margin-top: 4px; }
 
