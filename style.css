@@ -87,6 +87,8 @@ body { margin: 0; background: var(--bg); font-size: 14px; }
   padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line);
 }
 .topbar h1 { font-size: 18px; margin: 0; color: var(--accent); }
+/* Enlace a la presentación: visible desde el primer momento, junto al título. */
+.btn.about { text-decoration: none; background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
 .class-picker, .topbar-actions, .topbar-settings { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .topbar-actions { margin-left: auto; }
 .topbar-settings { gap: 4px; }

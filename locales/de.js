@@ -3,6 +3,8 @@
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.de = {
   app_title: 'Sitzplan',
+  about_link: 'Über AulaMap',
+  about_title: 'Wozu das Programm dient und was es ermöglicht',
   class_label: 'Klasse',
   class_new: 'Neue Klasse',
   class_rename: 'Umbenennen',

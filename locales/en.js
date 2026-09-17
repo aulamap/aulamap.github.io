@@ -3,6 +3,8 @@
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.en = {
   app_title: 'Classroom plan',
+  about_link: 'About AulaMap',
+  about_title: 'What the program is for and what it can do',
   class_label: 'Class',
   class_new: 'New class',
   class_rename: 'Rename',

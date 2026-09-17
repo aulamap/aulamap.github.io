@@ -3,6 +3,8 @@
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.ca = {
   app_title: 'Plànol de classe',
+  about_link: 'Què és AulaMap',
+  about_title: 'Per a què serveix el programa i què permet fer',
   class_label: 'Classe',
   class_new: 'Nova classe',
   class_rename: 'Canviar el nom',

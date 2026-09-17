@@ -3,6 +3,8 @@
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.eu = {
   app_title: 'Ikasgelaren planoa',
+  about_link: 'Zer da AulaMap',
+  about_title: 'Programa zertarako den eta zer egiteko aukera ematen duen',
   class_label: 'Taldea',
   class_new: 'Talde berria',
   class_rename: 'Izena aldatu',

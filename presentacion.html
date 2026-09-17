@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qué es AulaMap</title>
+  <meta name="description" content="AulaMap sirve para decidir dónde se sienta cada alumno, con el plano real del aula y equipos cooperativos opcionales.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="alternate icon" href="favicon.ico" sizes="16x16 32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <script>
+    // Misma apariencia que la aplicación: el tema elegido allí se aplica aquí.
+    (function () {
+      try {
+        var saved = localStorage.getItem('classe-theme');
+        if (saved === 'dark' || saved === 'light') document.documentElement.setAttribute('data-theme', saved);
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #f4f2ee; --panel: #ffffff; --ink: #23262b; --muted: #6b7078; --line: #d9d5cc;
+      --accent: #2f6f5e; --accent-soft: #e3efe9; --on-accent: #ffffff;
+      color-scheme: light;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #14171a; --panel: #1b1f23; --ink: #e6e3dd; --muted: #9aa1a9; --line: #333a41;
+        --accent: #6fbfa3; --accent-soft: #1f3630; --on-accent: #10211c;
+        color-scheme: dark;
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #14171a; --panel: #1b1f23; --ink: #e6e3dd; --muted: #9aa1a9; --line: #333a41;
+      --accent: #6fbfa3; --accent-soft: #1f3630; --on-accent: #10211c;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--ink);
+      font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    .top {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line);
+    }
+    .top .brand { font-weight: 700; font-size: 18px; color: var(--accent); text-decoration: none; }
+    .back {
+      display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 8px;
+      background: var(--accent); color: var(--on-accent); text-decoration: none; font-size: 15px; font-weight: 600;
+    }
+    .back:hover { filter: brightness(1.08); }
+    .back svg { width: 16px; height: 16px; }
+
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 56px; }
+    h1 { font-size: 34px; line-height: 1.2; margin: 0 0 16px; }
+    h2 { font-size: 23px; margin: 40px 0 10px; color: var(--accent); }
+    p { margin: 0 0 14px; }
+    ul { margin: 0 0 14px; padding-left: 22px; }
+    li { margin: 4px 0; }
+    a { color: var(--accent); }
+    .lead { font-size: 19px; }
+
+    figure { margin: 28px 0 8px; }
+    figure img {
+      display: block; width: 100%; height: auto; border-radius: 10px;
+      border: 1px solid var(--line); background: #f3f0ea;
+    }
+    figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+    .types { list-style: none; padding: 0; }
+    .types li { display: flex; gap: 10px; align-items: baseline; }
+    .tag {
+      flex: none; display: inline-grid; place-items: center; width: 22px; height: 22px;
+      border: 1px solid var(--muted); border-radius: 4px; font-size: 13px; font-weight: 700;
+      background: var(--panel);
+    }
+    .start { margin-top: 40px; text-align: center; }
+    .start .back { font-size: 17px; padding: 11px 20px; }
+
+    footer { text-align: center; font-size: 13px; color: var(--muted); padding: 0 16px 28px; }
+    footer a { color: inherit; }
+
+    @media (max-width: 600px) {
+      body { font-size: 16px; }
+      h1 { font-size: 27px; }
+      h2 { font-size: 20px; }
+      .lead { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="./">AulaMap</a>
+    <a class="back" href="./">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+      Ir al plano
+    </a>
+  </header>
+
+  <main>
+    <h1>Qué es AulaMap</h1>
+
+    <p class="lead">AulaMap sirve para decidir <strong>dónde se sienta cada alumno</strong> y tenerlo a mano en un plano del aula. Está pensado para tutorías y para cualquier docente que quiera organizar el espacio con criterio pedagógico: agrupar para trabajar en equipo, separar a quien no conviene que esté junto o preparar una distribución para un examen.</p>
+
+    <p>El plano se dibuja con las <strong>medidas reales</strong> del aula, así que lo que se ve en pantalla es lo que cabe de verdad. Se puede imprimir para tenerlo en la mesa, compartir con el equipo docente y guardar varias clases.</p>
+
+    <figure>
+      <img src="img/ejemplo-aula.webp" width="1200" height="1232"
+        alt="Plano de un aula con pizarra, pantalla, mesa del docente, tablón, dos ventanas, armario, estantería y puerta. En el centro, seis mesas de grupo de cuatro puestos, cada una de un color y con un número de equipo. Junto a cada nombre aparece una letra A, B o C. Las mesas de los lados están giradas hacia la pizarra.">
+      <figcaption>Ejemplo: un aula de 8 × 8,2 m con 24 alumnos en seis equipos heterogéneos, colocados por el propio programa. Cada color es un equipo y la letra de cada puesto indica la tipología. Las mesas de los lados se orientan hacia la pizarra y quedan pasillos para circular.</figcaption>
+    </figure>
+
+    <h2>Aula</h2>
+    <p>Aquí se reproduce el aula tal como es: medidas, pantalla o pizarra, mesa del docente, puerta, ventanas, armarios y el resto del mobiliario.</p>
+    <p>Las mesas del alumnado son <strong>opcionales</strong>. Si ya hay una disposición fija, se dibuja y se respeta. Si no, el programa puede proponer una a partir de los equipos.</p>
+
+    <h2>Alumnado</h2>
+    <p>Basta con <strong>pegar la lista de la clase</strong>, por ejemplo desde la hoja de cálculo o la plataforma del centro. A partir de ahí cada alumno se puede arrastrar a su sitio y cambiar de lugar cuando haga falta.</p>
+    <p>Esta pestaña es suficiente para quien solo necesita un plano de clase con los nombres.</p>
+
+    <h2>Equipos (opcional)</h2>
+    <p>Para el trabajo cooperativo, el programa puede <strong>formar equipos</strong> siguiendo la propuesta de <a href="https://cife-ei-caac.com/wp-content/uploads/2015/06/EL_APRENDIZAJE_COOPERATIVO.pdf">Pujolàs y Lago (2011)</a>, con el mismo sistema que <a href="https://jjdeharo.github.io/geco/">GeCo</a>. Cada alumno se asigna a una de tres tipologías:</p>
+    <ul class="types">
+      <li><span class="tag">A</span> <span>Trabaja con autonomía.</span></li>
+      <li><span class="tag">B</span> <span>Necesita ayuda de vez en cuando.</span></li>
+      <li><span class="tag">C</span> <span>Necesita apoyo para avanzar.</span></li>
+    </ul>
+    <p>Con esa información se forman tres tipos de equipo:</p>
+    <ul>
+      <li><strong>Heterogéneos</strong>, que combinan las tres tipologías. Son los equipos base del trabajo cooperativo.</li>
+      <li><strong>Homogéneos</strong>, que reúnen alumnado de la misma tipología para tareas diferenciadas.</li>
+      <li><strong>Temporales</strong>, formados al azar para dinámicas puntuales.</li>
+    </ul>
+    <p>También se puede indicar qué alumnos no deben coincidir en un mismo equipo.</p>
+    <p>El programa no se limita a hacer los grupos: también <strong>coloca las mesas automáticamente</strong>, una por equipo, orientadas hacia la pantalla y con espacio para circular entre ellas.</p>
+    <p><strong>Todo es opcional</strong> y admite distintos grados de intervención del docente:</p>
+    <ul>
+      <li>Asignar a cada alumno su equipo a mano, sin generación automática.</li>
+      <li>Sentar los equipos en una disposición de mesas ya existente, que se respeta tal como está.</li>
+      <li>Dejar que el programa monte el aula y retocar después lo que haga falta.</li>
+    </ul>
+    <p>En el plano, cada equipo se distingue por su color y su número, y la tipología de cada alumno puede mostrarse u ocultarse.</p>
+
+    <h2>Privacidad</h2>
+    <p>Los datos <strong>no salen del navegador</strong>: no hay cuentas, ni servidor, ni seguimiento. Al compartir un plano se puede enviar <strong>sin los nombres del alumnado</strong>, y la tipología solo aparece al imprimir si está visible en pantalla.</p>
+
+    <p class="start">
+      <a class="back" href="./">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+        Ir al plano
+      </a>
+    </p>
+  </main>
+
+  <footer>
+    © 2026 <a href="https://bilateria.org">Juan José de Haro</a> ·
+    Código bajo licencia <a href="https://www.gnu.org/licenses/agpl-3.0.html">AGPL v3</a> ·
+    contenidos bajo <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es">CC BY-SA 4.0</a>
+  </footer>
+</body>
+</html>

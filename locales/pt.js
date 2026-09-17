@@ -3,6 +3,8 @@
 window.CLASSE_LOCALES = window.CLASSE_LOCALES || {};
 window.CLASSE_LOCALES.pt = {
   app_title: 'Planta da sala',
+  about_link: 'O que é o AulaMap',
+  about_title: 'Para que serve o programa e o que permite fazer',
   class_label: 'Turma',
   class_new: 'Nova turma',
   class_rename: 'Mudar o nome',
