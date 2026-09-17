@@ -210,7 +210,7 @@ window.CLASSE_LOCALES.gl = {
   print_show_teams: 'Engadir a lista de equipos',
   teams_room: 'Montar a aula para os equipos',
   teams_room_title: 'Cambia as mesas por unha por equipo, de cara ao encerado',
-  teams_room_overflow: 'Os equipos non caben con folgura nunha aula destas medidas: colocáronse dentro, pero con menos espazo do recomendado para pasar entre as mesas. Convén ampliar a aula ou cambiar o tamaño dos equipos.',
+  teams_room_overflow: 'Os equipos non caben con folgura nunha aula destas medidas: colocáronse dentro, pero con menos espazo do recomendado entre as mesas ou ata as paredes. Convén ampliar a aula ou cambiar o tamaño dos equipos.',
   confirm_teams_room: 'Cambiar as mesas da aula por unha por equipo? O resto do mobiliario queda onde está. Pódese desfacer.',
   name_format: 'Nome que se mostra',
   name_full: 'Nome e apelidos',

@@ -2694,9 +2694,9 @@
     // 40 cm de la propia silla), que es lo que hace falta para levantarse y
     // pasar por detrás; si ni así caben, se sigue apretando para que queden
     // dentro del aula, pero se avisa. El aula no cambia de tamaño nunca.
-    const fits = [[70, 120, 120, 110], [60, 100, 100, 90], [50, 90, 80, 75], [50, 80, 70, 60]];
+    const fits = [[70, 120, 120, 110], [60, 100, 100, 90], [50, 80, 70, 75], [50, 60, 50, 60]];
     const RECOMMENDED = fits.length;
-    fits.push([40, 60, 50, 40], [30, 45, 40, 25], [15, 30, 25, 10], [5, 15, 15, 0]);
+    fits.push([40, 50, 40, 40], [30, 40, 30, 25], [15, 30, 20, 10], [5, 15, 10, 0]);
     let margin, top, left, right, bottom;
     // La inclinación en abanico (hasta 15°) saca las esquinas de los equipos
     // de los extremos hacia las paredes: se reserva ese sitio en los márgenes
@@ -2746,10 +2746,6 @@
     // Reparte los conjuntos en filas con el hueco dado; «spreadX» y «spreadY»
     // son hueco extra para aprovechar el sitio que sobre sin cambiar de filas.
     const layout = (gapX, gapY, spreadX = 0, spreadY = 0) => {
-      // Dos vecinos de una misma fila no se inclinan igual: el del borde va
-      // más torcido que el del centro y su esquina se acerca al otro. Se
-      // reserva la mitad del vuelo de la inclinación en el hueco horizontal.
-      gapX += tiltX / 2;
       const rows = [[]];
       let x = 0;
       for (const k of clusters) {
@@ -2793,7 +2789,7 @@
       const rec = fits[RECOMMENDED - 1];
       const rows = layout.rows, nRows = rows.length;
       const cols = Math.max(...rows.map(r => r.length));
-      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * (fit[3] + tiltX / 2)));
+      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * fit[3]));
       const stackH = rows.reduce((n, r) => n + Math.max(...r.map(k => k.h)), 0) + (nRows - 1) * fit[3];
       let spareX = availW - rowW, spareY = bottom - top - stackH;
       // 1. Pasillos hasta lo recomendado.
@@ -2812,14 +2808,19 @@
       if (nRows > 1) spreadY += Math.max(0, Math.min(fits[0][3] - fit[3] - spreadY, spareY / (nRows - 1)));
       layout(fit[3], fit[3], spreadX, spreadY);
       const gapX = cols > 1 ? fit[3] + spreadX : Infinity, gapY = nRows > 1 ? fit[3] + spreadY : Infinity;
-      return fit[0] + sideUp < rec[0] || fit[1] + topUp < rec[1] || fit[2] + bottomUp < rec[2] || gapX < rec[3] || gapY < rec[3];
+      // Se avisa si algo queda claramente por debajo de lo recomendado: unos
+      // centímetros de menos no son motivo.
+      const tol = 10;
+      return fit[0] + sideUp < rec[0] - tol || fit[1] + topUp < rec[1] - tol || fit[2] + bottomUp < rec[2] - tol || gapX < rec[3] - tol || gapY < rec[3] - tol;
     };
-    let overflow = attempt();
-    // Si con el abanico no caben con holgura, se prueba con las mesas rectas:
-    // la inclinación cuesta sitio y en un aula justa no se usa.
-    if (overflow) {
-      setTilt(0);
+    // El abanico va siempre: los equipos de los bordes miran al centro de la
+    // pizarra. Su vuelo se reserva en los márgenes con las paredes y cuesta
+    // sitio, así que en un aula justa se abre menos (10° o 5°), nunca nada.
+    let overflow = true;
+    for (const deg of [TILT_MAX, 10, 5]) {
+      setTilt(deg);
       overflow = attempt();
+      if (!overflow) break;
     }
     // Cada conjunto se inclina un poco hacia el centro de la pizarra, en
     // abanico, para que todo el equipo la vea bien: hasta 15° en los extremos.

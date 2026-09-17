@@ -210,7 +210,7 @@ window.CLASSE_LOCALES.fr = {
   print_show_teams: 'Ajouter la liste des équipes',
   teams_room: 'Aménager la salle pour les équipes',
   teams_room_title: 'Remplace les tables par une par équipe, face au tableau',
-  teams_room_overflow: 'Les équipes ne tiennent pas à l’aise dans une salle de ces dimensions : elles ont été placées à l’intérieur, mais avec moins d’espace que recommandé pour circuler entre les tables. Il vaut mieux agrandir la salle ou changer la taille des équipes.',
+  teams_room_overflow: 'Les équipes ne tiennent pas à l’aise dans une salle de ces dimensions : elles ont été placées à l’intérieur, mais avec moins d’espace que recommandé entre les tables ou jusqu’aux murs. Il vaut mieux agrandir la salle ou changer la taille des équipes.',
   confirm_teams_room: 'Remplacer les tables de la salle par une par équipe ? Le reste du mobilier reste en place. L’opération peut être annulée.',
   name_format: 'Nom affiché',
   name_full: 'Prénom et nom',
