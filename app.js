@@ -3223,7 +3223,7 @@
     const x0 = Math.min(0, b.x0) - pad, y0 = Math.min(0, b.y0) - pad;
     const x1 = Math.max(c.room.w, b.x1) + pad, y1 = Math.max(c.room.h, b.y1) + pad;
     drawRoom(printSvg, c, {
-      viewRot: +document.getElementById('print-orientation').value,
+      viewRot: 0,   // el plano se imprime tal como se ve en pantalla
       nameFormat: c.nameFormat,
       showPeople,
       showTeams: c.showTeams !== false,
