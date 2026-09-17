@@ -62,8 +62,12 @@
 
   function apply(root = document) {
     document.documentElement.lang = lang;
-    if (root === document) document.title = t('app_title');
+    // La página puede indicar qué clave usa de título (la presentación, por ejemplo).
+    if (root === document) document.title = t(document.documentElement.dataset.i18nDocTitle || 'app_title');
     root.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    // Textos con formato propio (negritas, enlaces): son de la aplicación, no del usuario.
+    root.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+    root.querySelectorAll('[data-i18n-alt]').forEach(el => { el.alt = t(el.dataset.i18nAlt); });
     root.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
     root.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
     root.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
