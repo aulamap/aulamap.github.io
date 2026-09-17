@@ -2683,12 +2683,19 @@
     c.objects = c.objects.filter(o => !isDesk(o));
     // Zona libre: por debajo de lo que hay pegado a la pared de la pizarra
     // (pizarra, mesa del docente) y con aire hasta las demás paredes.
-    const margin = 60;
-    let top = 100;
+    let furnitureBottom = 0;
     for (const o of c.objects) {
-      if (o.y < c.room.h / 2) top = Math.max(top, boundsOf([o], c).y1 + 90);
+      if (o.y < c.room.h / 2) furnitureBottom = Math.max(furnitureBottom, boundsOf([o], c).y1);
     }
-    const left = margin, right = c.room.w - margin, bottom = c.room.h - 100;
+    // Márgenes: los holgados primero; si los equipos no caben, se van
+    // apretando. El aula no cambia de tamaño en ningún caso.
+    const fits = [[60, 90, 100, 60], [40, 60, 70, 40], [30, 40, 50, 20], [20, 30, 40, 0]];
+    let margin, top, left, right, bottom;
+    const setMargins = ([m, gapTop, gapBottom]) => {
+      margin = m; top = Math.max(m, furnitureBottom + gapTop);
+      left = m; right = c.room.w - m; bottom = c.room.h - gapBottom;
+    };
+    setMargins(fits[0]);
     // Cada equipo es un conjunto de mesas pegadas en fila.
     const clusters = teams.map(team => {
       const desks = teamDeskTypes(team.members.length).map(type => makeObject(type, 0, 0));
@@ -2718,7 +2725,7 @@
     // centra en el aula. Si no caben con el hueco normal se aprietan y, si
     // ni así, se alarga el aula lo justo y se baja lo que hay pegado a la
     // pared del fondo (la puerta, por ejemplo).
-    const availW = right - left;
+    let availW = right - left;
     const layout = (gapX, gapY) => {
       const rows = [[]];
       let x = 0;
@@ -2742,15 +2749,14 @@
       }
       return y - gapY;   // hasta dónde llega la última fila
     };
-    let end = layout(60, 60);
-    if (end > bottom) end = layout(30, 30);
-    if (end > bottom) {
-      const extra = Math.ceil((end - bottom) / 10) * 10;
-      const oldH = c.room.h;
-      c.room.h = Math.min(4000, oldH + extra);
-      const delta = c.room.h - oldH;
-      c.objects.forEach(o => { if (o.y > oldH - 60) o.y += delta; });
+    let end = 0;
+    for (const fit of fits) {
+      setMargins(fit);
+      availW = right - left;
+      end = layout(fit[3], fit[3]);
+      if (end <= bottom) break;
     }
+    const overflow = end > bottom;
     // Cada conjunto se inclina un poco hacia el centro de la pizarra, en
     // abanico, para que todo el equipo la vea bien: hasta 15° en los extremos.
     clusters.forEach(k => {
@@ -2770,6 +2776,7 @@
     selection.clear();
     commit();
     fitZoom();
+    if (overflow) alert(t('teams_room_overflow'));
     reportSeating(result);
   }
 
@@ -2938,9 +2945,6 @@
       document.getElementById('panel-room').hidden = mode !== 'room';
       document.getElementById('panel-students').hidden = mode !== 'students';
       document.getElementById('panel-teams').hidden = mode !== 'teams';
-      // El tamaño del aula y la colocación del plano solo se tocan en «Aula»;
-      // las opciones de vista se ven siempre.
-      document.getElementById('room-size').hidden = mode !== 'room';
       if (mode !== 'room') selection.clear();
       render();
     });

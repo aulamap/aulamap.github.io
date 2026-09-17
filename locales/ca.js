@@ -210,6 +210,7 @@ window.CLASSE_LOCALES.ca = {
   print_show_teams: 'Afegir la llista d\'equips',
   teams_room: 'Muntar l\'aula per als equips',
   teams_room_title: 'Canvia les taules per una per equip, de cara a la pissarra',
+  teams_room_overflow: 'Els equips no caben a l\'aula amb aquestes mides: s\'han col·locat igualment, però convé ampliar l\'aula o moure alguna taula.',
   confirm_teams_room: 'Canviar les taules de l\'aula per una per equip? La resta del mobiliari es queda on és. Es pot desfer.',
   name_format: 'Nom que es mostra',
   name_full: 'Nom i cognoms',

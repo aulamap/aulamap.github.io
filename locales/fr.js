@@ -210,6 +210,7 @@ window.CLASSE_LOCALES.fr = {
   print_show_teams: 'Ajouter la liste des équipes',
   teams_room: 'Aménager la salle pour les équipes',
   teams_room_title: 'Remplace les tables par une par équipe, face au tableau',
+  teams_room_overflow: 'Les équipes ne tiennent pas dans la salle avec ces dimensions : elles ont été placées quand même, mais il vaut mieux agrandir la salle ou déplacer une table.',
   confirm_teams_room: 'Remplacer les tables de la salle par une par équipe ? Le reste du mobilier reste en place. L’opération peut être annulée.',
   name_format: 'Nom affiché',
   name_full: 'Prénom et nom',

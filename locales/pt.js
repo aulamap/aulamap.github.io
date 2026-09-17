@@ -210,6 +210,7 @@ window.CLASSE_LOCALES.pt = {
   print_show_teams: 'Adicionar a lista de equipas',
   teams_room: 'Montar a sala para as equipas',
   teams_room_title: 'Substitui as mesas por uma por equipa, viradas para o quadro',
+  teams_room_overflow: 'As equipas não cabem na sala com estas medidas: foram colocadas mesmo assim, mas convém ampliar a sala ou mover alguma mesa.',
   confirm_teams_room: 'Substituir as mesas da sala por uma por equipa? O resto do mobiliário fica onde está. Pode desfazer-se.',
   name_format: 'Nome apresentado',
   name_full: 'Nome e apelidos',

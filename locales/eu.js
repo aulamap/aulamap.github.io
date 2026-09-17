@@ -210,6 +210,7 @@ window.CLASSE_LOCALES.eu = {
   print_show_teams: 'Taldeen zerrenda gehitu',
   teams_room: 'Gela taldeetarako antolatu',
   teams_room_title: 'Mahaiak talde bakoitzeko batekin ordezkatzen ditu, arbelari begira',
+  teams_room_overflow: 'Taldeak ez dira gelan kabitzen neurri hauekin: hala ere jarri dira, baina komeni da gela handitzea edo mahairen bat mugitzea.',
   confirm_teams_room: 'Gelako mahaiak talde bakoitzeko batekin ordezkatu? Gainerako altzariak dauden lekuan geratzen dira. Desegin daiteke.',
   name_format: 'Erakusten den izena',
   name_full: 'Izena eta abizenak',
