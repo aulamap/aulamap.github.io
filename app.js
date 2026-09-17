@@ -187,10 +187,10 @@
 
   function newClass(name) {
     const room = { w: 800, h: 700 };
-    const board = makeObject('board', room.w / 2, 7);
+    const screen = makeObject('screen', room.w / 2, 5);
     const teacher = makeObject('teacher', 150, 120);
     const door = makeObject('door', room.w - 80, room.h - 5);
-    return { id: uid(), name, room, objects: [board, teacher, door], students: [], nameFormat: 'first1' };
+    return { id: uid(), name, room, objects: [screen, teacher, door], students: [], nameFormat: 'first1' };
   }
 
   // Durante unas horas el grupo de 3 tuvo otra forma (mesa doble con la
