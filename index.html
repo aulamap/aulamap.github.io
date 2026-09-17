@@ -70,7 +70,7 @@
 
         <section id="panel-room" class="panel">
           <h2 class="with-help"><span data-i18n="add_desks">Mesas (opcional)</span>
-            <button type="button" id="btn-desks-help" class="help" data-i18n-title="desks_help_title" data-i18n-aria="desks_help_title">?</button></h2>
+            <button type="button" id="btn-desks-help" class="help" data-i18n-aria="desks_help_title">?</button></h2>
           <div class="palette" id="palette-desks"></div>
           <button id="btn-block" class="btn wide" data-i18n="desk_block" data-i18n-title="desk_block_title">Bloque de mesas…</button>
 
@@ -198,16 +198,6 @@
     </form>
   </dialog>
 
-  <dialog id="dlg-desks-help" class="dlg-help">
-    <form method="dialog" class="dialog-form">
-      <h2 data-i18n="add_desks">Mesas (opcional)</h2>
-      <p class="help-text" data-i18n="desks_help"></p>
-      <div class="dialog-actions">
-        <button value="ok" class="btn primary" data-i18n="close">Cerrar</button>
-      </div>
-    </form>
-  </dialog>
-
   <dialog id="dlg-shapes">
     <form method="dialog" class="dialog-form">
       <h2 data-i18n="shapes_title">Formas por defecto</h2>
@@ -310,6 +300,7 @@
   </dialog>
 
   <div id="print-area"></div>
+  <div id="desks-tip" class="tip" role="tooltip" data-i18n="desks_help" hidden></div>
   <div id="drag-ghost" hidden></div>
   <div id="context-menu" class="context-menu" role="menu" hidden></div>
 

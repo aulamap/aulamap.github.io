@@ -127,7 +127,12 @@ textarea { width: 100%; resize: vertical; }
   background: var(--field); color: var(--muted); cursor: pointer; padding: 0; line-height: 1;
 }
 .help:hover, .help[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-.help-text { font-size: 15px; line-height: 1.5; margin: 0; }
+.tip {
+  position: fixed; z-index: 1000; max-width: 320px; padding: 10px 12px; border-radius: 8px;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 4px 14px var(--shadow);
+  font-size: 14px; line-height: 1.45;
+}
+.tip[hidden] { display: none; }
 .sidebar h2, .props h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 6px; }
 .props h2 { margin-top: 4px; }
 

@@ -2369,10 +2369,28 @@
   document.getElementById('room-w').addEventListener('change', onRoomSize);
   document.getElementById('room-h').addEventListener('change', onRoomSize);
 
-  // El «?» de «Mesas (opcional)» abre la explicación en una ventana.
-  document.getElementById('btn-desks-help').addEventListener('click', () => {
-    document.getElementById('dlg-desks-help').showModal();
-  });
+  // El «?» de «Mesas (opcional)»: la explicación sale al pasar el ratón o al
+  // pulsarlo (en pantallas táctiles no hay ratón que pasar).
+  {
+    const btn = document.getElementById('btn-desks-help');
+    const tip = document.getElementById('desks-tip');
+    let pinned = false;
+    const show = () => {
+      tip.hidden = false;
+      // Debajo del botón, nunca encima: si lo tapara, en una pantalla táctil
+      // el toque acabaría en el propio rótulo.
+      const r = btn.getBoundingClientRect();
+      tip.style.left = Math.max(8, Math.min(r.left, window.innerWidth - tip.offsetWidth - 8)) + 'px';
+      tip.style.top = Math.min(r.bottom + 8, window.innerHeight - tip.offsetHeight - 8) + 'px';
+    };
+    const hide = () => { if (!pinned) tip.hidden = true; };
+    btn.addEventListener('mouseenter', show);
+    btn.addEventListener('mouseleave', hide);
+    btn.addEventListener('focus', show);
+    btn.addEventListener('blur', () => { pinned = false; tip.hidden = true; });
+    btn.addEventListener('click', () => { pinned = !pinned; if (pinned) show(); else tip.hidden = true; });
+    document.addEventListener('pointerdown', (e) => { if (!btn.contains(e.target) && !tip.contains(e.target)) { pinned = false; tip.hidden = true; } });
+  }
 
   /* ---------- Alumnado ---------- */
 
