@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.ca = {
   teams_title: 'Equips',
   teams_size: 'Alumnes per equip',
   teams_kind: 'Tipus d\'equips',
-  teams_kind_random: 'A l\'atzar',
+  teams_kind_random: 'Temporals',
   teams_kind_hetero: 'Heterogenis',
   teams_kind_homo: 'Homogenis',
   teams_leftovers: 'Si no surten justos',

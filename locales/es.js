@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.es = {
   teams_title: 'Equipos',
   teams_size: 'Alumnos por equipo',
   teams_kind: 'Tipo de equipos',
-  teams_kind_random: 'Al azar',
+  teams_kind_random: 'Temporales',
   teams_kind_hetero: 'Heterogéneos',
   teams_kind_homo: 'Homogéneos',
   teams_leftovers: 'Si no salen justos',

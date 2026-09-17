@@ -22,7 +22,7 @@ No hay que instalar nada ni crear ninguna cuenta.
   parte del nombre se ve, si se dibuja a cada alumno en su silla y si se
   muestran los equipos y la tipología.
 - **Equipos.** Se forman con el mismo motor que
-  [GeCo](https://github.com/jjdeharo/geco): al azar, heterogéneos u homogéneos
+  [GeCo](https://github.com/jjdeharo/geco): heterogéneos, homogéneos o temporales
   según la tipología de cada alumno (A, B o C), con alumnado que no debe
   coincidir y con sobrantes repartidos o en un equipo aparte. Cada equipo se
   sienta junto en las mesas tal como están y se ve en el plano con su color y

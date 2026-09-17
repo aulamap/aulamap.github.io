@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.gl = {
   teams_title: 'Equipos',
   teams_size: 'Alumnos por equipo',
   teams_kind: 'Tipo de equipos',
-  teams_kind_random: 'Ao chou',
+  teams_kind_random: 'Temporais',
   teams_kind_hetero: 'Heteroxéneos',
   teams_kind_homo: 'Homoxéneos',
   teams_leftovers: 'Se non saen xustos',

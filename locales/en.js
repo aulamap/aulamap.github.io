@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.en = {
   teams_title: 'Teams',
   teams_size: 'Students per team',
   teams_kind: 'Kind of teams',
-  teams_kind_random: 'Random',
+  teams_kind_random: 'Temporary',
   teams_kind_hetero: 'Mixed (heterogeneous)',
   teams_kind_homo: 'Alike (homogeneous)',
   teams_leftovers: 'If it does not divide evenly',

@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.eu = {
   teams_title: 'Taldeak',
   teams_size: 'Ikasleak talde bakoitzeko',
   teams_kind: 'Talde mota',
-  teams_kind_random: 'Ausaz',
+  teams_kind_random: 'Aldi baterakoak',
   teams_kind_hetero: 'Heterogeneoak',
   teams_kind_homo: 'Homogeneoak',
   teams_leftovers: 'Zehatz ez badatoz',

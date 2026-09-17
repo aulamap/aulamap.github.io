@@ -175,7 +175,7 @@ window.CLASSE_LOCALES.de = {
   teams_title: 'Teams',
   teams_size: 'Schüler pro Team',
   teams_kind: 'Art der Teams',
-  teams_kind_random: 'Zufällig',
+  teams_kind_random: 'Temporär',
   teams_kind_hetero: 'Heterogen',
   teams_kind_homo: 'Homogen',
   teams_leftovers: 'Wenn es nicht aufgeht',
