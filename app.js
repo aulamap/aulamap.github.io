@@ -844,7 +844,7 @@
     document.getElementById('show-teams').checked = c.showTeams !== false;
     document.getElementById('show-types').checked = c.showTypes !== false;
     document.getElementById('team-size').value = c.teamSize || 4;
-    document.getElementById('team-kind').value = c.teamKind || 'esporadicos';
+    document.getElementById('team-kind').value = c.teamKind || 'heterogeneos';
     document.getElementById('team-leftovers').value = c.teamLeftovers || 'agregar';
     renderStudents();
   }
@@ -867,7 +867,7 @@
     const seated = new Set();
     c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(s => s && seated.add(s)); });
     const teams = teamsOf(c);
-    const withTypes = (c.teamKind || 'esporadicos') !== 'esporadicos';
+    const withTypes = (c.teamKind || 'heterogeneos') !== 'esporadicos';
     const sets = (c.incompatible || []).length;
     document.getElementById('students-count').textContent = t('students_list', { assigned: seated.size, total: c.students.length });
     document.getElementById('teams-count').textContent = teams.length ? t('teams_list', { teams: teams.length, total: c.students.length }) : t('teams_list_none');
@@ -2481,7 +2481,7 @@
     const result = window.GecoTeamEngine.generateTeams({
       grupoA: by.A, grupoB: by.B, grupoC: by.C,
       numAlumnos: c.teamSize || 4,
-      tipoGrupo: c.teamKind || 'esporadicos',
+      tipoGrupo: c.teamKind || 'heterogeneos',
       opcionSobrantes: c.teamLeftovers || 'agregar',
       incompatibleGroups: cleanIncompatible(c)
     });
@@ -2971,9 +2971,9 @@
     if (Array.isArray(d.teams) && d.teams.length) {
       c.students.forEach(s => { delete s.team; });
       d.teams.forEach((team, i) => team.forEach(a => { const s = findStudent(idOf(String(a.nombre || a.name || ''))); if (s) s.team = i + 1; }));
-      if (c.teamKind === undefined || c.teamKind === 'esporadicos') c.teamKind = 'heterogeneos';
+      if (c.teamKind === 'esporadicos') c.teamKind = 'heterogeneos';
     } else if (names.some(s => ['A', 'B', 'C'].includes(s.type))) {
-      c.teamKind = c.teamKind === 'esporadicos' || !c.teamKind ? 'heterogeneos' : c.teamKind;
+      c.teamKind = c.teamKind === 'esporadicos' ? 'heterogeneos' : c.teamKind;
     }
     commit();
     alert(t('import_geco_done', { count: names.length }));
