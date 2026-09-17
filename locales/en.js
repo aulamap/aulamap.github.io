@@ -210,7 +210,7 @@ window.CLASSE_LOCALES.en = {
   print_show_teams: 'Add the list of teams',
   teams_room: 'Set up the room for the teams',
   teams_room_title: 'Replaces the desks with one per team, facing the board',
-  teams_room_overflow: 'The teams do not fit in the room at this size: they have been placed anyway, but consider enlarging the room or moving a desk.',
+  teams_room_overflow: 'The teams do not fit comfortably in a room of this size: they have been placed inside, but with less space than recommended to move between desks. Consider enlarging the room or changing the team size.',
   confirm_teams_room: 'Replace the desks with one per team? The rest of the furniture stays where it is. This can be undone.',
   name_format: 'Name shown',
   name_full: 'First name and surname',

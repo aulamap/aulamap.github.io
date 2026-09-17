@@ -210,7 +210,7 @@ window.CLASSE_LOCALES.de = {
   print_show_teams: 'Teamliste hinzufügen',
   teams_room: 'Raum für die Teams einrichten',
   teams_room_title: 'Ersetzt die Tische durch einen pro Team, zur Tafel hin',
-  teams_room_overflow: 'Die Teams passen bei diesen Maßen nicht in den Raum: sie wurden trotzdem platziert, aber besser den Raum vergrößern oder einen Tisch verschieben.',
+  teams_room_overflow: 'Die Teams passen bei diesen Raummaßen nicht bequem: sie wurden innerhalb platziert, aber mit weniger Platz zwischen den Tischen als empfohlen. Besser den Raum vergrößern oder die Teamgröße ändern.',
   confirm_teams_room: 'Die Tische im Raum durch einen pro Team ersetzen? Die übrigen Möbel bleiben, wo sie sind. Lässt sich rückgängig machen.',
   name_format: 'Angezeigter Name',
   name_full: 'Vor- und Nachname',

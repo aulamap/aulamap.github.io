@@ -2689,10 +2689,13 @@
     }
     // Márgenes en centímetros reales: [pared, tras el mobiliario frontal,
     // pared del fondo, entre equipos]. Los holgados primero; si no caben se
-    // aprietan, pero nunca por debajo de 60 cm entre sillas (más los 40 cm de
-    // la propia silla): es lo que hace falta para levantarse y pasar por
-    // detrás. Si ni así caben, se avisa: el aula no cambia de tamaño nunca.
+    // aprietan. Lo recomendable es no bajar de 60 cm entre sillas (más los
+    // 40 cm de la propia silla), que es lo que hace falta para levantarse y
+    // pasar por detrás; si ni así caben, se sigue apretando para que queden
+    // dentro del aula, pero se avisa. El aula no cambia de tamaño nunca.
     const fits = [[70, 120, 120, 110], [60, 100, 100, 90], [50, 90, 80, 75], [50, 80, 70, 60]];
+    const RECOMMENDED = fits.length;
+    fits.push([40, 60, 50, 40], [30, 45, 40, 25], [15, 30, 25, 10], [5, 15, 15, 0]);
     let margin, top, left, right, bottom;
     const setMargins = ([m, gapTop, gapBottom]) => {
       margin = m; top = Math.max(m, furnitureBottom + gapTop);
@@ -2729,7 +2732,9 @@
     // ni así, se alarga el aula lo justo y se baja lo que hay pegado a la
     // pared del fondo (la puerta, por ejemplo).
     let availW = right - left;
-    const layout = (gapX, gapY) => {
+    // Reparte los conjuntos en filas con el hueco dado; «spreadX» y «spreadY»
+    // son hueco extra para aprovechar el sitio que sobre sin cambiar de filas.
+    const layout = (gapX, gapY, spreadX = 0, spreadY = 0) => {
       const rows = [[]];
       let x = 0;
       for (const k of clusters) {
@@ -2740,26 +2745,40 @@
       }
       let y = top;
       for (const row of rows) {
-        const rowW = row.reduce((n, k) => n + k.w, 0) + (row.length - 1) * gapX;
+        const gx = gapX + spreadX;
+        const rowW = row.reduce((n, k) => n + k.w, 0) + (row.length - 1) * gx;
         const rowH = Math.max(...row.map(k => k.h));
         let cx = left + (availW - rowW) / 2;
         for (const k of row) {
           k.cx = cx + k.w / 2;
           k.cy = y + rowH / 2;
-          cx += k.w + gapX;
+          cx += k.w + gx;
         }
-        y += rowH + gapY;
+        y += rowH + gapY + spreadY;
       }
-      return y - gapY;   // hasta dónde llega la última fila
+      layout.rows = rows;
+      return y - gapY - spreadY;   // hasta dónde llega la última fila
     };
-    let end = 0;
+    let end = 0, used = 0;
     for (const fit of fits) {
       setMargins(fit);
       availW = right - left;
       end = layout(fit[3], fit[3]);
       if (end <= bottom) break;
+      used++;
     }
-    const overflow = end > bottom;
+    const overflow = used >= RECOMMENDED;
+    // Con la distribución ya decidida, el sitio que sobra se reparte entre
+    // los pasillos (hasta el hueco holgado), sin que cambien las filas.
+    if (end <= bottom) {
+      const fit = fits[Math.min(used, fits.length - 1)];
+      const rows = layout.rows, nRows = rows.length;
+      const cols = Math.max(...rows.map(r => r.length));
+      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * fit[3]));
+      const spreadX = cols > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (availW - rowW) / (cols - 1))) : 0;
+      const spreadY = nRows > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (bottom - end) / (nRows - 1))) : 0;
+      layout(fit[3], fit[3], spreadX, spreadY);
+    }
     // Cada conjunto se inclina un poco hacia el centro de la pizarra, en
     // abanico, para que todo el equipo la vea bien: hasta 15° en los extremos.
     clusters.forEach(k => {
