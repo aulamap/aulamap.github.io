@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.ca = {
   type_group4: 'Grup de 4',
   type_group5: 'Grup de 5',
   type_group6: 'Grup de 6',
+  type_group6b: 'Grup de 6 amb capçaleres',
   type_teacher: 'Taula del docent',
   type_board: 'Pissarra',
   type_screen: 'Pantalla o projector',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.ca = {
   rotate_90: 'Girar 90°',
   delete_count: 'Eliminar {count} elements',
   menu_free_desks: 'Deixar les taules lliures',
+  menu_split_desk: 'Separar en taules soltes',
+  menu_change_shape: 'Canviar la forma de la taula',
   menu_free_seat: 'Deixar aquest lloc lliure',
   menu_select_all: 'Seleccionar-ho tot',
 

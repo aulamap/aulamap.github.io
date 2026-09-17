@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.es = {
   type_group4: 'Grupo de 4',
   type_group5: 'Grupo de 5',
   type_group6: 'Grupo de 6',
+  type_group6b: 'Grupo de 6 con cabeceras',
   type_teacher: 'Mesa del docente',
   type_board: 'Pizarra',
   type_screen: 'Pantalla o proyector',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.es = {
   rotate_90: 'Girar 90°',
   delete_count: 'Eliminar {count} elementos',
   menu_free_desks: 'Dejar las mesas libres',
+  menu_split_desk: 'Separar en mesas sueltas',
+  menu_change_shape: 'Cambiar la forma de la mesa',
   menu_free_seat: 'Dejar este sitio libre',
   menu_select_all: 'Seleccionar todo',
 

@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.fr = {
   type_group4: 'Îlot de 4',
   type_group5: 'Îlot de 5',
   type_group6: 'Îlot de 6',
+  type_group6b: 'Îlot de 6 avec bouts de table',
   type_teacher: 'Bureau de l’enseignant',
   type_board: 'Tableau',
   type_screen: 'Écran ou vidéoprojecteur',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.fr = {
   rotate_90: 'Pivoter de 90°',
   delete_count: 'Supprimer {count} éléments',
   menu_free_desks: 'Libérer ces tables',
+  menu_split_desk: 'Séparer en tables individuelles',
+  menu_change_shape: 'Changer la forme de la table',
   menu_free_seat: 'Libérer cette place',
   menu_select_all: 'Tout sélectionner',
 

@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.eu = {
   type_group4: '4ko taldea',
   type_group5: '5eko taldea',
   type_group6: '6ko taldea',
+  type_group6b: '6ko taldea buruekin',
   type_teacher: 'Irakaslearen mahaia',
   type_board: 'Arbela',
   type_screen: 'Pantaila edo proiektorea',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.eu = {
   rotate_90: 'Biratu 90°',
   delete_count: 'Ezabatu {count} elementu',
   menu_free_desks: 'Mahaiak libre utzi',
+  menu_split_desk: 'Mahai solteetan banatu',
+  menu_change_shape: 'Mahaiaren forma aldatu',
   menu_free_seat: 'Eserleku hau libre utzi',
   menu_select_all: 'Hautatu dena',
 

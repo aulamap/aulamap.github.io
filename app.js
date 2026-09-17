@@ -49,8 +49,31 @@
         { x: 70, y: 0, w: 50, h: 70, side: 'right' }
       ]
     },
-    group6: { w: 210, h: 100, cols: 3, rows: 2 }
+    group6: { w: 210, h: 100, cols: 3, rows: 2 },
+    // El grupo de 4 con una mesa perpendicular a cada lado (dos cabeceras).
+    group6b: {
+      w: 240, h: 100,
+      cells: [
+        { x: -95, y: 0, w: 50, h: 70, side: 'left' },
+        { x: -35, y: -25, w: 70, h: 50, side: 'top' },
+        { x: 35, y: -25, w: 70, h: 50, side: 'top' },
+        { x: -35, y: 25, w: 70, h: 50, side: 'bottom' },
+        { x: 35, y: 25, w: 70, h: 50, side: 'bottom' },
+        { x: 95, y: 0, w: 50, h: 70, side: 'right' }
+      ]
+    }
   };
+
+  // Formas distintas para el mismo número de puestos: con el botón derecho
+  // se pasa de una a la siguiente.
+  const DESK_SHAPES = [['group6', 'group6b']];
+  function nextShape(type) {
+    const family = DESK_SHAPES.find(f => f.includes(type));
+    return family ? family[(family.indexOf(type) + 1) % family.length] : null;
+  }
+  function sameShapeFamily(a, b) {
+    return a === b || DESK_SHAPES.some(f => f.includes(a) && f.includes(b));
+  }
 
   const FURNITURE_TYPES = {
     teacher: { w: 140, h: 70, fill: '#e8d9c0', stroke: '#8a6d3b' },
@@ -880,6 +903,7 @@
           checkpoint();
           s.team = pick.value ? +pick.value : undefined;
           if (!s.team) delete s.team;
+          syncTeamDesks(c);
           commit();
         });
         li.appendChild(pick);
@@ -893,6 +917,7 @@
         c.students = c.students.filter(x => x.id !== s.id);
         c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(v => (v === s.id ? null : v)); });
         c.incompatible = cleanIncompatible(c);
+        syncTeamDesks(c);
         commit();
       });
       li.append(handle, mark, input);
@@ -1397,6 +1422,46 @@
     commit();
   }
 
+  // Una mesa de grupo pasa a ser mesas individuales sueltas, cada una en el
+  // sitio de su puesto, con su silla al mismo lado y con quien estuviera
+  // sentado. Así el profesor puede recolocarlas como quiera.
+  function splitSelection() {
+    const c = cls();
+    const desks = selectedObjects().filter(o => isDesk(o) && o.seats.length > 1);
+    if (!desks.length) return;
+    checkpoint();
+    const turn = { bottom: 0, top: 180, left: 90, right: -90 };
+    const created = [];
+    for (const desk of desks) {
+      const a = desk.rot * Math.PI / 180, cos = Math.cos(a), sin = Math.sin(a);
+      for (const cell of deskCells(desk)) {
+        const lx = cell.x + cell.w / 2, ly = cell.y + cell.h / 2;
+        const one = makeObject('desk1', Math.round(desk.x + lx * cos - ly * sin), Math.round(desk.y + lx * sin + ly * cos));
+        one.rot = desk.rot + (turn[cell.side] || 0);
+        one.seats[0] = desk.seats[cell.i] || null;
+        created.push(one);
+      }
+      c.objects.splice(c.objects.indexOf(desk), 1, ...created.splice(0));
+      created.length = 0;
+    }
+    selection.clear();
+    commit();
+  }
+
+  // Cambia las mesas seleccionadas a la otra forma con los mismos puestos,
+  // sin mover a nadie de su número de puesto.
+  function changeShapeOfSelection() {
+    const desks = selectedObjects().filter(o => isDesk(o) && nextShape(o.type));
+    if (!desks.length) return;
+    checkpoint();
+    for (const desk of desks) {
+      const seats = desk.seats.slice();
+      setDeskType(desk, nextShape(desk.type));
+      seats.forEach((id, i) => { if (i < desk.seats.length) desk.seats[i] = id; });
+    }
+    commit();
+  }
+
   function clearSeatsOfSelection() {
     const desks = selectedObjects().filter(isDesk);
     if (!desks.some(o => o.seats.some(Boolean))) return;
@@ -1526,6 +1591,8 @@
     duplicate: '<rect x="2.3" y="2.3" width="8" height="8" rx="1.4"/><rect x="5.7" y="5.7" width="8" height="8" rx="1.4"/>',
     group: '<path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/>',
     ungroup: '<path d="M2.5 5.5v-3h3M10.5 2.5h3v3M13.5 10.5v3h-3M5.5 13.5h-3v-3"/><path d="M3.6 12.4 12.4 3.6"/>',
+    shape: '<rect x="2" y="4.5" width="7" height="7" rx="1"/><path d="M11 2.5h3v3M14 2.5 9.5 7"/>',
+    split: '<rect x="1.8" y="2.5" width="5.2" height="4.6" rx="1"/><rect x="9" y="2.5" width="5.2" height="4.6" rx="1"/><rect x="5.4" y="9" width="5.2" height="4.6" rx="1"/>',
     rotate_left: '<path d="M3.4 7A5 5 0 1 1 3.2 9.8"/><path d="M6.6 6.8H3.2V3.4"/>',
     rotate_right: '<path d="M12.6 7A5 5 0 1 0 12.8 9.8"/><path d="M9.4 6.8h3.4V3.4"/>',
     rotate_90: '<rect x="2.4" y="8" width="6.2" height="5.6" rx="1"/><path d="M11.2 13.2a2.6 2.6 0 0 0 2.6-2.6V5.4"/><path d="M11.9 7.1 13.8 5.2l1.9 1.9"/>',
@@ -1672,6 +1739,12 @@
     );
     if (sel.some(isDesk)) {
       items.push('-', { label: t('menu_free_desks'), icon: MENU_ICONS.free_seat, disabled: !hasStudents, action: clearSeatsOfSelection });
+      if (sel.some(o => isDesk(o) && nextShape(o.type))) {
+        items.push({ label: t('menu_change_shape'), icon: MENU_ICONS.shape, action: changeShapeOfSelection });
+      }
+      if (sel.some(o => isDesk(o) && o.seats.length > 1)) {
+        items.push({ label: t('menu_split_desk'), icon: MENU_ICONS.split, action: splitSelection });
+      }
     }
     items.push('-', { label: sel.length > 1 ? t('delete_count', { count: sel.length }) : t('delete'), icon: MENU_ICONS.delete, keys: 'Supr', danger: true, action: deleteSelection });
     showMenu(e.clientX, e.clientY, items);
@@ -1971,10 +2044,12 @@
       });
       dest.seats[target.seat] = d.studentId;
       if (occupant && freed) freed.o.seats[freed.i] = occupant;
+      syncTeamsAfterDrag(c, [d.studentId, occupant]);
       commit();
     } else if (target.kind === 'list' && d.from) {
       checkpoint();
       findObj(d.from.obj).seats[d.from.seat] = null;
+      syncTeamsAfterDrag(c, [d.studentId]);
       commit();
     } else {
       render();
@@ -2267,7 +2342,7 @@
     const c = cls();
     c.students = [];
     c.incompatible = [];
-    c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); });
+    c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); delete o.team; });
     commit();
   });
 
@@ -2332,9 +2407,10 @@
   // recogido. Los equipos grandes van primero, que son los que peor caben.
   function seatTeams(c) {
     c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); });
-    const free = seatPositions(c).sort((p, q) => (p.y - q.y) || (p.x - q.x));
+    const fixed = syncTeamDesks(c);
+    const free = seatPositions(c).filter(p => !p.o.seats[p.i]).sort((p, q) => (p.y - q.y) || (p.x - q.x));
     const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) + (p.o === q.o ? 0 : 40);
-    const teams = teamsOf(c).sort((a, b) => b.members.length - a.members.length || a.n - b.n);
+    const teams = teamsOf(c).filter(team => !fixed.has(team.n)).sort((a, b) => b.members.length - a.members.length || a.n - b.n);
     const split = [], unseated = [];
     for (const team of teams) {
       const n = team.members.length;
@@ -2396,6 +2472,58 @@
       l: sides.has('left') ? chair : 0, r: sides.has('right') ? chair : 0,
       t: sides.has('top') ? chair : 0, b: sides.has('bottom') ? chair : 0
     };
+  }
+
+  // Cambia el tipo de una mesa sin moverla: mismo sitio, mismo giro.
+  function setDeskType(obj, type) {
+    const base = DESK_TYPES[type];
+    obj.type = type;
+    obj.w = base.w; obj.h = base.h;
+    obj.cols = base.cols || 1; obj.rows = base.rows || 1;
+    if (base.sides) obj.sides = [...base.sides]; else delete obj.sides;
+    obj.seats = new Array(base.cells ? base.cells.length : obj.cols * obj.rows).fill(null);
+  }
+
+  // Las mesas que se montaron para un equipo (obj.team) siguen a su equipo:
+  // si entra o sale alguien cambian de tipo (de 6 a 5, de 4 a 3…) y sientan
+  // a sus miembros; si el equipo se queda vacío, la mesa desaparece.
+  // Devuelve los equipos que han quedado sentados así.
+  function syncTeamDesks(c) {
+    const done = new Set();
+    for (const desk of [...c.objects]) {
+      if (!isDesk(desk) || !desk.team) continue;
+      const members = c.students.filter(s => s.team === desk.team);
+      if (!members.length) { c.objects.splice(c.objects.indexOf(desk), 1); continue; }
+      if (members.length > 6 || done.has(desk.team)) continue;
+      const type = teamDeskTypes(members.length)[0];
+      const before = desk.seats.slice();
+      if (!sameShapeFamily(desk.type, type)) setDeskType(desk, type);
+      // Quien ya estaba en esta mesa conserva su puesto si sigue existiendo.
+      const ids = new Set(members.map(m => m.id));
+      const seats = new Array(desk.seats.length).fill(null);
+      before.forEach((id, i) => { if (id && ids.has(id) && i < seats.length) seats[i] = id; });
+      const rest = members.filter(m => !seats.includes(m.id));
+      seats.forEach((id, i) => { if (!id && rest.length) seats[i] = rest.shift().id; });
+      desk.seats = seats;
+      for (const o of c.objects) {
+        if (o !== desk && isDesk(o)) o.seats = o.seats.map(id => (id && ids.has(id) ? null : id));
+      }
+      done.add(desk.team);
+    }
+    return done;
+  }
+
+  // Tras arrastrar a alguien: quien cae en una mesa de equipo pasa a ese
+  // equipo, y quien sale de una hacia la lista o una mesa normal lo deja.
+  function syncTeamsAfterDrag(c, ids) {
+    for (const id of ids) {
+      const s = id && findStudent(id);
+      if (!s) continue;
+      const desk = seatOf(id);
+      if (desk && desk.team) s.team = desk.team;
+      else if (s.team && c.objects.some(o => isDesk(o) && o.team === s.team)) delete s.team;
+    }
+    syncTeamDesks(c);
   }
 
   // Sustituye las mesas del aula por una por equipo, en rejilla y de cara a
@@ -2468,7 +2596,11 @@
       c.objects.forEach(o => { if (o.y > oldH - 60) o.y += delta; });
     }
     clusters.forEach(k => {
-      k.desks.forEach(d => { d.x = Math.round(k.x0 + d.x); d.y = Math.round(k.y0); c.objects.push(d); });
+      k.desks.forEach(d => {
+        d.x = Math.round(k.x0 + d.x); d.y = Math.round(k.y0);
+        if (k.desks.length === 1) d.team = k.team.n;
+        c.objects.push(d);
+      });
     });
     const result = seatTeams(c);
     selection.clear();
@@ -2484,6 +2616,7 @@
     if (!teamsOf(c).length || !confirm(t('confirm_clear_teams'))) return;
     checkpoint();
     c.students.forEach(s => { delete s.team; });
+    c.objects.forEach(o => { delete o.team; });
     commit();
   });
 

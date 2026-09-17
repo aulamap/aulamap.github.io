@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.de = {
   type_group4: 'Gruppe mit 4',
   type_group5: 'Gruppe mit 5',
   type_group6: 'Gruppe mit 6',
+  type_group6b: 'Gruppe mit 6 und Stirnseiten',
   type_teacher: 'Lehrertisch',
   type_board: 'Tafel',
   type_screen: 'Leinwand oder Beamer',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.de = {
   rotate_90: 'Um 90° drehen',
   delete_count: '{count} Elemente löschen',
   menu_free_desks: 'Diese Tische freigeben',
+  menu_split_desk: 'In einzelne Tische trennen',
+  menu_change_shape: 'Tischform ändern',
   menu_free_seat: 'Diesen Platz freigeben',
   menu_select_all: 'Alles auswählen',
 

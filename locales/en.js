@@ -42,6 +42,7 @@ window.CLASSE_LOCALES.en = {
   type_group4: 'Group of 4',
   type_group5: 'Group of 5',
   type_group6: 'Group of 6',
+  type_group6b: 'Group of 6 with ends',
   type_teacher: 'Teacher’s desk',
   type_board: 'Board',
   type_screen: 'Screen or projector',
@@ -95,6 +96,8 @@ window.CLASSE_LOCALES.en = {
   rotate_90: 'Rotate 90°',
   delete_count: 'Delete {count} items',
   menu_free_desks: 'Clear these desks',
+  menu_split_desk: 'Split into single desks',
+  menu_change_shape: 'Change the desk shape',
   menu_free_seat: 'Clear this seat',
   menu_select_all: 'Select all',
 
