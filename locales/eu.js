@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.eu = {
   teams_clear_title: 'Taldeak desegiten ditu zerrenda eta lekuak ukitu gabe',
   teams_incompat: 'Bateraezinak…',
   teams_incompat_count: 'Bateraezinak ({count})',
+  teams_incompat_title: 'Adierazi zein ikasle ez diren talde berean egon behar',
   hint_teams: 'Taldeak GeCo-ren sistema berarekin osatzen dira. Talde bakoitzak kolore bat eta zenbaki bat du planoan. Ikasle bakoitzak nola lan egiten duen kontuan hartzeko, aukeratu talde heterogeneoak edo homogeneoak.',
   hint_teams_types: 'Markatu zerrendan ikasle bakoitzaren tipologia: A, autonomiaz lan egiten du; B, noizean behin laguntza behar du (gehienak); C, aurrera egiteko laguntza behar du. Markarik ez duenak B gisa kontatzen du. Talde heterogeneoek tipologiak nahasten dituzte; homogeneoek elkartzen dituzte.',
   type_A: 'A: autonomiaz lan egiten du',

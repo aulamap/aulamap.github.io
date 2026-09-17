@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.fr = {
   teams_clear_title: 'Défait les équipes sans toucher à la liste ni aux places',
   teams_incompat: 'Incompatibles…',
   teams_incompat_count: 'Incompatibles ({count})',
+  teams_incompat_title: 'Indique quels élèves ne doivent pas être dans la même équipe',
   hint_teams: 'Les équipes sont formées avec le même système que GeCo. Chaque équipe a une couleur et un numéro sur le plan. Pour tenir compte de la façon de travailler de chaque élève, choisir des équipes hétérogènes ou homogènes.',
   hint_teams_types: 'Marquer dans la liste la typologie de chaque élève : A, travaille en autonomie ; B, a besoin d’aide de temps en temps (la majorité) ; C, a besoin de soutien pour progresser. Sans marque, l’élève compte comme B. Les équipes hétérogènes mélangent les typologies ; les homogènes les regroupent.',
   type_A: 'A : travaille en autonomie',

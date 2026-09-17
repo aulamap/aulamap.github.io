@@ -61,8 +61,9 @@ No hay que instalar nada ni crear ninguna cuenta.
    pueden hacer a mano con el desplegable que hay junto a cada nombre
    («Nuevo» crea el siguiente equipo), o cambiar a alguien de equipo después.
    «Sentar por equipos» vuelve a colocarlos con las mesas tal como están, y
-   «Montar el aula para los equipos» cambia las mesas por una por equipo, de
-   cara a la pizarra, sin tocar el resto del mobiliario. Esas mesas siguen a
+   «Montar el aula para los equipos» cambia las mesas por una por equipo, sin
+   tocar el resto del mobiliario: las mesas de grupo se ponen de lado, para
+   que nadie quede de espaldas a la pizarra, y en abanico hacia ella. Esas mesas siguen a
    su equipo: si entra o sale alguien, cambian de tipo (de 6 a 5, de 4 a 3…)
    y, si el equipo se queda vacío, desaparecen. Los grupos de 4 y de 6 tienen
    dos formas: en «Formas de mesa para los equipos…» (pestaña Equipos) se elige cuál se usa al

@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.es = {
   teams_clear_title: 'Deshace los equipos sin tocar la lista ni los sitios',
   teams_incompat: 'Incompatibles…',
   teams_incompat_count: 'Incompatibles ({count})',
+  teams_incompat_title: 'Indica qué alumnos no deben coincidir en el mismo equipo',
   hint_teams: 'Los equipos se forman con el mismo sistema que GeCo. Cada equipo tiene un color y un número en el plano. Para tener en cuenta cómo trabaja cada alumno, elige equipos heterogéneos u homogéneos.',
   hint_teams_types: 'Marca en la lista la tipología de cada alumno: A, trabaja con autonomía; B, necesita ayuda de vez en cuando (la mayoría); C, necesita apoyo para avanzar. Quien no tiene marca cuenta como B. Los equipos heterogéneos mezclan tipologías; los homogéneos las juntan.',
   type_A: 'A: trabaja con autonomía',

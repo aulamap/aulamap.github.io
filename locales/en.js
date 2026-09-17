@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.en = {
   teams_clear_title: 'Undoes the teams without touching the list or the seats',
   teams_incompat: 'Keep apart…',
   teams_incompat_count: 'Keep apart ({count})',
+  teams_incompat_title: 'Choose which students must not be on the same team',
   hint_teams: 'Teams are made with the same system as GeCo. Each team has a colour and a number on the plan. To take into account how each student works, choose mixed or alike teams.',
   hint_teams_types: 'Mark each student’s type in the list: A, works independently; B, needs help now and then (most students); C, needs support to make progress. Unmarked students count as B. Mixed teams combine types; alike teams keep them together.',
   type_A: 'A: works independently',

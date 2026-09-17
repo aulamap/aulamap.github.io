@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.ca = {
   teams_clear_title: 'Desfà els equips sense tocar la llista ni els llocs',
   teams_incompat: 'Incompatibles…',
   teams_incompat_count: 'Incompatibles ({count})',
+  teams_incompat_title: 'Indica quins alumnes no han de coincidir en el mateix equip',
   hint_teams: 'Els equips es formen amb el mateix sistema que GeCo. Cada equip té un color i un número al plànol. Per tenir en compte com treballa cada alumne, tria equips heterogenis o homogenis.',
   hint_teams_types: 'Marca a la llista la tipologia de cada alumne: A, treballa amb autonomia; B, necessita ajuda de tant en tant (la majoria); C, necessita suport per avançar. Qui no té marca compta com a B. Els equips heterogenis barregen tipologies; els homogenis les ajunten.',
   type_A: 'A: treballa amb autonomia',

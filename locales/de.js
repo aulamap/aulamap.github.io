@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.de = {
   teams_clear_title: 'Löst die Teams auf, ohne Liste oder Plätze zu ändern',
   teams_incompat: 'Unverträglich…',
   teams_incompat_count: 'Unverträglich ({count})',
+  teams_incompat_title: 'Legt fest, welche Schüler nicht im selben Team sein sollen',
   hint_teams: 'Die Teams werden mit demselben System wie GeCo gebildet. Jedes Team hat im Plan eine Farbe und eine Nummer. Um zu berücksichtigen, wie jeder Schüler arbeitet, heterogene oder homogene Teams wählen.',
   hint_teams_types: 'In der Liste die Typologie jedes Schülers markieren: A, arbeitet selbstständig; B, braucht ab und zu Hilfe (die meisten); C, braucht Unterstützung, um voranzukommen. Ohne Markierung zählt der Schüler als B. Heterogene Teams mischen die Typologien; homogene fassen sie zusammen.',
   type_A: 'A: arbeitet selbstständig',

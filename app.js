@@ -77,6 +77,9 @@
   // Formas distintas para el mismo número de puestos: con el botón derecho
   // se pasa de una a la siguiente.
   const DESK_SHAPES = [['group4', 'group4b'], ['group6', 'group6b']];
+  // Mesas de grupo cuyos puestos dan a la pizarra y a la pared del fondo: al
+  // montar el aula se ponen de lado para que nadie quede de espaldas.
+  const SIDEWAYS_FOR_BOARD = new Set(['group4', 'group5', 'group6', 'group6b']);
   function shapeFamily(type) { return DESK_SHAPES.find(f => f.includes(type)) || null; }
   // Forma preferida de cada familia (se elige en «Formas por defecto…» y
   // vale para todas las clases): es la que usa «Montar el aula para los equipos».
@@ -872,6 +875,7 @@
     document.getElementById('students-count').textContent = t('students_list', { assigned: seated.size, total: c.students.length });
     document.getElementById('teams-count').textContent = teams.length ? t('teams_list', { teams: teams.length, total: c.students.length }) : t('teams_list_none');
     document.getElementById('btn-incompat').textContent = sets ? t('teams_incompat_count', { count: sets }) : t('teams_incompat');
+    document.getElementById('btn-incompat').title = t('teams_incompat_title');
     document.getElementById('hint-teams').textContent = t(withTypes ? 'hint_teams_types' : 'hint_teams');
     document.getElementById('btn-teams-seat').disabled = !teams.length;
     document.getElementById('btn-teams-clear').disabled = !teams.length;
@@ -2678,7 +2682,17 @@
         x += d.w;
         r = f.r; t = Math.max(t, d.h / 2 + f.t); b = Math.max(b, d.h / 2 + f.b);
       });
-      return { team, desks, w: l + x + r, h: t + b, offX: l, offY: t };
+      // Las mesas de grupo en rejilla (2 × 2, 3 × 2…) se giran un cuarto de
+      // vuelta: así los puestos quedan a los lados y nadie da la espalda a la
+      // pizarra. Para colocarlas, el hueco que ocupan se mide ya girado.
+      const turned = SIDEWAYS_FOR_BOARD.has(desks[0].type);
+      const fw = l + x + r, fh = t + b;
+      return {
+        team, desks, turned,
+        w: turned ? fh : fw, h: turned ? fw : fh,
+        // Desplazamiento de cada mesa respecto al centro del conjunto, sin girar.
+        offsets: desks.map(d => [l + d.x - fw / 2, t - fh / 2])
+      };
     });
     // Se van colocando por filas, de izquierda a derecha, y cada fila se
     // centra en el aula. Si no caben con el hueco normal se aprietan y, si
@@ -2700,8 +2714,8 @@
         const rowH = Math.max(...row.map(k => k.h));
         let cx = left + (availW - rowW) / 2;
         for (const k of row) {
-          k.x0 = cx + k.offX;
-          k.y0 = y + (rowH - k.h) / 2 + k.offY;
+          k.cx = cx + k.w / 2;
+          k.cy = y + rowH / 2;
           cx += k.w + gapX;
         }
         y += rowH + gapY;
@@ -2717,9 +2731,17 @@
       const delta = c.room.h - oldH;
       c.objects.forEach(o => { if (o.y > oldH - 60) o.y += delta; });
     }
+    // Cada conjunto se inclina un poco hacia el centro de la pizarra, en
+    // abanico, para que todo el equipo la vea bien: hasta 15° en los extremos.
     clusters.forEach(k => {
-      k.desks.forEach(d => {
-        d.x = Math.round(k.x0 + d.x); d.y = Math.round(k.y0);
+      const tilt = Math.round(15 * (c.room.w / 2 - k.cx) / (c.room.w / 2));
+      const rot = (k.turned ? 90 : 0) + clamp(tilt, -15, 15);
+      const a = rot * Math.PI / 180, cos = Math.cos(a), sin = Math.sin(a);
+      k.desks.forEach((d, i) => {
+        const [ox, oy] = k.offsets[i];
+        d.x = Math.round(k.cx + ox * cos - oy * sin);
+        d.y = Math.round(k.cy + ox * sin + oy * cos);
+        d.rot = rot;
         if (k.desks.length === 1) d.team = k.team.n;
         c.objects.push(d);
       });
