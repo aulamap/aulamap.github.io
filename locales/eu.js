@@ -197,7 +197,6 @@ window.CLASSE_LOCALES.eu = {
   import_geco_confirm: 'Fitxategia GeCo-rena da, {count} ikaslerekin. «{name}» klasean gehitu, tipologia eta taldeekin?',
   import_geco_done: 'GeCo-ren datuak gehitu dira ({count} ikasle).',
   print_show_teams: 'Taldeen zerrenda gehitu',
-  print_show_types: 'Tipologia (A, B, C) planoan erakutsi',
   teams_room: 'Gela taldeetarako antolatu',
   teams_room_title: 'Mahaiak talde bakoitzeko batekin ordezkatzen ditu, arbelari begira',
   confirm_teams_room: 'Gelako mahaiak talde bakoitzeko batekin ordezkatu? Gainerako altzariak dauden lekuan geratzen dira. Desegin daiteke.',

@@ -197,7 +197,6 @@ window.CLASSE_LOCALES.es = {
   import_geco_confirm: 'El archivo es de GeCo con {count} alumnos. ¿Añadirlos, con sus tipologías y equipos, a la clase «{name}»?',
   import_geco_done: 'Se han añadido los datos de GeCo ({count} alumnos).',
   print_show_teams: 'Añadir la lista de equipos',
-  print_show_types: 'Mostrar la tipología (A, B, C) en el plano',
   teams_room: 'Montar el aula para los equipos',
   teams_room_title: 'Cambia las mesas por una por equipo, de cara a la pizarra',
   confirm_teams_room: '¿Cambiar las mesas del aula por una por equipo? El resto del mobiliario se queda donde está. Se puede deshacer.',

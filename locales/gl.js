@@ -197,7 +197,6 @@ window.CLASSE_LOCALES.gl = {
   import_geco_confirm: 'O ficheiro é de GeCo con {count} alumnos. Engadilos, coas súas tipoloxías e equipos, á clase «{name}»?',
   import_geco_done: 'Engadíronse os datos de GeCo ({count} alumnos).',
   print_show_teams: 'Engadir a lista de equipos',
-  print_show_types: 'Mostrar a tipoloxía (A, B, C) no plano',
   teams_room: 'Montar a aula para os equipos',
   teams_room_title: 'Cambia as mesas por unha por equipo, de cara ao encerado',
   confirm_teams_room: 'Cambiar as mesas da aula por unha por equipo? O resto do mobiliario queda onde está. Pódese desfacer.',

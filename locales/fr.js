@@ -197,7 +197,6 @@ window.CLASSE_LOCALES.fr = {
   import_geco_confirm: 'Le fichier vient de GeCo avec {count} élèves. Les ajouter, avec leurs typologies et leurs équipes, à la classe « {name} » ?',
   import_geco_done: 'Les données de GeCo ont été ajoutées ({count} élèves).',
   print_show_teams: 'Ajouter la liste des équipes',
-  print_show_types: 'Afficher la typologie (A, B, C) sur le plan',
   teams_room: 'Aménager la salle pour les équipes',
   teams_room_title: 'Remplace les tables par une par équipe, face au tableau',
   confirm_teams_room: 'Remplacer les tables de la salle par une par équipe ? Le reste du mobilier reste en place. L’opération peut être annulée.',

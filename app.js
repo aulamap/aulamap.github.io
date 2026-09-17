@@ -3071,13 +3071,8 @@
   document.getElementById('btn-print').addEventListener('click', () => {
     const c = cls();
     document.getElementById('print-heading').value = c.name;
-    document.getElementById('print-name-format').value = c.nameFormat;
-    document.getElementById('print-people').checked = c.showPeople !== false;
     const teamsRow = document.getElementById('print-teams').closest('label');
     teamsRow.hidden = !teamsOf(c).length;
-    const typesRow = document.getElementById('print-types').closest('label');
-    typesRow.hidden = !c.students.some(s => s.type);
-    document.getElementById('print-types').checked = false;
     document.getElementById('print-teams').checked = !teamsRow.hidden;
     document.getElementById('print-paper').value = lastPaper;
     document.getElementById('print-margin').value = lastMargin;
@@ -3150,16 +3145,17 @@
     // el barrido de la puerta), el encuadre crece solo lo justo para que no se
     // corte: el espacio vacío no cuenta.
     const pad = 5;
-    const showPeople = document.getElementById('print-people').checked;
+    // Se imprime tal como se ve el plano: mismas opciones de vista.
+    const showPeople = c.showPeople !== false;
     const b = boundsOf(c.objects, { showPeople }, 0);
     const x0 = Math.min(0, b.x0) - pad, y0 = Math.min(0, b.y0) - pad;
     const x1 = Math.max(c.room.w, b.x1) + pad, y1 = Math.max(c.room.h, b.y1) + pad;
     drawRoom(printSvg, c, {
       viewRot: +document.getElementById('print-orientation').value,
-      nameFormat: document.getElementById('print-name-format').value,
+      nameFormat: c.nameFormat,
       showPeople,
       showTeams: c.showTeams !== false,
-      showTypes: document.getElementById('print-types').checked,
+      showTypes: c.showTypes !== false,
       viewBox: [x0, y0, x1 - x0, y1 - y0],
       print: true
     });
