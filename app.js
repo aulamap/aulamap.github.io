@@ -2698,11 +2698,15 @@
     const RECOMMENDED = fits.length;
     fits.push([40, 60, 50, 40], [30, 45, 40, 25], [15, 30, 25, 10], [5, 15, 15, 0]);
     let margin, top, left, right, bottom;
+    // La inclinación en abanico (hasta 15°) saca las esquinas de los equipos
+    // de los extremos hacia las paredes: se reserva ese sitio en los márgenes
+    // para que la distancia a la pared sea la que se pide.
+    const TILT = 15 * Math.PI / 180;
+    let tiltX = 0, tiltY = 0;
     const setMargins = ([m, gapTop, gapBottom]) => {
-      margin = m; top = Math.max(m, furnitureBottom + gapTop);
-      left = m; right = c.room.w - m; bottom = c.room.h - gapBottom;
+      margin = m; top = Math.max(m, furnitureBottom + gapTop) + tiltY;
+      left = m + tiltX; right = c.room.w - m - tiltX; bottom = c.room.h - gapBottom - tiltY;
     };
-    setMargins(fits[0]);
     // Cada equipo es un conjunto de mesas pegadas en fila.
     const clusters = teams.map(team => {
       const desks = teamDeskTypes(team.members.length).map(type => makeObject(type, 0, 0));
@@ -2729,13 +2733,18 @@
       };
     });
     // Se van colocando por filas, de izquierda a derecha, y cada fila se
-    // centra en el aula. Si no caben con el hueco normal se aprietan y, si
-    // ni así, se alarga el aula lo justo y se baja lo que hay pegado a la
-    // pared del fondo (la puerta, por ejemplo).
+    // centra en el aula. Si no caben con el hueco normal se aprietan.
+    tiltX = Math.max(...clusters.map(k => k.h / 2 * Math.sin(TILT) + k.w / 2 * (1 - Math.cos(TILT))));
+    tiltY = Math.max(...clusters.map(k => k.w / 2 * Math.sin(TILT) + k.h / 2 * (1 - Math.cos(TILT))));
+    setMargins(fits[0]);
     let availW = right - left;
     // Reparte los conjuntos en filas con el hueco dado; «spreadX» y «spreadY»
     // son hueco extra para aprovechar el sitio que sobre sin cambiar de filas.
     const layout = (gapX, gapY, spreadX = 0, spreadY = 0) => {
+      // Dos vecinos de una misma fila no se inclinan igual: el del borde va
+      // más torcido que el del centro y su esquina se acerca al otro. Se
+      // reserva la mitad del vuelo de la inclinación en el hueco horizontal.
+      gapX += tiltX / 2;
       const rows = [[]];
       let x = 0;
       for (const k of clusters) {
@@ -2775,7 +2784,7 @@
       const fit = fits[Math.min(used, fits.length - 1)];
       const rows = layout.rows, nRows = rows.length;
       const cols = Math.max(...rows.map(r => r.length));
-      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * fit[3]));
+      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * (fit[3] + tiltX / 2)));
       const spreadX = cols > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (availW - rowW) / (cols - 1))) : 0;
       const spreadY = nRows > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (bottom - end) / (nRows - 1))) : 0;
       layout(fit[3], fit[3], spreadX, spreadY);
