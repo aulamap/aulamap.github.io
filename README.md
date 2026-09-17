@@ -18,8 +18,9 @@ No hay que instalar nada ni crear ninguna cuenta.
   medidas van en centímetros reales y el tamaño del aula se cambia arrastrando
   sus paredes.
 - **El alumnado.** Se pega la lista de nombres, se reparte al azar o se arrastra
-  cada uno a su mesa. Se elige qué parte del nombre se ve en el plano y si se
-  dibuja o no a cada alumno en su silla.
+  cada uno a su mesa. En el recuadro «Vista», sobre el plano, se elige qué
+  parte del nombre se ve, si se dibuja a cada alumno en su silla y si se
+  muestran los equipos y la tipología.
 - **Equipos.** Se forman con el mismo motor que
   [GeCo](https://github.com/jjdeharo/geco): al azar, heterogéneos u homogéneos
   según la tipología de cada alumno (A, B o C), con alumnado que no debe
@@ -53,10 +54,10 @@ No hay que instalar nada ni crear ninguna cuenta.
    Villaverde, María del Carmen»).
 4. **Siéntalos.** «Repartir al azar» sienta a quien no tiene sitio, o arrastra
    cada nombre a la mesa que quieras. De una mesa a otra, se cambian de sitio.
-5. **Por equipos, si se quiere.** En «Equipos», elige cuántos alumnos por
-   equipo y de qué tipo. Con equipos heterogéneos u homogéneos aparece en la
-   lista un selector A · B · C para marcar cómo trabaja cada alumno (sin marca
-   cuenta como B). «Formar equipos» los crea y los sienta juntos. También se
+5. **Por equipos, si se quiere.** En la pestaña *Equipos (opcional)*, elige
+   cuántos alumnos por equipo y de qué tipo. Con equipos heterogéneos u
+   homogéneos aparece junto a cada nombre un selector A · B · C para marcar
+   cómo trabaja cada alumno (sin marca cuenta como B). «Formar equipos» los crea y los sienta juntos. También se
    pueden hacer a mano con el desplegable que hay junto a cada nombre
    («Nuevo» crea el siguiente equipo), o cambiar a alguien de equipo después.
    «Sentar por equipos» vuelve a colocarlos con las mesas tal como están, y

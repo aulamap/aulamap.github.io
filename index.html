@@ -65,6 +65,7 @@
         <div class="tabs" role="tablist">
           <button class="tab active" data-mode="room" role="tab" data-i18n="tab_room">Aula</button>
           <button class="tab" data-mode="students" role="tab" data-i18n="tab_students">Alumnado</button>
+          <button class="tab" data-mode="teams" role="tab" data-i18n="tab_teams">Equipos (opcional)</button>
         </div>
 
         <section id="panel-room" class="panel">
@@ -83,10 +84,6 @@
           <textarea id="students-paste" rows="5" data-i18n-placeholder="students_paste_placeholder"></textarea>
           <button id="btn-students-add" class="btn wide" data-i18n="students_add_btn">Añadir a la lista</button>
 
-          <label class="stack"><span data-i18n="name_format">Nombre que se muestra</span>
-            <select id="name-format" class="name-format"></select></label>
-          <label class="check"><input id="show-people" type="checkbox" checked> <span data-i18n="show_people">Dibujar al alumnado</span></label>
-
           <div class="btn-grid">
             <button id="btn-random" class="btn" data-i18n="students_random" data-i18n-title="students_random_title">Repartir al azar</button>
             <button id="btn-clear-seats" class="btn" data-i18n="students_clear_seats" data-i18n-title="students_clear_title">Levantar a todos</button>
@@ -94,6 +91,12 @@
             <button id="btn-delete-students" class="btn danger" data-i18n="students_delete_all">Borrar lista</button>
           </div>
 
+          <h2 id="students-count"></h2>
+          <ul id="student-list" class="student-list"></ul>
+          <p class="hint" data-i18n="hint_students"></p>
+        </section>
+
+        <section id="panel-teams" class="panel" hidden>
           <h2 data-i18n="teams_title">Equipos</h2>
           <div class="field-row">
             <label><span data-i18n="teams_size">Alumnos por equipo</span><input id="team-size" type="number" min="2" max="12" value="4"></label>
@@ -118,21 +121,31 @@
           <button id="btn-teams-room" class="btn wide" data-i18n="teams_room" data-i18n-title="teams_room_title">Montar el aula para los equipos</button>
           <p class="hint" id="hint-teams"></p>
 
-          <h2 id="students-count"></h2>
-          <ul id="student-list" class="student-list"></ul>
-          <p class="hint" data-i18n="hint_students"></p>
+          <h2 id="teams-count"></h2>
+          <ul id="team-list" class="student-list team-list"></ul>
         </section>
       </aside>
 
       <section class="canvas-wrap">
         <div class="room-bar" id="room-bar" role="group" data-i18n-aria="tab_room">
-          <h2 data-i18n="tab_room">Aula</h2>
-          <label><span data-i18n="room_width">Ancho (m)</span>
-            <input id="room-w" type="number" min="2" max="40" step="0.1"></label>
-          <label><span data-i18n="room_depth">Fondo (m)</span>
-            <input id="room-h" type="number" min="2" max="40" step="0.1"></label>
-          <span class="room-bar-sep" aria-hidden="true"></span>
-          <div class="room-tools" id="room-tools"></div>
+          <div class="room-size" id="room-size">
+            <h2 data-i18n="tab_room">Aula</h2>
+            <label><span data-i18n="room_width">Ancho (m)</span>
+              <input id="room-w" type="number" min="2" max="40" step="0.1"></label>
+            <label><span data-i18n="room_depth">Fondo (m)</span>
+              <input id="room-h" type="number" min="2" max="40" step="0.1"></label>
+            <span class="room-bar-sep" aria-hidden="true"></span>
+            <div class="room-tools" id="room-tools"></div>
+            <span class="room-bar-sep" aria-hidden="true"></span>
+          </div>
+          <div class="room-view">
+            <h2 data-i18n="view_title">Vista</h2>
+            <label class="check"><input id="show-people" type="checkbox" checked> <span data-i18n="view_people">Alumnado en su silla</span></label>
+            <label class="check"><input id="show-teams" type="checkbox" checked> <span data-i18n="view_teams">Equipos</span></label>
+            <label class="check"><input id="show-types" type="checkbox" checked> <span data-i18n="view_types">Tipología</span></label>
+            <label><span data-i18n="name_format">Nombre que se muestra</span>
+              <select id="name-format" class="name-format"></select></label>
+          </div>
         </div>
         <div class="zoom-bar">
           <button id="btn-zoom-out" class="btn icon" data-i18n-title="zoom_out" title="Alejar">−</button>

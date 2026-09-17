@@ -485,7 +485,7 @@
         el('rect', { x: cell.x, y: cell.y, width: cell.w, height: cell.h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
       }
       const seatG = el('g', { 'data-obj': obj.id, 'data-seat': cell.i }, g);
-      const team = student && student.team ? student.team : 0;
+      const team = student && student.team && opts.showTeams ? student.team : 0;
       el('rect', {
         class: 'seat', x: cell.x + 1.5, y: cell.y + 1.5, width: cell.w - 3, height: cell.h - 3, rx: 2,
         fill: team ? teamFill(team) : (student ? '#ffffff' : '#fbf8f2'), stroke: 'none'
@@ -776,10 +776,10 @@
     const viewBox = frame
       ? [frame.x - drag.shiftX, frame.y - drag.shiftY, frame.w, frame.h]
       : null;
-    drawRoom(svg, c, { viewRot: 0, nameFormat: c.nameFormat, showPeople: c.showPeople !== false, showTypes: true, print: false, viewBox });
+    drawRoom(svg, c, { viewRot: 0, nameFormat: c.nameFormat, showPeople: c.showPeople !== false, showTeams: c.showTeams !== false, showTypes: c.showTypes !== false, print: false, viewBox });
     svg.setAttribute('width', (frame ? frame.w : c.room.w + 2 * MARGIN) * zoom);
     svg.setAttribute('height', (frame ? frame.h : c.room.h + 2 * MARGIN) * zoom);
-    svg.classList.toggle('students-mode', mode === 'students');
+    svg.classList.toggle('students-mode', mode !== 'room');
     renderSeatCount();
     renderProps();
     updateUndoButtons();
@@ -823,6 +823,8 @@
     document.getElementById('room-h').value = (c.room.h / 100).toFixed(1);
     document.querySelectorAll('select.name-format').forEach(s => { s.value = c.nameFormat; });
     document.getElementById('show-people').checked = c.showPeople !== false;
+    document.getElementById('show-teams').checked = c.showTeams !== false;
+    document.getElementById('show-types').checked = c.showTypes !== false;
     document.getElementById('team-size').value = c.teamSize || 4;
     document.getElementById('team-kind').value = c.teamKind || 'esporadicos';
     document.getElementById('team-leftovers').value = c.teamLeftovers || 'agregar';
@@ -844,27 +846,32 @@
 
   function renderStudents() {
     const c = cls();
-    const list = document.getElementById('student-list');
-    list.innerHTML = '';
     const seated = new Set();
     c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(s => s && seated.add(s)); });
-    document.getElementById('students-count').textContent = t('students_list', { assigned: seated.size, total: c.students.length });
     const teams = teamsOf(c);
     const withTypes = (c.teamKind || 'esporadicos') !== 'esporadicos';
     const sets = (c.incompatible || []).length;
+    document.getElementById('students-count').textContent = t('students_list', { assigned: seated.size, total: c.students.length });
+    document.getElementById('teams-count').textContent = teams.length ? t('teams_list', { teams: teams.length, total: c.students.length }) : t('teams_list_none');
     document.getElementById('btn-incompat').textContent = sets ? t('teams_incompat_count', { count: sets }) : t('teams_incompat');
     document.getElementById('hint-teams').textContent = t(withTypes ? 'hint_teams_types' : 'hint_teams');
     document.getElementById('btn-teams-seat').disabled = !teams.length;
     document.getElementById('btn-teams-clear').disabled = !teams.length;
     document.getElementById('btn-teams-room').disabled = !teams.length;
+    const list = document.getElementById('student-list');
+    const tl = document.getElementById('team-list');
+    list.innerHTML = '';
+    tl.innerHTML = '';
     if (!c.students.length) {
-      const li = document.createElement('li');
-      li.className = 'empty';
-      li.textContent = t('students_empty');
-      list.appendChild(li);
+      for (const ul of [list, tl]) {
+        const li = document.createElement('li');
+        li.className = 'empty';
+        li.textContent = t('students_empty');
+        ul.appendChild(li);
+      }
       return;
     }
-    for (const s of c.students) {
+    const rowStart = (s) => {
       const li = document.createElement('li');
       li.dataset.student = s.id;
       if (seated.has(s.id)) li.classList.add('seated');
@@ -876,6 +883,12 @@
       mark.className = 'seat-mark';
       mark.textContent = seated.has(s.id) ? '✓' : '';
       if (seated.has(s.id)) mark.title = t('student_seated');
+      li.append(handle, mark);
+      return li;
+    };
+    for (const s of c.students) {
+      // Pestaña Alumnado: el nombre, editable, y quitarlo de la lista.
+      const li = rowStart(s);
       const input = document.createElement('input');
       input.type = 'text';
       input.value = s.name;
@@ -886,35 +899,6 @@
         s.name = name;
         commit();
       });
-      // El equipo: un desplegable con el color del equipo. Sirve para hacer
-      // los equipos a mano desde cero («Nuevo» crea el siguiente) o para
-      // cambiar a alguien de equipo después de formarlos.
-      {
-        const pick = document.createElement('select');
-        pick.className = 'team-pick';
-        pick.title = t('team_pick_title');
-        const none = document.createElement('option');
-        none.value = '';
-        none.textContent = '–';
-        pick.appendChild(none);
-        const last = teams.length ? teams[teams.length - 1].n : 0;
-        for (let n = 1; n <= last + 1; n++) {
-          const opt = document.createElement('option');
-          opt.value = n;
-          opt.textContent = n <= last ? n : t('team_new');
-          pick.appendChild(opt);
-        }
-        pick.value = s.team ? String(s.team) : '';
-        if (s.team) { pick.style.background = teamFill(s.team); pick.style.color = teamInk(s.team); }
-        pick.addEventListener('change', () => {
-          checkpoint();
-          s.team = pick.value ? +pick.value : undefined;
-          if (!s.team) delete s.team;
-          syncTeamDesks(c);
-          commit();
-        });
-        li.appendChild(pick);
-      }
       const del = document.createElement('button');
       del.className = 'del';
       del.textContent = '×';
@@ -927,9 +911,43 @@
         syncTeamDesks(c);
         commit();
       });
-      li.append(handle, mark, input);
-      // La tipología solo se pide cuando los equipos van a tener en cuenta:
-      // con equipos al azar la fila se queda como siempre.
+      li.append(input, del);
+      list.appendChild(li);
+
+      // Pestaña Equipos: el mismo nombre con su equipo y, si cuenta, su tipología.
+      const tr = rowStart(s);
+      // El equipo: un desplegable con el color del equipo. Sirve para hacer
+      // los equipos a mano desde cero («Nuevo» crea el siguiente) o para
+      // cambiar a alguien de equipo después de formarlos.
+      const pick = document.createElement('select');
+      pick.className = 'team-pick';
+      pick.title = t('team_pick_title');
+      const none = document.createElement('option');
+      none.value = '';
+      none.textContent = '–';
+      pick.appendChild(none);
+      const last = teams.length ? teams[teams.length - 1].n : 0;
+      for (let n = 1; n <= last + 1; n++) {
+        const opt = document.createElement('option');
+        opt.value = n;
+        opt.textContent = n <= last ? n : t('team_new');
+        pick.appendChild(opt);
+      }
+      pick.value = s.team ? String(s.team) : '';
+      if (s.team) { pick.style.background = teamFill(s.team); pick.style.color = teamInk(s.team); }
+      pick.addEventListener('change', () => {
+        checkpoint();
+        s.team = pick.value ? +pick.value : undefined;
+        if (!s.team) delete s.team;
+        syncTeamDesks(c);
+        commit();
+      });
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = s.name;
+      name.title = s.name;
+      tr.append(pick, name);
+      // La tipología solo se pide cuando los equipos la van a tener en cuenta.
       if (withTypes) {
         const types = document.createElement('span');
         types.className = 'type-pick';
@@ -946,10 +964,9 @@
           });
           types.appendChild(b);
         }
-        li.appendChild(types);
+        tr.appendChild(types);
       }
-      li.appendChild(del);
-      list.appendChild(li);
+      tl.appendChild(tr);
     }
   }
 
@@ -1520,7 +1537,7 @@
     const p = clientToSvg(e.clientX, e.clientY);
     const c = cls();
 
-    if (mode === 'students') {
+    if (mode !== 'room') {
       const seat = e.target.closest('[data-seat]');
       const obj = seat && findObj(seat.dataset.obj);
       const studentId = obj && obj.seats[+seat.dataset.seat];
@@ -1674,7 +1691,7 @@
   svg.addEventListener('contextmenu', (e) => {
     e.preventDefault();
     const g = e.target.closest('.obj');
-    if (mode === 'students') {
+    if (mode !== 'room') {
       const seat = e.target.closest('[data-seat]');
       const obj = seat && findObj(seat.dataset.obj);
       const index = seat ? +seat.dataset.seat : -1;
@@ -1995,6 +2012,9 @@
   let studentDrag = null;
   const ghost = document.getElementById('drag-ghost');
   const studentList = document.getElementById('student-list');
+  const teamList = document.getElementById('team-list');
+  // La lista que recibe a quien se arrastra desde el plano es la de la pestaña abierta.
+  const activeList = () => (mode === 'teams' ? teamList : studentList);
 
   function startStudentDrag(e, studentId, from) {
     const student = findStudent(studentId);
@@ -2009,7 +2029,7 @@
     if (!target) return null;
     const seat = target.closest('[data-seat]');
     if (seat) return { kind: 'seat', obj: seat.dataset.obj, seat: +seat.dataset.seat, node: seat.querySelector('.seat') };
-    if (target.closest('#student-list')) return { kind: 'list' };
+    if (target.closest('#student-list, #team-list')) return { kind: 'list' };
     return null;
   }
 
@@ -2022,9 +2042,10 @@
     ghost.style.top = e.clientY + 'px';
     svg.querySelectorAll('.drop-hover').forEach(n => n.classList.remove('drop-hover'));
     studentList.classList.remove('drop-target');
+    teamList.classList.remove('drop-target');
     const target = dropTargetAt(e.clientX, e.clientY);
     if (target?.kind === 'seat') target.node.classList.add('drop-hover');
-    if (target?.kind === 'list' && d.from) studentList.classList.add('drop-target');
+    if (target?.kind === 'list' && d.from) activeList().classList.add('drop-target');
   }
 
   function endStudentDrag(e) {
@@ -2032,6 +2053,7 @@
     studentDrag = null;
     ghost.hidden = true;
     studentList.classList.remove('drop-target');
+    teamList.classList.remove('drop-target');
     if (!d.active) { render(); return; }
     const target = dropTargetAt(e.clientX, e.clientY);
     if (!target) { render(); return; }
@@ -2063,11 +2085,13 @@
     }
   }
 
-  studentList.addEventListener('pointerdown', (e) => {
-    const handle = e.target.closest('.handle');
-    if (!handle || e.button !== 0) return;
-    startStudentDrag(e, handle.dataset.student, null);
-  });
+  for (const list of [studentList, teamList]) {
+    list.addEventListener('pointerdown', (e) => {
+      const handle = e.target.closest('.handle');
+      if (!handle || e.button !== 0) return;
+      startStudentDrag(e, handle.dataset.student, null);
+    });
+  }
 
   /* ---------- Teclado ---------- */
 
@@ -2296,11 +2320,13 @@
     });
   });
 
-  document.getElementById('show-people').addEventListener('change', (e) => {
-    cls().showPeople = e.target.checked;
-    saveState();
-    render();
-  });
+  for (const [id, key] of [['show-people', 'showPeople'], ['show-teams', 'showTeams'], ['show-types', 'showTypes']]) {
+    document.getElementById(id).addEventListener('change', (e) => {
+      cls()[key] = e.target.checked;
+      saveState();
+      render();
+    });
+  }
 
   function emptySeats() {
     const seats = [];
@@ -2780,9 +2806,11 @@
       document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === tab));
       document.getElementById('panel-room').hidden = mode !== 'room';
       document.getElementById('panel-students').hidden = mode !== 'students';
-      // El tamaño del aula y la colocación del plano solo se tocan en «Aula».
-      document.getElementById('room-bar').hidden = mode !== 'room';
-      if (mode === 'students') selection.clear();
+      document.getElementById('panel-teams').hidden = mode !== 'teams';
+      // El tamaño del aula y la colocación del plano solo se tocan en «Aula»;
+      // las opciones de vista se ven siempre.
+      document.getElementById('room-size').hidden = mode !== 'room';
+      if (mode !== 'room') selection.clear();
       render();
     });
   });
@@ -3130,6 +3158,7 @@
       viewRot: +document.getElementById('print-orientation').value,
       nameFormat: document.getElementById('print-name-format').value,
       showPeople,
+      showTeams: c.showTeams !== false,
       showTypes: document.getElementById('print-types').checked,
       viewBox: [x0, y0, x1 - x0, y1 - y0],
       print: true
