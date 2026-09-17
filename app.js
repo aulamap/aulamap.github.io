@@ -796,6 +796,7 @@
     document.getElementById('hint-teams').textContent = t(withTypes ? 'hint_teams_types' : 'hint_teams');
     document.getElementById('btn-teams-seat').disabled = !teams.length;
     document.getElementById('btn-teams-clear').disabled = !teams.length;
+    document.getElementById('btn-teams-room').disabled = !teams.length;
     if (!c.students.length) {
       const li = document.createElement('li');
       li.className = 'empty';
@@ -825,9 +826,10 @@
         s.name = name;
         commit();
       });
-      // El equipo, si los hay: un desplegable con el color del equipo para
-      // cambiar a alguien de equipo a mano.
-      if (teams.length) {
+      // El equipo: un desplegable con el color del equipo. Sirve para hacer
+      // los equipos a mano desde cero («Nuevo» crea el siguiente) o para
+      // cambiar a alguien de equipo después de formarlos.
+      {
         const pick = document.createElement('select');
         pick.className = 'team-pick';
         pick.title = t('team_pick_title');
@@ -835,7 +837,7 @@
         none.value = '';
         none.textContent = '–';
         pick.appendChild(none);
-        const last = teams[teams.length - 1].n;
+        const last = teams.length ? teams[teams.length - 1].n : 0;
         for (let n = 1; n <= last + 1; n++) {
           const opt = document.createElement('option');
           opt.value = n;
@@ -2346,6 +2348,106 @@
     commit();
     reportSeating(result);
   });
+
+  // Mesas para un equipo según cuántos son: hasta seis, una sola mesa de
+  // grupo; más, una de seis y otra al lado con el resto.
+  function teamDeskTypes(n) {
+    const one = k => (k <= 1 ? 'desk1' : k === 2 ? 'facing2' : k === 3 ? 'group3' : k === 4 ? 'group4' : 'group6');
+    const types = [];
+    while (n > 6) { types.push('group6'); n -= 6; }
+    types.push(one(n));
+    return types;
+  }
+
+  // Hueco que ocupa una mesa con sus sillas, para separar los equipos de verdad.
+  function deskFootprint(obj) {
+    const sides = deskSides(obj), chair = 40;
+    return {
+      l: sides.has('left') ? chair : 0, r: sides.has('right') ? chair : 0,
+      t: sides.has('top') ? chair : 0, b: sides.has('bottom') ? chair : 0
+    };
+  }
+
+  // Sustituye las mesas del aula por una por equipo, en rejilla y de cara a
+  // la pizarra, dejando el mobiliario donde está. Después sienta a los equipos.
+  function buildTeamRoom() {
+    const c = cls();
+    const teams = teamsOf(c);
+    if (!teams.length) return;
+    if (!confirm(t('confirm_teams_room'))) return;
+    checkpoint();
+    c.objects = c.objects.filter(o => !isDesk(o));
+    // Zona libre: por debajo de lo que hay pegado a la pared de la pizarra
+    // (pizarra, mesa del docente) y con aire hasta las demás paredes.
+    const margin = 60;
+    let top = 100;
+    for (const o of c.objects) {
+      if (o.y < c.room.h / 2) top = Math.max(top, boundsOf([o], c).y1 + 90);
+    }
+    const left = margin, right = c.room.w - margin, bottom = c.room.h - 100;
+    // Cada equipo es un conjunto de mesas pegadas en fila.
+    const clusters = teams.map(team => {
+      const desks = teamDeskTypes(team.members.length).map(type => makeObject(type, 0, 0));
+      // Entre dos mesas de un mismo equipo se deja sitio para las sillas
+      // que dan a ese lado, para que no se monten unas sobre otras.
+      let x = 0, l = 0, r = 0, t = 0, b = 0;
+      desks.forEach((d, i) => {
+        const f = deskFootprint(d);
+        if (i === 0) l = f.l; else x += r + f.l;
+        d.x = x + d.w / 2; d.y = 0;
+        x += d.w;
+        r = f.r; t = Math.max(t, d.h / 2 + f.t); b = Math.max(b, d.h / 2 + f.b);
+      });
+      return { team, desks, w: l + x + r, h: t + b, offX: l, offY: t };
+    });
+    // Se van colocando por filas, de izquierda a derecha, y cada fila se
+    // centra en el aula. Si no caben con el hueco normal se aprietan y, si
+    // ni así, se alarga el aula lo justo y se baja lo que hay pegado a la
+    // pared del fondo (la puerta, por ejemplo).
+    const availW = right - left;
+    const layout = (gapX, gapY) => {
+      const rows = [[]];
+      let x = 0;
+      for (const k of clusters) {
+        const row = rows[rows.length - 1];
+        if (row.length && x + gapX + k.w > availW) { rows.push([k]); x = k.w; continue; }
+        x += (row.length ? gapX : 0) + k.w;
+        row.push(k);
+      }
+      let y = top;
+      for (const row of rows) {
+        const rowW = row.reduce((n, k) => n + k.w, 0) + (row.length - 1) * gapX;
+        const rowH = Math.max(...row.map(k => k.h));
+        let cx = left + (availW - rowW) / 2;
+        for (const k of row) {
+          k.x0 = cx + k.offX;
+          k.y0 = y + (rowH - k.h) / 2 + k.offY;
+          cx += k.w + gapX;
+        }
+        y += rowH + gapY;
+      }
+      return y - gapY;   // hasta dónde llega la última fila
+    };
+    let end = layout(60, 60);
+    if (end > bottom) end = layout(30, 30);
+    if (end > bottom) {
+      const extra = Math.ceil((end - bottom) / 10) * 10;
+      const oldH = c.room.h;
+      c.room.h = Math.min(4000, oldH + extra);
+      const delta = c.room.h - oldH;
+      c.objects.forEach(o => { if (o.y > oldH - 60) o.y += delta; });
+    }
+    clusters.forEach(k => {
+      k.desks.forEach(d => { d.x = Math.round(k.x0 + d.x); d.y = Math.round(k.y0); c.objects.push(d); });
+    });
+    const result = seatTeams(c);
+    selection.clear();
+    commit();
+    fitZoom();
+    reportSeating(result);
+  }
+
+  document.getElementById('btn-teams-room').addEventListener('click', buildTeamRoom);
 
   document.getElementById('btn-teams-clear').addEventListener('click', () => {
     const c = cls();
