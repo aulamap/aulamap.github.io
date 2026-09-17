@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.ca = {
   add_desks: 'Taules',
   add_furniture: 'Mobiliari',
   desk_block: 'Bloc de taules…',
+  desk_block_title: 'Crea d\'un cop diverses files i columnes de taules iguals, amb la separació que s\'indiqui',
   hint_room: 'Arrossega un element per moure\'l i una paret per canviar la mida de l\'aula. Arrossega en una zona buida per desplaçar el plànol; amb Maj, per seleccionar-ne uns quants. Ctrl + roda acosta o allunya. Botó dret sobre un element per duplicar-lo, agrupar-lo, girar-lo o eliminar-lo.',
 
   type_desk1: 'Taula individual',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.ca = {
   teams_list: 'Llista ({teams} equips, {total} alumnes)',
   teams_list_none: 'Llista (sense equips)',
   prop_shape: 'Forma',
-  shapes_button: 'Formes per defecte…',
+  shapes_button: 'Formes de taula per als equips…',
+  shapes_button_title: 'Tria quina forma de taula s\'usa per a cada mida d\'equip en muntar l\'aula',
   shapes_title: 'Formes per defecte',
   shapes_help: 'Per a les taules de grup que tenen més d\'una forma: la marcada és la que s\'usa en muntar l\'aula per als equips. Qualsevol taula es pot canviar després a l\'altra forma des de les propietats o amb el botó dret.',
   teams_title: 'Equips',

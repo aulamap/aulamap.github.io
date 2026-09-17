@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.es = {
   add_desks: 'Mesas',
   add_furniture: 'Mobiliario',
   desk_block: 'Bloque de mesas…',
+  desk_block_title: 'Crea de una vez varias filas y columnas de mesas iguales, con la separación que se indique',
   hint_room: 'Arrastra un elemento para moverlo y una pared para cambiar el tamaño del aula. Arrastra en una zona vacía para desplazar el plano; con Mayús, para seleccionar varios. Ctrl + rueda acerca o aleja. Botón derecho sobre un elemento para duplicarlo, agruparlo, girarlo o eliminarlo.',
 
   type_desk1: 'Mesa individual',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.es = {
   teams_list: 'Lista ({teams} equipos, {total} alumnos)',
   teams_list_none: 'Lista (sin equipos)',
   prop_shape: 'Forma',
-  shapes_button: 'Formas por defecto…',
+  shapes_button: 'Formas de mesa para los equipos…',
+  shapes_button_title: 'Elige qué forma de mesa se usa para cada tamaño de equipo al montar el aula',
   shapes_title: 'Formas por defecto',
   shapes_help: 'Para las mesas de grupo que tienen más de una forma: la marcada es la que se usa al montar el aula para los equipos. Cualquier mesa se puede cambiar después a la otra forma desde sus propiedades o con el botón derecho.',
   teams_title: 'Equipos',

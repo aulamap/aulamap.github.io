@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.de = {
   add_desks: 'Tische',
   add_furniture: 'Möbel',
   desk_block: 'Tischblock…',
+  desk_block_title: 'Erstellt auf einmal mehrere Reihen und Spalten gleicher Tische mit dem angegebenen Abstand',
   hint_room: 'Ein Element ziehen, um es zu verschieben, und eine Wand, um die Raumgröße zu ändern. Auf einer freien Fläche ziehen, um den Plan zu verschieben; mit Umschalt, um mehrere Elemente auszuwählen. Strg + Mausrad zoomt. Rechtsklick auf ein Element zum Duplizieren, Gruppieren, Drehen oder Löschen.',
 
   type_desk1: 'Einzeltisch',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.de = {
   teams_list: 'Liste ({teams} Teams, {total} Schüler)',
   teams_list_none: 'Liste (ohne Teams)',
   prop_shape: 'Form',
-  shapes_button: 'Standardformen…',
+  shapes_button: 'Tischformen für die Teams…',
+  shapes_button_title: 'Wählen, welche Tischform beim Einrichten des Raums für jede Teamgröße verwendet wird',
   shapes_title: 'Standardformen',
   shapes_help: 'Für Gruppentische mit mehr als einer Form: die markierte wird beim Einrichten des Raums für die Teams verwendet. Jeder Tisch lässt sich später in den Eigenschaften oder mit der rechten Maustaste in die andere Form ändern.',
   teams_title: 'Teams',

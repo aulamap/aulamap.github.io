@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.en = {
   add_desks: 'Desks',
   add_furniture: 'Furniture',
   desk_block: 'Block of desks…',
+  desk_block_title: 'Creates several rows and columns of identical desks at once, with the spacing given',
   hint_room: 'Drag an item to move it and a wall to resize the room. Drag on an empty area to pan the plan; hold Shift to select several items. Ctrl + wheel zooms in and out. Right-click an item to duplicate, group, rotate or delete it.',
 
   type_desk1: 'Single desk',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.en = {
   teams_list: 'List ({teams} teams, {total} students)',
   teams_list_none: 'List (no teams)',
   prop_shape: 'Shape',
-  shapes_button: 'Default shapes…',
+  shapes_button: 'Desk shapes for the teams…',
+  shapes_button_title: 'Choose which desk shape is used for each team size when setting up the room',
   shapes_title: 'Default shapes',
   shapes_help: 'For group desks that have more than one shape: the one marked is used when setting up the room for the teams. Any desk can be switched to the other shape later from its properties or with the right button.',
   teams_title: 'Teams',

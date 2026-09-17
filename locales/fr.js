@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.fr = {
   add_desks: 'Tables',
   add_furniture: 'Mobilier',
   desk_block: 'Bloc de tables…',
+  desk_block_title: 'Crée en une fois plusieurs rangées et colonnes de tables identiques, avec l’espacement indiqué',
   hint_room: 'Faire glisser un élément pour le déplacer et un mur pour modifier la taille de la salle. Faire glisser sur une zone vide pour déplacer le plan ; avec Maj, pour sélectionner plusieurs éléments. Ctrl + molette pour zoomer. Clic droit sur un élément pour le dupliquer, le grouper, le faire pivoter ou le supprimer.',
 
   type_desk1: 'Table individuelle',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.fr = {
   teams_list: 'Liste ({teams} équipes, {total} élèves)',
   teams_list_none: 'Liste (sans équipes)',
   prop_shape: 'Forme',
-  shapes_button: 'Formes par défaut…',
+  shapes_button: 'Formes de table pour les équipes…',
+  shapes_button_title: 'Choisir la forme de table utilisée pour chaque taille d’équipe lors de l’aménagement de la salle',
   shapes_title: 'Formes par défaut',
   shapes_help: 'Pour les tables de groupe qui ont plusieurs formes : celle qui est cochée est utilisée pour aménager la salle pour les équipes. Toute table peut ensuite passer à l’autre forme depuis ses propriétés ou avec le bouton droit.',
   teams_title: 'Équipes',

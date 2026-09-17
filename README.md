@@ -65,7 +65,7 @@ No hay que instalar nada ni crear ninguna cuenta.
    cara a la pizarra, sin tocar el resto del mobiliario. Esas mesas siguen a
    su equipo: si entra o sale alguien, cambian de tipo (de 6 a 5, de 4 a 3…)
    y, si el equipo se queda vacío, desaparecen. Los grupos de 4 y de 6 tienen
-   dos formas: en «Formas por defecto…» (pestaña Aula) se elige cuál se usa al
+   dos formas: en «Formas de mesa para los equipos…» (pestaña Equipos) se elige cuál se usa al
    montar el aula, y cualquier mesa se cambia después a la otra desde sus
    propiedades o con el botón derecho, que también permite separarla en mesas
    sueltas para recolocar cada puesto a mano. Al imprimir

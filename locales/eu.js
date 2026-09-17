@@ -33,6 +33,7 @@ window.CLASSE_LOCALES.eu = {
   add_desks: 'Mahaiak',
   add_furniture: 'Altzariak',
   desk_block: 'Mahai-multzoa…',
+  desk_block_title: 'Mahai berdinen hainbat errenkada eta zutabe sortzen ditu batera, adierazitako tartearekin',
   hint_room: 'Arrastatu elementu bat mugitzeko eta horma bat ikasgelaren neurria aldatzeko. Arrastatu gune huts batean planoa lekuz aldatzeko; Maius sakatuta, hainbat hautatzeko. Ctrl + gurpilak hurbildu edo urrundu egiten du. Eskuineko botoia elementu baten gainean bikoiztu, elkartu, biratu edo ezabatzeko.',
 
   type_desk1: 'Mahai bakuna',
@@ -164,7 +165,8 @@ window.CLASSE_LOCALES.eu = {
   teams_list: 'Zerrenda ({teams} talde, {total} ikasle)',
   teams_list_none: 'Zerrenda (talderik gabe)',
   prop_shape: 'Forma',
-  shapes_button: 'Forma lehenetsiak…',
+  shapes_button: 'Mahai-formak taldeentzat…',
+  shapes_button_title: 'Aukeratu zein mahai-forma erabiltzen den talde-tamaina bakoitzerako gela antolatzean',
   shapes_title: 'Forma lehenetsiak',
   shapes_help: 'Forma bat baino gehiago duten talde-mahaientzat: markatutakoa erabiltzen da gela taldeetarako antolatzean. Edozein mahai gero beste formara alda daiteke propietateetatik edo eskuineko botoiarekin.',
   teams_title: 'Taldeak',
