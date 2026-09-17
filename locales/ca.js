@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.ca = {
   type_facing2: 'Cara a cara',
   type_group3: 'Grup de 3',
   type_group4: 'Grup de 4',
+  type_group5: 'Grup de 5',
   type_group6: 'Grup de 6',
   type_teacher: 'Taula del docent',
   type_board: 'Pissarra',

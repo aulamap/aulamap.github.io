@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.eu = {
   type_facing2: 'Aurrez aurre',
   type_group3: '3ko taldea',
   type_group4: '4ko taldea',
+  type_group5: '5eko taldea',
   type_group6: '6ko taldea',
   type_teacher: 'Irakaslearen mahaia',
   type_board: 'Arbela',

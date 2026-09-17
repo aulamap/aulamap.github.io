@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.en = {
   type_facing2: 'Face to face',
   type_group3: 'Group of 3',
   type_group4: 'Group of 4',
+  type_group5: 'Group of 5',
   type_group6: 'Group of 6',
   type_teacher: 'Teacher’s desk',
   type_board: 'Board',

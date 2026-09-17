@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.pt = {
   type_facing2: 'Frente a frente',
   type_group3: 'Grupo de 3',
   type_group4: 'Grupo de 4',
+  type_group5: 'Grupo de 5',
   type_group6: 'Grupo de 6',
   type_teacher: 'Mesa do professor',
   type_board: 'Quadro',

@@ -11,7 +11,7 @@ No hay que instalar nada ni crear ninguna cuenta.
 
 ## Qué hace
 
-- **El aula.** Mesas individuales, dobles, «cara a cara», grupos de 3, 4 y 6, y
+- **El aula.** Mesas individuales, dobles, «cara a cara», grupos de 3, 4, 5 y 6, y
   mobiliario: pizarra, mesa del docente, pantalla o proyector, puerta, ventana,
   tablón de anuncios, armario, estantería, mesa auxiliar, ordenador, pica,
   columna, papelera, planta y textos libres. Las

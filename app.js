@@ -38,6 +38,17 @@
       ]
     },
     group4: { w: 140, h: 100, cols: 2, rows: 2 },
+    // El grupo de 4 con una quinta mesa perpendicular y centrada en un extremo.
+    group5: {
+      w: 190, h: 100,
+      cells: [
+        { x: -60, y: -25, w: 70, h: 50, side: 'top' },
+        { x: 10, y: -25, w: 70, h: 50, side: 'top' },
+        { x: -60, y: 25, w: 70, h: 50, side: 'bottom' },
+        { x: 10, y: 25, w: 70, h: 50, side: 'bottom' },
+        { x: 70, y: 0, w: 50, h: 70, side: 'right' }
+      ]
+    },
     group6: { w: 210, h: 100, cols: 3, rows: 2 }
   };
 
@@ -2360,7 +2371,7 @@
   // Mesas para un equipo según cuántos son: hasta seis, una sola mesa de
   // grupo; más, una de seis y otra al lado con el resto.
   function teamDeskTypes(n) {
-    const one = k => (k <= 1 ? 'desk1' : k === 2 ? 'facing2' : k === 3 ? 'group3' : k === 4 ? 'group4' : 'group6');
+    const one = k => (k <= 1 ? 'desk1' : k === 2 ? 'facing2' : k === 3 ? 'group3' : k === 4 ? 'group4' : k === 5 ? 'group5' : 'group6');
     const types = [];
     while (n > 6) { types.push('group6'); n -= 6; }
     types.push(one(n));

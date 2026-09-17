@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.de = {
   type_facing2: 'Gegenüber',
   type_group3: 'Gruppe mit 3',
   type_group4: 'Gruppe mit 4',
+  type_group5: 'Gruppe mit 5',
   type_group6: 'Gruppe mit 6',
   type_teacher: 'Lehrertisch',
   type_board: 'Tafel',

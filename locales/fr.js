@@ -40,6 +40,7 @@ window.CLASSE_LOCALES.fr = {
   type_facing2: 'Face à face',
   type_group3: 'Îlot de 3',
   type_group4: 'Îlot de 4',
+  type_group5: 'Îlot de 5',
   type_group6: 'Îlot de 6',
   type_teacher: 'Bureau de l’enseignant',
   type_board: 'Tableau',
