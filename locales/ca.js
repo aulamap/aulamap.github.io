@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.ca = {
   import_geco_confirm: 'El fitxer és de GeCo amb {count} alumnes. Vols afegir-los, amb les tipologies i els equips, a la classe «{name}»?',
   import_geco_done: 'S\'han afegit les dades de GeCo ({count} alumnes).',
   print_show_teams: 'Afegir la llista d\'equips',
+  print_show_types: 'Mostrar la tipologia (A, B, C) al plànol',
   teams_room: 'Muntar l\'aula per als equips',
   teams_room_title: 'Canvia les taules per una per equip, de cara a la pissarra',
   confirm_teams_room: 'Canviar les taules de l\'aula per una per equip? La resta del mobiliari es queda on és. Es pot desfer.',

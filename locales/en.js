@@ -186,6 +186,7 @@ window.CLASSE_LOCALES.en = {
   import_geco_confirm: 'This is a GeCo file with {count} students. Add them, with their types and teams, to class “{name}”?',
   import_geco_done: 'GeCo data added ({count} students).',
   print_show_teams: 'Add the list of teams',
+  print_show_types: 'Show the type (A, B, C) on the plan',
   teams_room: 'Set up the room for the teams',
   teams_room_title: 'Replaces the desks with one per team, facing the board',
   confirm_teams_room: 'Replace the desks with one per team? The rest of the furniture stays where it is. This can be undone.',

@@ -449,6 +449,14 @@
         el('circle', { cx: bx, cy: by, r, fill: teamInk(team), stroke: 'none' }, seatG);
         addText(seatG, [String(team)], bx, by + 0.3, 9, { flip, weight: 700, fill: '#fff' });
       }
+      // La tipología (A, B o C), en la otra esquina de arriba.
+      if (student && student.type && opts.showTypes) {
+        const r = 6.5;
+        const bx = cell.x + (flip ? r + 2.5 : cell.w - r - 2.5);
+        const by = cell.y + (flip ? cell.h - r - 2.5 : r + 2.5);
+        el('rect', { x: bx - r, y: by - r, width: 2 * r, height: 2 * r, rx: 2, fill: '#fff', stroke: '#6b6258', 'stroke-width': 1 }, seatG);
+        addText(seatG, [student.type], bx, by + 0.3, 9, { flip, weight: 700, fill: '#23262b' });
+      }
       if (!propia) {
         if (cell.col > 0) el('line', { x1: cell.x, y1: cell.y + 4, x2: cell.x, y2: cell.y + cell.h - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (cell.r > 0 && cell.col === 0) el('line', { x1: -obj.w / 2 + 4, y1: cell.y, x2: obj.w / 2 - 4, y2: cell.y, stroke: '#c9b894', 'stroke-width': 1 }, g);
@@ -716,7 +724,7 @@
     const viewBox = frame
       ? [frame.x - drag.shiftX, frame.y - drag.shiftY, frame.w, frame.h]
       : null;
-    drawRoom(svg, c, { viewRot: 0, nameFormat: c.nameFormat, showPeople: c.showPeople !== false, print: false, viewBox });
+    drawRoom(svg, c, { viewRot: 0, nameFormat: c.nameFormat, showPeople: c.showPeople !== false, showTypes: true, print: false, viewBox });
     svg.setAttribute('width', (frame ? frame.w : c.room.w + 2 * MARGIN) * zoom);
     svg.setAttribute('height', (frame ? frame.h : c.room.h + 2 * MARGIN) * zoom);
     svg.classList.toggle('students-mode', mode === 'students');
@@ -2876,6 +2884,9 @@
     document.getElementById('print-people').checked = c.showPeople !== false;
     const teamsRow = document.getElementById('print-teams').closest('label');
     teamsRow.hidden = !teamsOf(c).length;
+    const typesRow = document.getElementById('print-types').closest('label');
+    typesRow.hidden = !c.students.some(s => s.type);
+    document.getElementById('print-types').checked = false;
     document.getElementById('print-teams').checked = !teamsRow.hidden;
     document.getElementById('print-paper').value = lastPaper;
     document.getElementById('print-margin').value = lastMargin;
@@ -2956,6 +2967,7 @@
       viewRot: +document.getElementById('print-orientation').value,
       nameFormat: document.getElementById('print-name-format').value,
       showPeople,
+      showTypes: document.getElementById('print-types').checked,
       viewBox: [x0, y0, x1 - x0, y1 - y0],
       print: true
     });
