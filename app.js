@@ -2370,6 +2370,17 @@
     commit();
     fitZoom();
   }
+  // Vaciar el aula: fuera mesas y mobiliario; la lista de alumnado se queda,
+  // aunque nadie tiene sitio, y los equipos siguen formados.
+  document.getElementById('btn-room-clear').addEventListener('click', () => {
+    const c = cls();
+    if (!c.objects.length || !confirm(t('confirm_room_clear'))) return;
+    checkpoint();
+    c.objects = [];
+    selection.clear();
+    commit();
+  });
+
   document.getElementById('room-w').addEventListener('change', onRoomSize);
   document.getElementById('room-h').addEventListener('change', onRoomSize);
 
