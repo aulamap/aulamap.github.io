@@ -2684,10 +2684,26 @@
     c.objects = c.objects.filter(o => !isDesk(o));
     // Zona libre: por debajo de lo que hay pegado a la pared de la pizarra
     // (pizarra, mesa del docente) y con aire hasta las demás paredes.
+    // Lo que hay pegado a la pared frontal (pantalla, mesa del docente…)
+    // marca por dónde empiezan los equipos. Solo cuenta lo que acaba en el
+    // primer tercio largo del aula: un tablón o una ventana en una pared
+    // lateral no empujan las mesas hacia el fondo, solo estrechan sus filas.
+    const furniture = c.objects.map(o => ({ o, b: boundsOf([o], c) }));
     let furnitureBottom = 0;
-    for (const o of c.objects) {
-      if (o.y < c.room.h / 2) furnitureBottom = Math.max(furnitureBottom, boundsOf([o], c).y1);
+    for (const { b } of furniture) {
+      if (b.y1 < c.room.h * 0.4) furnitureBottom = Math.max(furnitureBottom, b.y1);
     }
+    // Muebles de las paredes laterales: lo que sobresale de cada pared en la
+    // franja de una fila le quita anchura a esa fila.
+    const sideObstacles = furniture.filter(({ b }) => b.y1 >= c.room.h * 0.4 || b.y0 > furnitureBottom - 1);
+    const rowBounds = (y0, y1) => {
+      let l = left, r = right;
+      for (const { o, b } of sideObstacles) {
+        if (b.y1 < y0 || b.y0 > y1) continue;
+        if (o.x < c.room.w / 2) l = Math.max(l, b.x1 + margin); else r = Math.min(r, b.x0 - margin);
+      }
+      return [l, r];
+    };
     // Márgenes en centímetros reales: [pared, tras el mobiliario frontal,
     // pared del fondo, entre equipos]. Los holgados primero; si no caben se
     // aprietan. Lo recomendable es no bajar de 60 cm entre sillas (más los
@@ -2745,26 +2761,36 @@
     let availW = right - left;
     // Reparte los conjuntos en filas con el hueco dado; «spreadX» y «spreadY»
     // son hueco extra para aprovechar el sitio que sobre sin cambiar de filas.
+    // Se reparte fila a fila: cada fila usa la anchura que le dejan los
+    // muebles de las paredes laterales a su altura.
+    const tallest = Math.max(...clusters.map(k => k.h));
     const layout = (gapX, gapY, spreadX = 0, spreadY = 0) => {
-      const rows = [[]];
-      let x = 0;
-      for (const k of clusters) {
-        const row = rows[rows.length - 1];
-        if (row.length && x + gapX + k.w > availW) { rows.push([k]); x = k.w; continue; }
-        x += (row.length ? gapX : 0) + k.w;
-        row.push(k);
-      }
-      let y = top;
-      for (const row of rows) {
+      const rows = [];
+      let y = top, i = 0;
+      layout.spare = Infinity;
+      while (i < clusters.length) {
+        const [l, r] = rowBounds(y, y + tallest);
+        const rowAvail = r - l;
+        const row = [];
+        let x = 0;
+        while (i < clusters.length) {
+          const k = clusters[i];
+          if (row.length && x + gapX + k.w > rowAvail) break;
+          x += (row.length ? gapX : 0) + k.w;
+          row.push(k);
+          i++;
+        }
         const gx = gapX + spreadX;
         const rowW = row.reduce((n, k) => n + k.w, 0) + (row.length - 1) * gx;
         const rowH = Math.max(...row.map(k => k.h));
-        let cx = left + (availW - rowW) / 2;
+        let cx = l + (rowAvail - rowW) / 2;
         for (const k of row) {
           k.cx = cx + k.w / 2;
           k.cy = y + rowH / 2;
           cx += k.w + gx;
         }
+        if (row.length > 1) layout.spare = Math.min(layout.spare, rowAvail - rowW);
+        rows.push(row);
         y += rowH + gapY + spreadY;
       }
       layout.rows = rows;
@@ -2789,9 +2815,8 @@
       const rec = fits[RECOMMENDED - 1];
       const rows = layout.rows, nRows = rows.length;
       const cols = Math.max(...rows.map(r => r.length));
-      const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * fit[3]));
       const stackH = rows.reduce((n, r) => n + Math.max(...r.map(k => k.h)), 0) + (nRows - 1) * fit[3];
-      let spareX = availW - rowW, spareY = bottom - top - stackH;
+      let spareX = cols > 1 ? layout.spare : 0, spareY = bottom - top - stackH;
       // 1. Pasillos hasta lo recomendado.
       let spreadX = cols > 1 ? Math.min(Math.max(0, rec[3] - fit[3]), spareX / (cols - 1)) : 0;
       let spreadY = nRows > 1 ? Math.min(Math.max(0, rec[3] - fit[3]), spareY / (nRows - 1)) : 0;
