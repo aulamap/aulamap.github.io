@@ -20,6 +20,12 @@ No hay que instalar nada ni crear ninguna cuenta.
 - **El alumnado.** Se pega la lista de nombres, se reparte al azar o se arrastra
   cada uno a su mesa. Se elige qué parte del nombre se ve en el plano y si se
   dibuja o no a cada alumno en su silla.
+- **Equipos.** Se forman con el mismo motor que
+  [GeCo](https://github.com/jjdeharo/geco): al azar, heterogéneos u homogéneos
+  según la tipología de cada alumno (A, B o C), con alumnado que no debe
+  coincidir y con sobrantes repartidos o en un equipo aparte. Cada equipo se
+  sienta junto en las mesas tal como están y se ve en el plano con su color y
+  su número. Un archivo exportado desde GeCo se importa directamente.
 - **Varias clases** en la misma aplicación, cada una con su plano y su lista.
 - **Ordenar.** Alinear, igualar el espacio entre mesas y centrar la selección en
   el aula, para que las filas queden cuadradas.
@@ -45,7 +51,14 @@ No hay que instalar nada ni crear ninguna cuenta.
    Villaverde, María del Carmen»).
 4. **Siéntalos.** «Repartir al azar» sienta a quien no tiene sitio, o arrastra
    cada nombre a la mesa que quieras. De una mesa a otra, se cambian de sitio.
-5. **Imprime.** El botón «Imprimir» deja elegir el título, si la pizarra se ve
+5. **Por equipos, si se quiere.** En «Equipos», elige cuántos alumnos por
+   equipo y de qué tipo. Con equipos heterogéneos u homogéneos aparece en la
+   lista un selector A · B · C para marcar cómo trabaja cada alumno (sin marca
+   cuenta como B). «Formar equipos» los crea y los sienta juntos; el
+   desplegable de cada nombre permite cambiar a alguien de equipo, y «Sentar
+   por equipos» vuelve a colocarlos. Al imprimir se puede añadir la lista de
+   equipos.
+6. **Imprime.** El botón «Imprimir» deja elegir el título, si la pizarra se ve
    arriba o abajo, y si se añade la fecha.
 
 Abajo a la izquierda del plano tienes siempre a la vista cuántos puestos hay,

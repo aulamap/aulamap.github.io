@@ -92,6 +92,27 @@
 
   function isDesk(obj) { return obj.type in DESK_TYPES; }
 
+  /* ---------- Equipos ---------- */
+
+  // Tonos bien separados para distinguir los equipos en el plano; a partir del
+  // duodécimo se repiten. Cada equipo lleva además su número, que es lo que
+  // se ve en una impresión en blanco y negro.
+  const TEAM_HUES = [210, 25, 140, 300, 55, 185, 350, 90, 260, 5, 165, 320];
+  function teamHue(n) { return TEAM_HUES[(n - 1) % TEAM_HUES.length]; }
+  function teamFill(n) { return `hsl(${teamHue(n)} 70% 88%)`; }
+  function teamInk(n) { return `hsl(${teamHue(n)} 55% 40%)`; }
+
+  // Equipos de la clase, ordenados por número, con sus miembros.
+  function teamsOf(c) {
+    const map = new Map();
+    for (const s of c.students) {
+      if (!s.team) continue;
+      if (!map.has(s.team)) map.set(s.team, []);
+      map.get(s.team).push(s);
+    }
+    return [...map.keys()].sort((a, b) => a - b).map(n => ({ n, members: map.get(n) }));
+  }
+
   function makeObject(type, x, y) {
     const base = DESK_TYPES[type] || FURNITURE_TYPES[type];
     const obj = { id: uid(), type, x, y, w: base.w, h: base.h, rot: 0 };
@@ -413,11 +434,21 @@
         el('rect', { x: cell.x, y: cell.y, width: cell.w, height: cell.h, rx: 3, fill: '#fbf8f2', stroke: '#8a6d3b', 'stroke-width': 1.5 }, g);
       }
       const seatG = el('g', { 'data-obj': obj.id, 'data-seat': cell.i }, g);
+      const team = student && student.team ? student.team : 0;
       el('rect', {
         class: 'seat', x: cell.x + 1.5, y: cell.y + 1.5, width: cell.w - 3, height: cell.h - 3, rx: 2,
-        fill: student ? '#ffffff' : '#fbf8f2', stroke: 'none'
+        fill: team ? teamFill(team) : (student ? '#ffffff' : '#fbf8f2'), stroke: 'none'
       }, seatG);
-      if (opts.showPeople) drawFigureAt(seatG, cell, !!student);
+      if (opts.showPeople) drawFigureAt(seatG, cell, !!student, team ? teamFill(team) : null);
+      if (team) {
+        // El número del equipo, en la esquina del puesto que queda arriba
+        // según se mire el plano.
+        const r = 6.5;
+        const bx = cell.x + (flip ? cell.w - r - 2.5 : r + 2.5);
+        const by = cell.y + (flip ? cell.h - r - 2.5 : r + 2.5);
+        el('circle', { cx: bx, cy: by, r, fill: teamInk(team), stroke: 'none' }, seatG);
+        addText(seatG, [String(team)], bx, by + 0.3, 9, { flip, weight: 700, fill: '#fff' });
+      }
       if (!propia) {
         if (cell.col > 0) el('line', { x1: cell.x, y1: cell.y + 4, x2: cell.x, y2: cell.y + cell.h - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (cell.r > 0 && cell.col === 0) el('line', { x1: -obj.w / 2 + 4, y1: cell.y, x2: obj.w / 2 - 4, y2: cell.y, stroke: '#c9b894', 'stroke-width': 1 }, g);
@@ -445,29 +476,30 @@
   // Figura esquemática vista desde arriba: silla, cuerpo, cabeza y brazos sobre
   // la mesa. Sin nombre asignado solo se dibuja la silla vacía.
   // Coloca la figura en el borde del puesto por el que se sienta.
-  function drawFigureAt(parent, cell, seated) {
+  function drawFigureAt(parent, cell, seated, tint) {
     const pos = {
       bottom: [cell.x + cell.w / 2, cell.y + cell.h, 0, cell.w],
       top: [cell.x + cell.w / 2, cell.y, 180, cell.w],
       left: [cell.x, cell.y + cell.h / 2, 90, cell.h],
       right: [cell.x + cell.w, cell.y + cell.h / 2, -90, cell.h]
     }[cell.side] || [cell.x + cell.w / 2, cell.y + cell.h, 0, cell.w];
-    drawFigure(parent, ...pos, seated);
+    drawFigure(parent, ...pos, seated, tint);
   }
 
 
   // (px, py) es el punto medio del borde de la mesa; la figura queda fuera,
   // mirando hacia la mesa. angle 0 = sentada abajo; 180 = arriba.
-  function drawFigure(parent, px, py, angle, edge, seated) {
+  function drawFigure(parent, px, py, angle, edge, seated, tint) {
     const W = Math.min(46, edge * 0.8);
     const k = W / 46;
     const fig = el('g', { class: seated ? 'person seated' : 'person', transform: `translate(${px} ${py}) rotate(${angle}) scale(${k})` }, parent);
     const line = { stroke: '#6b6258', 'stroke-width': 1.4 };
     el('rect', { x: -21, y: 30, width: 42, height: 8, rx: 3, fill: '#e6e0d5', ...line }, fig);
     if (!seated) return fig;
-    el('rect', { x: -21, y: -6, width: 8, height: 26, rx: 4, fill: '#fff', ...line }, fig);
-    el('rect', { x: 13, y: -6, width: 8, height: 26, rx: 4, fill: '#fff', ...line }, fig);
-    el('ellipse', { cx: 0, cy: 21, rx: 20, ry: 9, fill: '#fff', ...line }, fig);
+    const body = tint || '#fff';
+    el('rect', { x: -21, y: -6, width: 8, height: 26, rx: 4, fill: body, ...line }, fig);
+    el('rect', { x: 13, y: -6, width: 8, height: 26, rx: 4, fill: body, ...line }, fig);
+    el('ellipse', { cx: 0, cy: 21, rx: 20, ry: 9, fill: body, ...line }, fig);
     el('circle', { cx: 0, cy: 17, r: 9, fill: '#fff', ...line }, fig);
     return fig;
   }
@@ -731,6 +763,9 @@
     document.getElementById('room-h').value = (c.room.h / 100).toFixed(1);
     document.querySelectorAll('select.name-format').forEach(s => { s.value = c.nameFormat; });
     document.getElementById('show-people').checked = c.showPeople !== false;
+    document.getElementById('team-size').value = c.teamSize || 4;
+    document.getElementById('team-kind').value = c.teamKind || 'esporadicos';
+    document.getElementById('team-leftovers').value = c.teamLeftovers || 'agregar';
     renderStudents();
   }
 
@@ -754,6 +789,13 @@
     const seated = new Set();
     c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(s => s && seated.add(s)); });
     document.getElementById('students-count').textContent = t('students_list', { assigned: seated.size, total: c.students.length });
+    const teams = teamsOf(c);
+    const withTypes = (c.teamKind || 'esporadicos') !== 'esporadicos';
+    const sets = (c.incompatible || []).length;
+    document.getElementById('btn-incompat').textContent = sets ? t('teams_incompat_count', { count: sets }) : t('teams_incompat');
+    document.getElementById('hint-teams').textContent = t(withTypes ? 'hint_teams_types' : 'hint_teams');
+    document.getElementById('btn-teams-seat').disabled = !teams.length;
+    document.getElementById('btn-teams-clear').disabled = !teams.length;
     if (!c.students.length) {
       const li = document.createElement('li');
       li.className = 'empty';
@@ -783,6 +825,33 @@
         s.name = name;
         commit();
       });
+      // El equipo, si los hay: un desplegable con el color del equipo para
+      // cambiar a alguien de equipo a mano.
+      if (teams.length) {
+        const pick = document.createElement('select');
+        pick.className = 'team-pick';
+        pick.title = t('team_pick_title');
+        const none = document.createElement('option');
+        none.value = '';
+        none.textContent = '–';
+        pick.appendChild(none);
+        const last = teams[teams.length - 1].n;
+        for (let n = 1; n <= last + 1; n++) {
+          const opt = document.createElement('option');
+          opt.value = n;
+          opt.textContent = n <= last ? n : t('team_new');
+          pick.appendChild(opt);
+        }
+        pick.value = s.team ? String(s.team) : '';
+        if (s.team) { pick.style.background = teamFill(s.team); pick.style.color = teamInk(s.team); }
+        pick.addEventListener('change', () => {
+          checkpoint();
+          s.team = pick.value ? +pick.value : undefined;
+          if (!s.team) delete s.team;
+          commit();
+        });
+        li.appendChild(pick);
+      }
       const del = document.createElement('button');
       del.className = 'del';
       del.textContent = '×';
@@ -791,9 +860,31 @@
         checkpoint();
         c.students = c.students.filter(x => x.id !== s.id);
         c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(v => (v === s.id ? null : v)); });
+        c.incompatible = cleanIncompatible(c);
         commit();
       });
-      li.append(handle, mark, input, del);
+      li.append(handle, mark, input);
+      // La tipología solo se pide cuando los equipos van a tener en cuenta:
+      // con equipos al azar la fila se queda como siempre.
+      if (withTypes) {
+        const types = document.createElement('span');
+        types.className = 'type-pick';
+        for (const type of ['A', 'B', 'C']) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.textContent = type;
+          b.title = t('type_' + type);
+          if (s.type === type) b.classList.add('on');
+          b.addEventListener('click', () => {
+            checkpoint();
+            if (s.type === type) delete s.type; else s.type = type;
+            commit();
+          });
+          types.appendChild(b);
+        }
+        li.appendChild(types);
+      }
+      li.appendChild(del);
       list.appendChild(li);
     }
   }
@@ -2143,8 +2234,195 @@
     checkpoint();
     const c = cls();
     c.students = [];
+    c.incompatible = [];
     c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); });
     commit();
+  });
+
+  /* ---------- Equipos: formar, sentar, incompatibles ---------- */
+
+  // Quita de los grupos de incompatibles a quien ya no está en la lista y
+  // descarta los grupos que se quedan con una sola persona.
+  function cleanIncompatible(c) {
+    const ids = new Set(c.students.map(s => s.id));
+    return (c.incompatible || []).map(g => g.filter(id => ids.has(id))).filter(g => g.length >= 2);
+  }
+
+  for (const [id, key] of [['team-size', 'teamSize'], ['team-kind', 'teamKind'], ['team-leftovers', 'teamLeftovers']]) {
+    document.getElementById(id).addEventListener('change', (e) => {
+      cls()[key] = key === 'teamSize' ? clamp(Math.round(+e.target.value) || 4, 2, 12) : e.target.value;
+      saveState();
+      renderSidebar();
+    });
+  }
+
+  // Los equipos los hace el motor de GeCo, que recibe las listas por
+  // tipología (quien no tiene tipología cuenta como B, la mayoría) y las
+  // incompatibilidades. Se le pasan los identificadores en vez de los nombres
+  // para que dos alumnos que se llamen igual no se confundan.
+  function makeTeams() {
+    const c = cls();
+    if (!c.students.length) return;
+    const by = { A: [], B: [], C: [] };
+    c.students.forEach(s => by[by[s.type] ? s.type : 'B'].push(s.id));
+    const result = window.GecoTeamEngine.generateTeams({
+      grupoA: by.A, grupoB: by.B, grupoC: by.C,
+      numAlumnos: c.teamSize || 4,
+      tipoGrupo: c.teamKind || 'esporadicos',
+      opcionSobrantes: c.teamLeftovers || 'agregar',
+      incompatibleGroups: cleanIncompatible(c)
+    });
+    checkpoint();
+    c.students.forEach(s => { delete s.team; });
+    result.teams.forEach((team, i) => team.forEach(a => { const s = findStudent(a.nombre); if (s) s.team = i + 1; }));
+    const seated = c.objects.some(o => isDesk(o) && o.seats.length) ? seatTeams(c) : null;
+    commit();
+    if (seated) reportSeating(seated);
+  }
+
+  // Centro de cada puesto en coordenadas del aula, con el giro de la mesa.
+  function seatPositions(c) {
+    const seats = [];
+    for (const o of c.objects) {
+      if (!isDesk(o)) continue;
+      const a = o.rot * Math.PI / 180, cos = Math.cos(a), sin = Math.sin(a);
+      for (const cell of deskCells(o)) {
+        const lx = cell.x + cell.w / 2, ly = cell.y + cell.h / 2;
+        seats.push({ o, i: cell.i, x: o.x + lx * cos - ly * sin, y: o.y + lx * sin + ly * cos });
+      }
+    }
+    return seats;
+  }
+
+  // Sienta cada equipo en los puestos libres más juntos que encuentre: se
+  // prueba cada puesto como semilla, se cogen los más cercanos a él (los de la
+  // misma mesa, antes) y se queda con la semilla que deja el equipo más
+  // recogido. Los equipos grandes van primero, que son los que peor caben.
+  function seatTeams(c) {
+    c.objects.forEach(o => { if (isDesk(o)) o.seats = o.seats.map(() => null); });
+    const free = seatPositions(c).sort((p, q) => (p.y - q.y) || (p.x - q.x));
+    const dist = (p, q) => Math.hypot(p.x - q.x, p.y - q.y) + (p.o === q.o ? 0 : 40);
+    const teams = teamsOf(c).sort((a, b) => b.members.length - a.members.length || a.n - b.n);
+    const split = [], unseated = [];
+    for (const team of teams) {
+      const n = team.members.length;
+      let best = null;
+      for (const seed of free) {
+        const near = free.filter(p => p !== seed).map(p => [dist(seed, p), p]).sort((a, b) => a[0] - b[0]).slice(0, n - 1);
+        if (near.length < n - 1) continue;
+        const radius = near.length ? near[near.length - 1][0] : 0;
+        const sum = near.reduce((k, [d]) => k + d, 0);
+        if (!best || radius < best.radius - 1e-6 || (Math.abs(radius - best.radius) < 1e-6 && sum < best.sum)) {
+          best = { radius, sum, seats: [seed, ...near.map(x => x[1])] };
+        }
+      }
+      if (!best) {
+        // No quedan puestos para todo el equipo: se sienta a quien quepa.
+        const rest = free.splice(0, n);
+        team.members.forEach((s, k) => { if (rest[k]) rest[k].o.seats[rest[k].i] = s.id; else unseated.push(s); });
+        continue;
+      }
+      team.members.forEach((s, k) => { best.seats[k].o.seats[best.seats[k].i] = s.id; });
+      best.seats.forEach(p => free.splice(free.indexOf(p), 1));
+      if (best.radius > 250) split.push(team.n);
+    }
+    return { split: split.sort((a, b) => a - b), unseated };
+  }
+
+  function reportSeating({ split, unseated }) {
+    const msgs = [];
+    if (unseated.length) msgs.push(t('random_no_seats', { count: unseated.length }));
+    if (split.length) msgs.push(t('teams_split', { list: split.join(', ') }));
+    if (msgs.length) alert(msgs.join('\n'));
+  }
+
+  document.getElementById('btn-teams-make').addEventListener('click', makeTeams);
+
+  document.getElementById('btn-teams-seat').addEventListener('click', () => {
+    const c = cls();
+    if (!teamsOf(c).length) return;
+    checkpoint();
+    const result = seatTeams(c);
+    commit();
+    reportSeating(result);
+  });
+
+  document.getElementById('btn-teams-clear').addEventListener('click', () => {
+    const c = cls();
+    if (!teamsOf(c).length || !confirm(t('confirm_clear_teams'))) return;
+    checkpoint();
+    c.students.forEach(s => { delete s.team; });
+    commit();
+  });
+
+  // Diálogo de incompatibles: arriba, los grupos que ya hay; abajo, la lista
+  // para marcar a dos o más y añadirlos como grupo nuevo.
+  const dlgIncompat = document.getElementById('dlg-incompat');
+
+  function renderIncompat() {
+    const c = cls();
+    c.incompatible = cleanIncompatible(c);
+    const groups = document.getElementById('incompat-list');
+    groups.innerHTML = '';
+    if (!c.incompatible.length) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = t('incompat_empty');
+      groups.appendChild(li);
+    }
+    c.incompatible.forEach((g, i) => {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = g.map(id => (findStudent(id) || {}).name).join(' · ');
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'del';
+      del.textContent = '×';
+      del.title = t('incompat_remove');
+      del.addEventListener('click', () => {
+        checkpoint();
+        c.incompatible.splice(i, 1);
+        commit();
+        renderIncompat();
+      });
+      li.append(span, del);
+      groups.appendChild(li);
+    });
+    const list = document.getElementById('incompat-students');
+    list.innerHTML = '';
+    const addBtn = document.getElementById('btn-incompat-add');
+    addBtn.disabled = true;
+    for (const s of c.students) {
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      const check = document.createElement('input');
+      check.type = 'checkbox';
+      check.value = s.id;
+      check.addEventListener('change', () => {
+        addBtn.disabled = list.querySelectorAll('input:checked').length < 2;
+      });
+      const span = document.createElement('span');
+      span.textContent = s.name;
+      label.append(check, span);
+      li.appendChild(label);
+      list.appendChild(li);
+    }
+  }
+
+  document.getElementById('btn-incompat').addEventListener('click', () => {
+    if (!cls().students.length) { alert(t('students_empty')); return; }
+    renderIncompat();
+    dlgIncompat.showModal();
+  });
+
+  document.getElementById('btn-incompat-add').addEventListener('click', () => {
+    const ids = [...document.querySelectorAll('#incompat-students input:checked')].map(i => i.value);
+    if (ids.length < 2) return;
+    checkpoint();
+    const c = cls();
+    c.incompatible = [...cleanIncompatible(c), ids];
+    commit();
+    renderIncompat();
   });
 
   /* ---------- Un guiño ---------- */
@@ -2257,7 +2535,17 @@
   function addClasses(classes) {
     for (const c of classes) {
       const studentIds = new Map();
-      c.students = (c.students || []).map(s => { const id = uid(); studentIds.set(s.id, id); return { id, name: String(s.name || '') }; });
+      c.students = (c.students || []).map(s => {
+        const id = uid();
+        studentIds.set(s.id, id);
+        const copy = { id, name: String(s.name || '') };
+        if (['A', 'B', 'C'].includes(s.type)) copy.type = s.type;
+        if (Number.isInteger(s.team) && s.team > 0) copy.team = s.team;
+        return copy;
+      });
+      c.incompatible = (Array.isArray(c.incompatible) ? c.incompatible : [])
+        .map(g => (Array.isArray(g) ? g.map(id => studentIds.get(id)).filter(Boolean) : []))
+        .filter(g => g.length >= 2);
       c.objects.forEach(o => {
         o.id = uid();
         if (o.seats) o.seats = o.seats.map(s => studentIds.get(s) || null);
@@ -2272,6 +2560,49 @@
     saveState();
     renderAll();
     fitZoom();
+  }
+
+  // Un archivo exportado desde GeCo trae el alumnado con su tipología, las
+  // incompatibilidades y, si se generaron, los equipos. Se vuelca en la clase
+  // actual: quien ya está en la lista (mismo nombre) no se repite.
+  function gecoData(parsed) {
+    const d = parsed && parsed.data ? parsed.data : parsed;
+    return d && Array.isArray(d.students) ? d : null;
+  }
+  function isGecoFile(parsed) { return !!gecoData(parsed); }
+
+  function importGeco(parsed) {
+    const d = gecoData(parsed);
+    const c = cls();
+    const names = d.students.map(s => ({ name: String(s.nombre || s.name || '').trim(), type: s.tipo || s.type })).filter(s => s.name);
+    if (!names.length) { alert(t('import_error')); return; }
+    if (!confirm(t('import_geco_confirm', { count: names.length, name: c.name }))) return;
+    checkpoint();
+    const key = n => n.toLowerCase().replace(/\s+/g, ' ').trim();
+    const byName = new Map(c.students.map(s => [key(s.name), s]));
+    const idOf = name => {
+      const found = byName.get(key(name));
+      if (found) return found.id;
+      const s = { id: uid(), name };
+      c.students.push(s);
+      byName.set(key(name), s);
+      return s.id;
+    };
+    for (const { name, type } of names) {
+      const s = findStudent(idOf(name));
+      if (['A', 'B', 'C'].includes(type)) s.type = type; else delete s.type;
+    }
+    const groups = Array.isArray(d.incompatibleGroups) ? d.incompatibleGroups : [];
+    c.incompatible = [...cleanIncompatible(c), ...groups.map(g => (Array.isArray(g) ? g.map(n => idOf(String(n))) : []))].filter(g => g.length >= 2);
+    if (Array.isArray(d.teams) && d.teams.length) {
+      c.students.forEach(s => { delete s.team; });
+      d.teams.forEach((team, i) => team.forEach(a => { const s = findStudent(idOf(String(a.nombre || a.name || ''))); if (s) s.team = i + 1; }));
+      if (c.teamKind === undefined || c.teamKind === 'esporadicos') c.teamKind = 'heterogeneos';
+    } else if (names.some(s => ['A', 'B', 'C'].includes(s.type))) {
+      c.teamKind = c.teamKind === 'esporadicos' || !c.teamKind ? 'heterogeneos' : c.teamKind;
+    }
+    commit();
+    alert(t('import_geco_done', { count: names.length }));
   }
 
   document.getElementById('btn-export').addEventListener('click', () => {
@@ -2292,7 +2623,9 @@
     e.target.value = '';
     if (!file) return;
     try {
-      const classes = validClasses(JSON.parse(await file.text()));
+      const parsed = JSON.parse(await file.text());
+      if (isGecoFile(parsed)) { importGeco(parsed); return; }
+      const classes = validClasses(parsed);
       if (!classes.length) throw new Error('sin clases');
       addClasses(classes);
       alert(t('import_done', { count: classes.length }));
@@ -2342,6 +2675,7 @@
     const copy = JSON.parse(JSON.stringify(c));
     if (withoutStudents) {
       copy.students = [];
+      copy.incompatible = [];
       copy.objects.forEach(o => { if (o.seats) o.seats = o.seats.map(() => null); });
     }
     return copy;
@@ -2438,6 +2772,9 @@
     document.getElementById('print-heading').value = c.name;
     document.getElementById('print-name-format').value = c.nameFormat;
     document.getElementById('print-people').checked = c.showPeople !== false;
+    const teamsRow = document.getElementById('print-teams').closest('label');
+    teamsRow.hidden = !teamsOf(c).length;
+    document.getElementById('print-teams').checked = !teamsRow.hidden;
     document.getElementById('print-paper').value = lastPaper;
     document.getElementById('print-margin').value = lastMargin;
     document.getElementById('dlg-print').showModal();
@@ -2476,7 +2813,7 @@
     const before = area.style.cssText;
     area.style.cssText = `display:block;position:absolute;left:-9999px;top:0;width:${width}mm`;
     let used = 0;
-    area.querySelectorAll('h1, .print-date, .unseated').forEach(el => {
+    area.querySelectorAll('h1, .print-date, .unseated, .print-teams').forEach(el => {
       const st = getComputedStyle(el);
       used += el.getBoundingClientRect().height + parseFloat(st.marginTop) + parseFloat(st.marginBottom);
     });
@@ -2529,6 +2866,23 @@
         p.className = 'unseated';
         p.textContent = `${t('print_unseated')}: ${rest.map(s => s.name).join(', ')}`;
         area.appendChild(p);
+      }
+    }
+    if (document.getElementById('print-teams').checked) {
+      const teams = teamsOf(c);
+      if (teams.length) {
+        const ul = document.createElement('ul');
+        ul.className = 'print-teams';
+        for (const team of teams) {
+          const li = document.createElement('li');
+          const dot = document.createElement('span');
+          dot.className = 'dot';
+          dot.style.background = teamInk(team.n);
+          dot.textContent = team.n;
+          li.append(dot, document.createTextNode(team.members.map(s => s.name).join(', ')));
+          ul.appendChild(li);
+        }
+        area.appendChild(ul);
       }
     }
     printSvg.style.maxHeight = printHeight(area) + 'mm';

@@ -94,6 +94,29 @@
             <button id="btn-delete-students" class="btn danger" data-i18n="students_delete_all">Borrar lista</button>
           </div>
 
+          <h2 data-i18n="teams_title">Equipos</h2>
+          <div class="field-row">
+            <label><span data-i18n="teams_size">Alumnos por equipo</span><input id="team-size" type="number" min="2" max="12" value="4"></label>
+            <label><span data-i18n="teams_kind">Tipo de equipos</span>
+              <select id="team-kind">
+                <option value="esporadicos" data-i18n="teams_kind_random">Al azar</option>
+                <option value="heterogeneos" data-i18n="teams_kind_hetero">Heterogéneos</option>
+                <option value="homogeneos" data-i18n="teams_kind_homo">Homogéneos</option>
+              </select></label>
+          </div>
+          <label class="stack"><span data-i18n="teams_leftovers">Si no salen justos</span>
+            <select id="team-leftovers">
+              <option value="agregar" data-i18n="teams_leftovers_spread">Se reparten entre los equipos</option>
+              <option value="grupoNuevo" data-i18n="teams_leftovers_new">Forman un equipo más pequeño</option>
+            </select></label>
+          <div class="btn-grid">
+            <button id="btn-teams-make" class="btn primary" data-i18n="teams_make" data-i18n-title="teams_make_title">Formar equipos</button>
+            <button id="btn-teams-seat" class="btn" data-i18n="teams_seat" data-i18n-title="teams_seat_title">Sentar por equipos</button>
+            <button id="btn-incompat" class="btn"></button>
+            <button id="btn-teams-clear" class="btn" data-i18n="teams_clear" data-i18n-title="teams_clear_title">Quitar equipos</button>
+          </div>
+          <p class="hint" id="hint-teams"></p>
+
           <h2 id="students-count"></h2>
           <ul id="student-list" class="student-list"></ul>
           <p class="hint" data-i18n="hint_students"></p>
@@ -214,6 +237,20 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-incompat">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="incompat_title">Alumnado que no debe coincidir</h2>
+      <p class="hint" data-i18n="incompat_help"></p>
+      <ul id="incompat-list" class="incompat-list"></ul>
+      <p class="hint" data-i18n="incompat_pick"></p>
+      <ul id="incompat-students" class="incompat-students"></ul>
+      <div class="dialog-actions">
+        <button type="button" id="btn-incompat-add" class="btn" disabled data-i18n="incompat_add">Añadir</button>
+        <button value="ok" class="btn primary" data-i18n="close">Cerrar</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="dlg-print">
     <form method="dialog" class="dialog-form">
       <h2 data-i18n="print_title">Imprimir</h2>
@@ -236,6 +273,7 @@
       <label class="check"><input id="print-people" type="checkbox" checked> <span data-i18n="show_people"></span></label>
       <label class="check"><input id="print-date" type="checkbox" checked> <span data-i18n="print_show_date"></span></label>
       <label class="check"><input id="print-unseated" type="checkbox"> <span data-i18n="print_show_unseated"></span></label>
+      <label class="check"><input id="print-teams" type="checkbox"> <span data-i18n="print_show_teams"></span></label>
       <div class="dialog-actions">
         <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
         <button value="ok" class="btn primary" data-i18n="print_go">Imprimir</button>
@@ -257,6 +295,7 @@
   <script src="locales/en.js"></script>
   <script src="i18n.js"></script>
   <script src="theme.js"></script>
+  <script src="team-engine.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
