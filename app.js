@@ -846,6 +846,14 @@
     document.getElementById('show-people').checked = c.showPeople !== false;
     document.getElementById('show-teams').checked = c.showTeams !== false;
     document.getElementById('show-types').checked = c.showTypes !== false;
+    // Cada casilla de vista solo se ofrece cuando hay algo que enseñar u
+    // ocultar: alumnado sentado, equipos formados, tipologías marcadas.
+    const seatedIds = new Set();
+    c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(id => id && seatedIds.add(id)); });
+    const seatedStudents = c.students.filter(s => seatedIds.has(s.id));
+    document.getElementById('show-people').closest('label').hidden = !seatedStudents.length;
+    document.getElementById('show-teams').closest('label').hidden = !seatedStudents.some(s => s.team);
+    document.getElementById('show-types').closest('label').hidden = !seatedStudents.some(s => s.type);
     document.getElementById('team-size').value = c.teamSize || 4;
     document.getElementById('team-kind').value = c.teamKind || 'heterogeneos';
     document.getElementById('team-leftovers').value = c.teamLeftovers || 'agregar';
