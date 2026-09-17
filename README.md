@@ -17,7 +17,7 @@ No hay que instalar nada ni crear ninguna cuenta.
   columna, papelera, planta y textos libres. Las
   medidas van en centímetros reales y el tamaño del aula se cambia arrastrando
   sus paredes.
-- **El alumnado.** Se pega la lista de nombres, se reparte al azar o se arrastra
+- **El alumnado.** Se pega la lista de nombres y se arrastra
   cada uno a su mesa. En el recuadro «Vista», sobre el plano, se elige qué
   parte del nombre se ve, si se dibuja a cada alumno en su silla y si se
   muestran los equipos y la tipología.
@@ -52,7 +52,7 @@ No hay que instalar nada ni crear ninguna cuenta.
    por línea. Valen tanto «Nombre Apellidos» como «Apellidos, Nombre» (esta
    segunda forma es la buena si hay nombres compuestos, como «Fernández
    Villaverde, María del Carmen»).
-4. **Siéntalos.** «Repartir al azar» sienta a quien no tiene sitio, o arrastra
+4. **Siéntalos.** Arrastra
    cada nombre a la mesa que quieras. De una mesa a otra, se cambian de sitio.
 5. **Por equipos, si se quiere.** En la pestaña *Equipos (opcional)*, elige
    cuántos alumnos por equipo y de qué tipo. Con equipos heterogéneos u

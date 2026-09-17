@@ -2414,19 +2414,6 @@
     return arr;
   }
 
-  document.getElementById('btn-random').addEventListener('click', () => {
-    const c = cls();
-    const seated = new Set();
-    c.objects.forEach(o => { if (isDesk(o)) o.seats.forEach(s => s && seated.add(s)); });
-    const waiting = shuffle(c.students.filter(s => !seated.has(s.id)));
-    if (!waiting.length) return;
-    const free = shuffle(emptySeats());
-    checkpoint();
-    waiting.forEach((s, k) => { if (free[k]) free[k].o.seats[free[k].i] = s.id; });
-    commit();
-    if (waiting.length > free.length) alert(t('random_no_seats', { count: waiting.length - free.length }));
-  });
-
   document.getElementById('btn-clear-seats').addEventListener('click', () => {
     if (!confirm(t('confirm_clear_seats'))) return;
     checkpoint();
