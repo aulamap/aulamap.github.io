@@ -2701,8 +2701,8 @@
     // La inclinación en abanico (hasta 15°) saca las esquinas de los equipos
     // de los extremos hacia las paredes: se reserva ese sitio en los márgenes
     // para que la distancia a la pared sea la que se pide.
-    const TILT = 15 * Math.PI / 180;
-    let tiltX = 0, tiltY = 0;
+    const TILT_MAX = 15;
+    let tiltDeg = TILT_MAX, tiltX = 0, tiltY = 0;
     const setMargins = ([m, gapTop, gapBottom]) => {
       margin = m; top = Math.max(m, furnitureBottom + gapTop) + tiltY;
       left = m + tiltX; right = c.room.w - m - tiltX; bottom = c.room.h - gapBottom - tiltY;
@@ -2734,8 +2734,13 @@
     });
     // Se van colocando por filas, de izquierda a derecha, y cada fila se
     // centra en el aula. Si no caben con el hueco normal se aprietan.
-    tiltX = Math.max(...clusters.map(k => k.h / 2 * Math.sin(TILT) + k.w / 2 * (1 - Math.cos(TILT))));
-    tiltY = Math.max(...clusters.map(k => k.w / 2 * Math.sin(TILT) + k.h / 2 * (1 - Math.cos(TILT))));
+    const setTilt = (deg) => {
+      tiltDeg = deg;
+      const a = deg * Math.PI / 180;
+      tiltX = Math.max(...clusters.map(k => k.h / 2 * Math.sin(a) + k.w / 2 * (1 - Math.cos(a))));
+      tiltY = Math.max(...clusters.map(k => k.w / 2 * Math.sin(a) + k.h / 2 * (1 - Math.cos(a))));
+    };
+    setTilt(TILT_MAX);
     setMargins(fits[0]);
     let availW = right - left;
     // Reparte los conjuntos en filas con el hueco dado; «spreadX» y «spreadY»
@@ -2769,31 +2774,58 @@
       layout.rows = rows;
       return y - gapY - spreadY;   // hasta dónde llega la última fila
     };
-    let end = 0, used = 0;
-    for (const fit of fits) {
-      setMargins(fit);
-      availW = right - left;
-      end = layout(fit[3], fit[3]);
-      if (end <= bottom) break;
-      used++;
-    }
-    const overflow = used >= RECOMMENDED;
-    // Con la distribución ya decidida, el sitio que sobra se reparte entre
-    // los pasillos (hasta el hueco holgado), sin que cambien las filas.
-    if (end <= bottom) {
+    // Busca el juego de márgenes más holgado con el que caben y reparte el
+    // sitio que sobra: primero los pasillos hasta lo recomendado (es por
+    // donde se pasa), después los márgenes hasta lo recomendado, y el resto
+    // ensancha los pasillos hasta el hueco holgado. Devuelve si el resultado
+    // final queda por debajo de lo recomendado.
+    const attempt = () => {
+      let end = 0, used = 0;
+      for (const fit of fits) {
+        setMargins(fit);
+        availW = right - left;
+        end = layout(fit[3], fit[3]);
+        if (end <= bottom) break;
+        used++;
+      }
+      if (end > bottom) return true;
       const fit = fits[Math.min(used, fits.length - 1)];
+      const rec = fits[RECOMMENDED - 1];
       const rows = layout.rows, nRows = rows.length;
       const cols = Math.max(...rows.map(r => r.length));
       const rowW = Math.max(...rows.map(r => r.reduce((n, k) => n + k.w, 0) + (r.length - 1) * (fit[3] + tiltX / 2)));
-      const spreadX = cols > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (availW - rowW) / (cols - 1))) : 0;
-      const spreadY = nRows > 1 ? Math.max(0, Math.min(fits[0][3] - fit[3], (bottom - end) / (nRows - 1))) : 0;
+      const stackH = rows.reduce((n, r) => n + Math.max(...r.map(k => k.h)), 0) + (nRows - 1) * fit[3];
+      let spareX = availW - rowW, spareY = bottom - top - stackH;
+      // 1. Pasillos hasta lo recomendado.
+      let spreadX = cols > 1 ? Math.min(Math.max(0, rec[3] - fit[3]), spareX / (cols - 1)) : 0;
+      let spreadY = nRows > 1 ? Math.min(Math.max(0, rec[3] - fit[3]), spareY / (nRows - 1)) : 0;
+      spareX -= spreadX * (cols - 1); spareY -= spreadY * (nRows - 1);
+      // 2. Márgenes hasta lo recomendado.
+      const sideUp = Math.min(Math.max(0, rec[0] - fit[0]), spareX / 2);
+      left += sideUp; right -= sideUp; availW = right - left; spareX -= 2 * sideUp;
+      const topUp = Math.min(Math.max(0, rec[1] - fit[1]), spareY);
+      top += topUp; spareY -= topUp;
+      const bottomUp = Math.min(Math.max(0, rec[2] - fit[2]), spareY);
+      bottom -= bottomUp; spareY -= bottomUp;
+      // 3. Pasillos hasta el hueco holgado.
+      if (cols > 1) spreadX += Math.max(0, Math.min(fits[0][3] - fit[3] - spreadX, spareX / (cols - 1)));
+      if (nRows > 1) spreadY += Math.max(0, Math.min(fits[0][3] - fit[3] - spreadY, spareY / (nRows - 1)));
       layout(fit[3], fit[3], spreadX, spreadY);
+      const gapX = cols > 1 ? fit[3] + spreadX : Infinity, gapY = nRows > 1 ? fit[3] + spreadY : Infinity;
+      return fit[0] + sideUp < rec[0] || fit[1] + topUp < rec[1] || fit[2] + bottomUp < rec[2] || gapX < rec[3] || gapY < rec[3];
+    };
+    let overflow = attempt();
+    // Si con el abanico no caben con holgura, se prueba con las mesas rectas:
+    // la inclinación cuesta sitio y en un aula justa no se usa.
+    if (overflow) {
+      setTilt(0);
+      overflow = attempt();
     }
     // Cada conjunto se inclina un poco hacia el centro de la pizarra, en
     // abanico, para que todo el equipo la vea bien: hasta 15° en los extremos.
     clusters.forEach(k => {
-      const tilt = Math.round(15 * (c.room.w / 2 - k.cx) / (c.room.w / 2));
-      const rot = (k.turned ? 90 : 0) + clamp(tilt, -15, 15);
+      const tilt = Math.round(tiltDeg * (c.room.w / 2 - k.cx) / (c.room.w / 2));
+      const rot = (k.turned ? 90 : 0) + clamp(tilt, -tiltDeg, tiltDeg);
       const a = rot * Math.PI / 180, cos = Math.cos(a), sin = Math.sin(a);
       k.desks.forEach((d, i) => {
         const [ox, oy] = k.offsets[i];
