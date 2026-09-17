@@ -28,13 +28,13 @@
     desk2: { w: 140, h: 50, cols: 2, rows: 1 },
     // Dos mesas unidas por el lado largo, cada alumno a un lado, de cara.
     facing2: { w: 100, h: 70, cols: 2, rows: 1, sides: ['left', 'right'] },
-    // La mesa doble más una tercera perpendicular y centrada en un extremo.
+    // Las dos de «cara a cara» más una tercera perpendicular y centrada.
     group3: {
-      w: 190, h: 70,
+      w: 100, h: 120,
       cells: [
-        { x: -60, y: 0, w: 70, h: 50, side: 'bottom' },
-        { x: 10, y: 0, w: 70, h: 50, side: 'bottom' },
-        { x: 70, y: 0, w: 50, h: 70, side: 'right' }
+        { x: -25, y: -25, w: 50, h: 70, side: 'left' },
+        { x: 25, y: -25, w: 50, h: 70, side: 'right' },
+        { x: 0, y: 35, w: 70, h: 50, side: 'bottom' }
       ]
     },
     group4: { w: 140, h: 100, cols: 2, rows: 2 },
@@ -149,12 +149,12 @@
     return { id: uid(), name, room, objects: [board, teacher, door], students: [], nameFormat: 'first1' };
   }
 
-  // El grupo de 3 cambió de forma (antes eran dos mesas cara a cara y una
-  // debajo): las guardadas con las medidas viejas toman las nuevas.
+  // Durante unas horas el grupo de 3 tuvo otra forma (mesa doble con la
+  // tercera en un extremo, 190 × 70): las guardadas así vuelven a la de siempre.
   function migrate(data) {
     for (const c of data.classes) {
       for (const o of c.objects || []) {
-        if (o.type === 'group3' && o.w === 100 && o.h === 120) { o.w = 190; o.h = 70; }
+        if (o.type === 'group3' && o.w === 190 && o.h === 70) { o.w = 100; o.h = 120; }
       }
     }
     return data;
