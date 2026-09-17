@@ -2687,9 +2687,12 @@
     for (const o of c.objects) {
       if (o.y < c.room.h / 2) furnitureBottom = Math.max(furnitureBottom, boundsOf([o], c).y1);
     }
-    // Márgenes: los holgados primero; si los equipos no caben, se van
-    // apretando. El aula no cambia de tamaño en ningún caso.
-    const fits = [[60, 90, 100, 60], [40, 60, 70, 40], [30, 40, 50, 20], [20, 30, 40, 0]];
+    // Márgenes en centímetros reales: [pared, tras el mobiliario frontal,
+    // pared del fondo, entre equipos]. Los holgados primero; si no caben se
+    // aprietan, pero nunca por debajo de 60 cm entre sillas (más los 40 cm de
+    // la propia silla): es lo que hace falta para levantarse y pasar por
+    // detrás. Si ni así caben, se avisa: el aula no cambia de tamaño nunca.
+    const fits = [[70, 120, 120, 110], [60, 100, 100, 90], [50, 90, 80, 75], [50, 80, 70, 60]];
     let margin, top, left, right, bottom;
     const setMargins = ([m, gapTop, gapBottom]) => {
       margin = m; top = Math.max(m, furnitureBottom + gapTop);
