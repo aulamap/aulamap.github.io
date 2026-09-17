@@ -283,7 +283,7 @@
       // La inicial es la de la palabra que cuenta, no la de la partícula.
       case 'initial': {
         const word = first.split(' ').pop() || '';
-        return word ? `${given} ${word[0]}.` : given;
+        return word ? `${given} ${word[0].toLocaleUpperCase()}.` : given;
       }
       case 'given': return given;
       default: return (given + ' ' + first).trim();
