@@ -465,6 +465,12 @@
     const cells = deskCells(obj);
     const propia = cells.length && cells[0].own;   // cada mesa con su contorno
     const flip = uprightFix(obj.rot, opts.viewRot) === 180;
+    // Los textos se leen siempre desde el punto de vista del plano: se
+    // deshace el giro de la mesa en pasos de un cuarto de vuelta, así quedan
+    // horizontales o, en una mesa en diagonal, lo más cerca posible sin
+    // salirse de los bordes del puesto.
+    const turn = normAngle(-Math.round(normAngle(obj.rot + (opts.viewRot || 0)) / 90) * 90);
+    const sideways = Math.abs(turn) === 90;
     // La rejilla de siempre es un tablero único con sus divisiones; un grupo
     // descrito mesa a mesa se dibuja con el contorno de cada mesa.
     if (!propia) {
@@ -492,7 +498,7 @@
         const bx = cell.x + (flip ? cell.w - r - 2.5 : r + 2.5);
         const by = cell.y + (flip ? cell.h - r - 2.5 : r + 2.5);
         el('circle', { cx: bx, cy: by, r, fill: teamInk(team), stroke: 'none' }, seatG);
-        addText(seatG, [String(team)], bx, by + 0.3, 9, { flip, weight: 700, fill: '#fff' });
+        addText(seatG, [String(team)], bx, by + 0.3, 9, { rotate: turn, weight: 700, fill: '#fff' });
       }
       // La tipología (A, B o C), en la otra esquina de arriba.
       if (student && student.type && opts.showTypes) {
@@ -500,15 +506,16 @@
         const bx = cell.x + (flip ? r + 2.5 : cell.w - r - 2.5);
         const by = cell.y + (flip ? cell.h - r - 2.5 : r + 2.5);
         el('rect', { x: bx - r, y: by - r, width: 2 * r, height: 2 * r, rx: 2, fill: '#fff', stroke: '#6b6258', 'stroke-width': 1 }, seatG);
-        addText(seatG, [student.type], bx, by + 0.3, 9, { flip, weight: 700, fill: '#23262b' });
+        addText(seatG, [student.type], bx, by + 0.3, 9, { rotate: turn, weight: 700, fill: '#23262b' });
       }
       if (!propia) {
         if (cell.col > 0) el('line', { x1: cell.x, y1: cell.y + 4, x2: cell.x, y2: cell.y + cell.h - 4, stroke: '#c9b894', 'stroke-width': 1 }, g);
         if (cell.r > 0 && cell.col === 0) el('line', { x1: -obj.w / 2 + 4, y1: cell.y, x2: obj.w / 2 - 4, y2: cell.y, stroke: '#c9b894', 'stroke-width': 1 }, g);
       }
       if (student) {
-        const { lines, size } = fitName(formatName(student.name, opts.nameFormat), cell.w - 10, cell.h - 10);
-        addText(g, lines, cell.x + cell.w / 2, cell.y + cell.h / 2, size, { flip, weight: NAME_WEIGHT, lineHeight: NAME_LINE_GAP });
+        // Girado un cuarto, el ancho disponible es el alto del puesto y al revés.
+        const { lines, size } = fitName(formatName(student.name, opts.nameFormat), (sideways ? cell.h : cell.w) - 10, (sideways ? cell.w : cell.h) - 10);
+        addText(g, lines, cell.x + cell.w / 2, cell.y + cell.h / 2, size, { rotate: turn, weight: NAME_WEIGHT, lineHeight: NAME_LINE_GAP });
       }
     }
   }
