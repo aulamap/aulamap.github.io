@@ -28,13 +28,13 @@
     desk2: { w: 140, h: 50, cols: 2, rows: 1 },
     // Dos mesas unidas por el lado largo, cada alumno a un lado, de cara.
     facing2: { w: 100, h: 70, cols: 2, rows: 1, sides: ['left', 'right'] },
-    // Las dos de «cara a cara» más una tercera perpendicular y centrada.
+    // La mesa doble más una tercera perpendicular y centrada en un extremo.
     group3: {
-      w: 100, h: 120,
+      w: 190, h: 70,
       cells: [
-        { x: -25, y: -25, w: 50, h: 70, side: 'left' },
-        { x: 25, y: -25, w: 50, h: 70, side: 'right' },
-        { x: 0, y: 35, w: 70, h: 50, side: 'bottom' }
+        { x: -60, y: 0, w: 70, h: 50, side: 'bottom' },
+        { x: 10, y: 0, w: 70, h: 50, side: 'bottom' },
+        { x: 70, y: 0, w: 50, h: 70, side: 'right' }
       ]
     },
     group4: { w: 140, h: 100, cols: 2, rows: 2 },
@@ -149,12 +149,23 @@
     return { id: uid(), name, room, objects: [board, teacher, door], students: [], nameFormat: 'first1' };
   }
 
+  // El grupo de 3 cambió de forma (antes eran dos mesas cara a cara y una
+  // debajo): las guardadas con las medidas viejas toman las nuevas.
+  function migrate(data) {
+    for (const c of data.classes) {
+      for (const o of c.objects || []) {
+        if (o.type === 'group3' && o.w === 100 && o.h === 120) { o.w = 190; o.h = 70; }
+      }
+    }
+    return data;
+  }
+
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (parsed && Array.isArray(parsed.classes) && parsed.classes.length) return parsed;
+        if (parsed && Array.isArray(parsed.classes) && parsed.classes.length) return migrate(parsed);
       }
     } catch (e) {
       console.warn('No se pudo leer el plano guardado:', e);
@@ -2654,6 +2665,7 @@
 
   // Las añade a las que ya hay, con identificadores nuevos para no chocar.
   function addClasses(classes) {
+    migrate({ classes });
     for (const c of classes) {
       const studentIds = new Map();
       c.students = (c.students || []).map(s => {
