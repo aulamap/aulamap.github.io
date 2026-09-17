@@ -2783,7 +2783,9 @@
         const gx = gapX + spreadX;
         const rowW = row.reduce((n, k) => n + k.w, 0) + (row.length - 1) * gx;
         const rowH = Math.max(...row.map(k => k.h));
-        let cx = l + (rowAvail - rowW) / 2;
+        // La fila se centra en el aula; si un mueble lateral no la deja,
+        // se desplaza solo lo justo para esquivarlo.
+        let cx = clamp(c.room.w / 2 - rowW / 2, l, Math.max(l, r - rowW));
         for (const k of row) {
           k.cx = cx + k.w / 2;
           k.cy = y + rowH / 2;
