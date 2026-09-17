@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.es = {
   room_rot_right: 'Girar el aula a la derecha',
   add_desks: 'Mesas (opcional)',
   desks_help_title: 'Por qué es opcional',
-  desks_help: 'Si se forman equipos en la pestaña Equipos, el programa coloca las mesas él solo con «Montar el aula para los equipos»: no hace falta ponerlas aquí. El resto del mobiliario (pizarra, mesa del docente, puerta, armarios…) se mantiene en cualquier caso.',
+  desks_help: 'Las mesas se pueden poner aquí o dejar que las coloque el programa. Si se ponen, se respetan: al formar equipos, el alumnado se sienta en ellas tal como están. Si no se ponen, en la pestaña Equipos el botón «Montar el aula para los equipos» crea una mesa por equipo (ese botón es el único que sustituye las mesas existentes, y avisa antes). El resto del mobiliario (pizarra, mesa del docente, puerta, armarios…) se mantiene en cualquier caso.',
   add_furniture: 'Mobiliario',
   desk_block: 'Bloque de mesas…',
   desk_block_title: 'Crea de una vez varias filas y columnas de mesas iguales, con la separación que se indique',

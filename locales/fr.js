@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.fr = {
   room_rot_right: 'Faire pivoter la salle vers la droite',
   add_desks: 'Tables (facultatif)',
   desks_help_title: 'Pourquoi c’est facultatif',
-  desks_help: 'Si des équipes sont formées dans l’onglet Équipes, le programme place les tables tout seul avec « Aménager la salle pour les équipes » : inutile de les ajouter ici. Le reste du mobilier (tableau, bureau, porte, armoires…) est conservé dans tous les cas.',
+  desks_help: 'Les tables peuvent être placées ici ou laissées au programme. Si elles sont placées, elles sont respectées : lors de la formation des équipes, les élèves s’assoient aux tables telles qu’elles sont. Sinon, dans l’onglet Équipes, le bouton « Aménager la salle pour les équipes » crée une table par équipe (ce bouton est le seul qui remplace les tables existantes, et il prévient avant). Le reste du mobilier (tableau, bureau, porte, armoires…) est conservé dans tous les cas.',
   add_furniture: 'Mobilier',
   desk_block: 'Bloc de tables…',
   desk_block_title: 'Crée en une fois plusieurs rangées et colonnes de tables identiques, avec l’espacement indiqué',

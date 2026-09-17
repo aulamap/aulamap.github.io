@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.ca = {
   room_rot_right: 'Girar l\'aula a la dreta',
   add_desks: 'Taules (opcional)',
   desks_help_title: 'Per què és opcional',
-  desks_help: 'Si es formen equips a la pestanya Equips, el programa col·loca les taules tot sol amb «Muntar l\'aula per als equips»: no cal posar-les aquí. La resta del mobiliari (pissarra, taula del docent, porta, armaris…) es manté en qualsevol cas.',
+  desks_help: 'Les taules es poden posar aquí o deixar que les col·loqui el programa. Si es posen, es respecten: en formar equips, l\'alumnat s\'asseu a les taules tal com estan. Si no es posen, a la pestanya Equips el botó «Muntar l\'aula per als equips» crea una taula per equip (aquest botó és l\'únic que substitueix les taules existents, i avisa abans). La resta del mobiliari (pissarra, taula del docent, porta, armaris…) es manté en qualsevol cas.',
   add_furniture: 'Mobiliari',
   desk_block: 'Bloc de taules…',
   desk_block_title: 'Crea d\'un cop diverses files i columnes de taules iguals, amb la separació que s\'indiqui',

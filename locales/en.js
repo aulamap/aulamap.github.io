@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.en = {
   room_rot_right: 'Rotate the room clockwise',
   add_desks: 'Desks (optional)',
   desks_help_title: 'Why this is optional',
-  desks_help: 'If teams are made in the Teams tab, the program places the desks by itself with “Set up the room for the teams”: there is no need to add them here. The rest of the furniture (board, teacher’s desk, door, cupboards…) is kept in any case.',
+  desks_help: 'Desks can be placed here or left to the program. If they are placed, they are respected: when teams are made, students are seated at the desks as they are. If not, in the Teams tab the button “Set up the room for the teams” creates one desk per team (that button is the only one that replaces existing desks, and it asks first). The rest of the furniture (board, teacher’s desk, door, cupboards…) is kept in any case.',
   add_furniture: 'Furniture',
   desk_block: 'Block of desks…',
   desk_block_title: 'Creates several rows and columns of identical desks at once, with the spacing given',

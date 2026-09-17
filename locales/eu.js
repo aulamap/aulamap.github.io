@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.eu = {
   room_rot_right: 'Ikasgela eskuinera biratu',
   add_desks: 'Mahaiak (aukeran)',
   desks_help_title: 'Zergatik den aukerakoa',
-  desks_help: 'Taldeak fitxan taldeak osatzen badira, programak berak jartzen ditu mahaiak «Gela taldeetarako antolatu» botoiarekin: ez da beharrezkoa hemen jartzea. Gainerako altzariak (arbela, irakaslearen mahaia, atea, armairuak…) edonola ere mantentzen dira.',
+  desks_help: 'Mahaiak hemen jar daitezke edo programak jartzen utzi. Jartzen badira, errespetatu egiten dira: taldeak osatzean, ikasleak dauden mahaietan esertzen dira. Jartzen ez badira, Taldeak fitxan «Gela taldeetarako antolatu» botoiak mahai bat sortzen du talde bakoitzeko (botoi hori da dauden mahaiak ordezkatzen dituen bakarra, eta aurretik abisatzen du). Gainerako altzariak (arbela, irakaslearen mahaia, atea, armairuak…) edonola ere mantentzen dira.',
   add_furniture: 'Altzariak',
   desk_block: 'Mahai-multzoa…',
   desk_block_title: 'Mahai berdinen hainbat errenkada eta zutabe sortzen ditu batera, adierazitako tartearekin',

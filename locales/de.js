@@ -32,7 +32,7 @@ window.CLASSE_LOCALES.de = {
   room_rot_right: 'Raum nach rechts drehen',
   add_desks: 'Tische (optional)',
   desks_help_title: 'Warum optional',
-  desks_help: 'Werden im Reiter Teams Teams gebildet, stellt das Programm die Tische mit „Raum für die Teams einrichten“ selbst auf: hier müssen keine gesetzt werden. Die übrigen Möbel (Tafel, Lehrertisch, Tür, Schränke …) bleiben in jedem Fall erhalten.',
+  desks_help: 'Die Tische können hier gesetzt oder dem Programm überlassen werden. Werden sie gesetzt, bleiben sie erhalten: beim Bilden der Teams setzen sich die Schüler an die Tische, wie sie stehen. Werden keine gesetzt, erstellt im Reiter Teams die Schaltfläche „Raum für die Teams einrichten“ einen Tisch pro Team (nur diese Schaltfläche ersetzt vorhandene Tische, und sie fragt vorher). Die übrigen Möbel (Tafel, Lehrertisch, Tür, Schränke …) bleiben in jedem Fall erhalten.',
   add_furniture: 'Möbel',
   desk_block: 'Tischblock…',
   desk_block_title: 'Erstellt auf einmal mehrere Reihen und Spalten gleicher Tische mit dem angegebenen Abstand',
