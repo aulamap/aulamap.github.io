@@ -2693,16 +2693,18 @@
     for (const { b } of furniture) {
       if (b.y1 < c.room.h * 0.4) furnitureBottom = Math.max(furnitureBottom, b.y1);
     }
-    // Muebles de las paredes laterales: lo que sobresale de cada pared en la
-    // franja de una fila le quita anchura a esa fila.
-    const sideObstacles = furniture.filter(({ b }) => b.y1 >= c.room.h * 0.4 || b.y0 > furnitureBottom - 1);
-    const rowBounds = (y0, y1) => {
+    // Muebles pegados a las paredes laterales: lo que sobresale de esa pared
+    // en la franja de una fila le quita anchura a esa fila. Lo que está en
+    // la pared del fondo (una ventana, la puerta) no cuenta aquí.
+    const sideObstacles = furniture.filter(({ b }) => (b.x0 < 30 || b.x1 > c.room.w - 30) && b.y1 >= c.room.h * 0.4);
+    const rowBounds = (y0, y1, need) => {
       let l = left, r = right;
-      for (const { o, b } of sideObstacles) {
+      for (const { b } of sideObstacles) {
         if (b.y1 < y0 || b.y0 > y1) continue;
-        if (o.x < c.room.w / 2) l = Math.max(l, b.x1 + margin); else r = Math.min(r, b.x0 - margin);
+        if (b.x0 < 30) l = Math.max(l, b.x1 + margin); else r = Math.min(r, b.x0 - margin);
       }
-      return [l, r];
+      // Si con los muebles no cabe ni un equipo, se hace como si no estuvieran.
+      return r - l >= need ? [l, r] : [left, right];
     };
     // Márgenes en centímetros reales: [pared, tras el mobiliario frontal,
     // pared del fondo, entre equipos]. Los holgados primero; si no caben se
@@ -2769,7 +2771,7 @@
       let y = top, i = 0;
       layout.spare = Infinity;
       while (i < clusters.length) {
-        const [l, r] = rowBounds(y, y + tallest);
+        const [l, r] = rowBounds(y, y + tallest, clusters[i].w);
         const rowAvail = r - l;
         const row = [];
         let x = 0;
