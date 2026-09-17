@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.gl = {
   confirm_delete_students: 'Borrar toda a lista de alumnado desta clase?',
   confirm_clear_seats: 'Deixar todas as mesas baleiras?',
   random_no_seats: 'Non quedan sitios libres para {count} alumnos.',
-  hint_students: 'Arrastra cada nome a unha mesa. Arrastra nunha zona baleira do plano para desprazalo. Arrastra dunha mesa a outra para cambialos de sitio, ou á lista para deixar a mesa libre. Na lapela Equipos o programa pode formar os equipos e sentalos só.',
+  hint_students: 'Arrastra cada nome a unha mesa (opcional: podes pasar directamente á formación de equipos). Arrastra nunha zona baleira do plano para desprazalo. Arrastra dunha mesa a outra para cambialos de sitio, ou á lista para deixar a mesa libre. Na lapela Equipos o programa pode formar os equipos e sentalos só.',
   student_delete: 'Quitar da lista',
   student_seated: 'Ten sitio',
   tab_teams: 'Equipos (opcional)',

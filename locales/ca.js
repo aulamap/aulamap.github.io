@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.ca = {
   confirm_delete_students: 'Esborrar tota la llista d\'alumnat d\'aquesta classe?',
   confirm_clear_seats: 'Deixar totes les taules buides?',
   random_no_seats: 'No queden llocs lliures per a {count} alumnes.',
-  hint_students: 'Arrossega cada nom a una taula. Arrossega en una zona buida del plànol per desplaçar-lo. Arrossega d\'una taula a una altra per canviar-los de lloc, o a la llista per deixar la taula lliure. A la pestanya Equips el programa pot formar els equips i asseure\'ls tot sol.',
+  hint_students: 'Arrossega cada nom a una taula (opcional: pots passar directament a la formació d\'equips). Arrossega en una zona buida del plànol per desplaçar-lo. Arrossega d\'una taula a una altra per canviar-los de lloc, o a la llista per deixar la taula lliure. A la pestanya Equips el programa pot formar els equips i asseure\'ls tot sol.',
   student_delete: 'Treure de la llista',
   student_seated: 'Té lloc',
   tab_teams: 'Equips (opcional)',

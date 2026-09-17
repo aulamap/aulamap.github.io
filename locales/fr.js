@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.fr = {
   confirm_delete_students: 'Effacer toute la liste d’élèves de cette classe ?',
   confirm_clear_seats: 'Vider toutes les tables ?',
   random_no_seats: 'Il ne reste pas assez de places libres pour {count} élèves.',
-  hint_students: 'Faire glisser chaque nom sur une table. Faire glisser sur une zone vide du plan pour le déplacer. Faire glisser d’une table à une autre pour échanger les places, ou vers la liste pour libérer la table. Dans l’onglet Équipes, le programme peut former les équipes et les placer tout seul.',
+  hint_students: 'Faire glisser chaque nom sur une table (facultatif : on peut passer directement à la formation des équipes). Faire glisser sur une zone vide du plan pour le déplacer. Faire glisser d’une table à une autre pour échanger les places, ou vers la liste pour libérer la table. Dans l’onglet Équipes, le programme peut former les équipes et les placer tout seul.',
   student_delete: 'Retirer de la liste',
   student_seated: 'A une place',
   tab_teams: 'Équipes (facultatif)',

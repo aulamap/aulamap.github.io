@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.en = {
   confirm_delete_students: 'Delete the whole student list for this class?',
   confirm_clear_seats: 'Empty every desk?',
   random_no_seats: 'There are not enough free seats for {count} students.',
-  hint_students: 'Drag each name onto a desk. Drag on an empty area of the plan to pan it. Drag from one desk to another to swap them, or back to the list to free the desk. In the Teams tab the program can make the teams and seat them by itself.',
+  hint_students: 'Drag each name onto a desk (optional: you can go straight to making teams). Drag on an empty area of the plan to pan it. Drag from one desk to another to swap them, or back to the list to free the desk. In the Teams tab the program can make the teams and seat them by itself.',
   student_delete: 'Remove from the list',
   student_seated: 'Has a seat',
   tab_teams: 'Teams (optional)',

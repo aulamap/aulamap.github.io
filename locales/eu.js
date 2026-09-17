@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.eu = {
   confirm_delete_students: 'Talde honetako ikasle-zerrenda osoa ezabatu?',
   confirm_clear_seats: 'Mahai guztiak hutsik utzi?',
   random_no_seats: 'Ez da eserleku librerik geratzen {count} ikaslerentzat.',
-  hint_students: 'Arrastatu izen bakoitza mahai batera. Arrastatu planoaren gune huts batean lekuz aldatzeko. Arrastatu mahai batetik bestera lekuz trukatzeko, edo zerrendara mahaia libre uzteko. Taldeak fitxan programak bere kabuz osa ditzake taldeak eta eserarazi.',
+  hint_students: 'Arrastatu izen bakoitza mahai batera (aukeran: zuzenean taldeak osatzera pasa zaitezke). Arrastatu planoaren gune huts batean lekuz aldatzeko. Arrastatu mahai batetik bestera lekuz trukatzeko, edo zerrendara mahaia libre uzteko. Taldeak fitxan programak bere kabuz osa ditzake taldeak eta eserarazi.',
   student_delete: 'Zerrendatik kendu',
   student_seated: 'Eserlekua du',
   tab_teams: 'Taldeak (aukeran)',

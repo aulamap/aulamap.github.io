@@ -154,7 +154,7 @@ window.CLASSE_LOCALES.es = {
   confirm_delete_students: '¿Borrar toda la lista de alumnado de esta clase?',
   confirm_clear_seats: '¿Dejar todas las mesas vacías?',
   random_no_seats: 'No quedan sitios libres para {count} alumnos.',
-  hint_students: 'Arrastra cada nombre a una mesa. Arrastra en una zona vacía del plano para desplazarlo. Arrastra de una mesa a otra para cambiarlos de sitio, o a la lista para dejar la mesa libre. En la pestaña Equipos el programa puede formar los equipos y sentarlos solo.',
+  hint_students: 'Arrastra cada nombre a una mesa (opcional: puedes pasar directamente a la formación de equipos). Arrastra en una zona vacía del plano para desplazarlo. Arrastra de una mesa a otra para cambiarlos de sitio, o a la lista para dejar la mesa libre. En la pestaña Equipos el programa puede formar los equipos y sentarlos solo.',
   student_delete: 'Quitar de la lista',
   student_seated: 'Tiene sitio',
   tab_teams: 'Equipos (opcional)',
