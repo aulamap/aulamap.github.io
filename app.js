@@ -38,6 +38,16 @@
       ]
     },
     group4: { w: 140, h: 100, cols: 2, rows: 2 },
+    // El grupo de 3 con una cuarta mesa en el lado libre: en cruz.
+    group4b: {
+      w: 100, h: 170,
+      cells: [
+        { x: -25, y: 0, w: 50, h: 70, side: 'left' },
+        { x: 25, y: 0, w: 50, h: 70, side: 'right' },
+        { x: 0, y: -60, w: 70, h: 50, side: 'top' },
+        { x: 0, y: 60, w: 70, h: 50, side: 'bottom' }
+      ]
+    },
     // El grupo de 4 con una quinta mesa perpendicular y centrada en un extremo.
     group5: {
       w: 190, h: 100,
@@ -66,7 +76,15 @@
 
   // Formas distintas para el mismo número de puestos: con el botón derecho
   // se pasa de una a la siguiente.
-  const DESK_SHAPES = [['group6', 'group6b']];
+  const DESK_SHAPES = [['group4', 'group4b'], ['group6', 'group6b']];
+  function shapeFamily(type) { return DESK_SHAPES.find(f => f.includes(type)) || null; }
+  // Forma preferida de cada familia (se elige en «Formas por defecto…» y
+  // vale para todas las clases): es la que usa «Montar el aula para los equipos».
+  function defaultShape(type) {
+    const family = shapeFamily(type);
+    const pref = state.shapes && state.shapes[family ? family[0] : type];
+    return family && family.includes(pref) ? pref : type;
+  }
   function nextShape(type) {
     const family = DESK_SHAPES.find(f => f.includes(type));
     return family ? family[(family.indexOf(type) + 1) % family.length] : null;
@@ -1095,6 +1113,27 @@
       numberInput(t('prop_depth'), Math.round(obj.h), update(v => { obj.h = clamp(+v, 3, 2000); }), { min: 3 }),
       numberInput(t('prop_rotation'), Math.round(normAngle(obj.rot)), update(v => { obj.rot = normAngle(+v || 0); }), { step: 5, full: true })
     );
+    if (isDesk(obj) && shapeFamily(obj.type)) {
+      const lab = document.createElement('label');
+      lab.className = 'full';
+      const span = document.createElement('span');
+      span.textContent = t('prop_shape');
+      const select = document.createElement('select');
+      for (const type of shapeFamily(obj.type)) {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = t('type_' + type);
+        if (type === obj.type) opt.selected = true;
+        select.appendChild(opt);
+      }
+      select.addEventListener('change', update(() => {
+        const seats = obj.seats.slice();
+        setDeskType(obj, select.value);
+        seats.forEach((id, i) => { if (i < obj.seats.length) obj.seats[i] = id; });
+      }));
+      lab.append(span, select);
+      grid.append(lab);
+    }
     if (isDesk(obj) && !DESK_TYPES[obj.type].cells) {
       grid.append(
         numberInput(t('prop_cols'), obj.cols, update(v => resizeSeats(obj, clamp(Math.round(+v), 1, 8), obj.rows)), { min: 1, max: 8 }),
@@ -2155,6 +2194,39 @@
   }
 
   document.getElementById('btn-block').addEventListener('click', () => document.getElementById('dlg-block').showModal());
+  // Formas por defecto: para cada familia con más de una forma, un botón por
+  // forma con su icono; la marcada es la que se usa al montar el aula.
+  const dlgShapes = document.getElementById('dlg-shapes');
+  document.getElementById('btn-shapes').addEventListener('click', () => {
+    const box = document.getElementById('shapes-list');
+    box.innerHTML = '';
+    for (const family of DESK_SHAPES) {
+      const row = document.createElement('div');
+      row.className = 'shapes-row';
+      const h = document.createElement('h3');
+      h.textContent = t('type_' + family[0]);
+      const opts = document.createElement('div');
+      opts.className = 'shapes-options';
+      for (const type of family) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.classList.toggle('on', defaultShape(family[0]) === type);
+        const span = document.createElement('span');
+        span.textContent = t('type_' + type);
+        b.append(paletteIcon(type), span);
+        b.addEventListener('click', () => {
+          state.shapes = { ...(state.shapes || {}), [family[0]]: type };
+          saveState();
+          [...opts.children].forEach(x => x.classList.toggle('on', x === b));
+        });
+        opts.appendChild(b);
+      }
+      row.append(h, opts);
+      box.appendChild(row);
+    }
+    dlgShapes.showModal();
+  });
+
   document.getElementById('dlg-block').addEventListener('close', (e) => {
     const dlg = e.target;
     if (dlg.returnValue !== 'ok') return;
@@ -2495,7 +2567,7 @@
     const types = [];
     while (n > 6) { types.push('group6'); n -= 6; }
     types.push(one(n));
-    return types;
+    return types.map(defaultShape);
   }
 
   // Hueco que ocupa una mesa con sus sillas, para separar los equipos de verdad.

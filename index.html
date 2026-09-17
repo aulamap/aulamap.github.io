@@ -72,6 +72,7 @@
           <h2 data-i18n="add_desks">Mesas</h2>
           <div class="palette" id="palette-desks"></div>
           <button id="btn-block" class="btn wide" data-i18n="desk_block">Bloque de mesas…</button>
+          <button id="btn-shapes" class="btn wide" data-i18n="shapes_button">Formas por defecto…</button>
 
           <h2 data-i18n="add_furniture">Mobiliario</h2>
           <div class="palette" id="palette-furniture"></div>
@@ -193,6 +194,17 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
         <button value="ok" class="btn primary" data-i18n="block_create">Crear</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-shapes">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="shapes_title">Formas por defecto</h2>
+      <p class="hint" data-i18n="shapes_help"></p>
+      <div id="shapes-list"></div>
+      <div class="dialog-actions">
+        <button value="ok" class="btn primary" data-i18n="close">Cerrar</button>
       </div>
     </form>
   </dialog>

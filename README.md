@@ -11,7 +11,7 @@ No hay que instalar nada ni crear ninguna cuenta.
 
 ## Qué hace
 
-- **El aula.** Mesas individuales, dobles, «cara a cara», grupos de 3, 4, 5 y 6 (con dos formas), y
+- **El aula.** Mesas individuales, dobles, «cara a cara», grupos de 3, 4, 5 y 6 (los de 4 y 6, con dos formas), y
   mobiliario: pizarra, mesa del docente, pantalla o proyector, puerta, ventana,
   tablón de anuncios, armario, estantería, mesa auxiliar, ordenador, pica,
   columna, papelera, planta y textos libres. Las
@@ -64,9 +64,11 @@ No hay que instalar nada ni crear ninguna cuenta.
    «Montar el aula para los equipos» cambia las mesas por una por equipo, de
    cara a la pizarra, sin tocar el resto del mobiliario. Esas mesas siguen a
    su equipo: si entra o sale alguien, cambian de tipo (de 6 a 5, de 4 a 3…)
-   y, si el equipo se queda vacío, desaparecen. Con el botón derecho sobre una
-   mesa de grupo se puede cambiar su forma (el grupo de 6 tiene dos) o
-   separarla en mesas sueltas para recolocar cada puesto a mano. Al imprimir
+   y, si el equipo se queda vacío, desaparecen. Los grupos de 4 y de 6 tienen
+   dos formas: en «Formas por defecto…» (pestaña Aula) se elige cuál se usa al
+   montar el aula, y cualquier mesa se cambia después a la otra desde sus
+   propiedades o con el botón derecho, que también permite separarla en mesas
+   sueltas para recolocar cada puesto a mano. Al imprimir
    se puede añadir la lista de equipos.
 6. **Imprime.** El botón «Imprimir» deja elegir el título, si la pizarra se ve
    arriba o abajo, y si se añade la fecha.
