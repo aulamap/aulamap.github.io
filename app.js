@@ -2369,11 +2369,9 @@
   document.getElementById('room-w').addEventListener('change', onRoomSize);
   document.getElementById('room-h').addEventListener('change', onRoomSize);
 
-  // El «?» de «Mesas (opcional)» muestra u oculta la explicación.
-  document.getElementById('btn-desks-help').addEventListener('click', (e) => {
-    const help = document.getElementById('desks-help');
-    help.hidden = !help.hidden;
-    e.currentTarget.setAttribute('aria-expanded', String(!help.hidden));
+  // El «?» de «Mesas (opcional)» abre la explicación en una ventana.
+  document.getElementById('btn-desks-help').addEventListener('click', () => {
+    document.getElementById('dlg-desks-help').showModal();
   });
 
   /* ---------- Alumnado ---------- */

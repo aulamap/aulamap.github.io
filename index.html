@@ -70,8 +70,7 @@
 
         <section id="panel-room" class="panel">
           <h2 class="with-help"><span data-i18n="add_desks">Mesas (opcional)</span>
-            <button type="button" id="btn-desks-help" class="help" aria-expanded="false" data-i18n-title="desks_help_title" data-i18n-aria="desks_help_title">?</button></h2>
-          <p class="hint" id="desks-help" data-i18n="desks_help" hidden></p>
+            <button type="button" id="btn-desks-help" class="help" data-i18n-title="desks_help_title" data-i18n-aria="desks_help_title">?</button></h2>
           <div class="palette" id="palette-desks"></div>
           <button id="btn-block" class="btn wide" data-i18n="desk_block" data-i18n-title="desk_block_title">Bloque de mesas…</button>
 
@@ -195,6 +194,16 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn" data-i18n="cancel">Cancelar</button>
         <button value="ok" class="btn primary" data-i18n="block_create">Crear</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-desks-help" class="dlg-help">
+    <form method="dialog" class="dialog-form">
+      <h2 data-i18n="add_desks">Mesas (opcional)</h2>
+      <p class="help-text" data-i18n="desks_help"></p>
+      <div class="dialog-actions">
+        <button value="ok" class="btn primary" data-i18n="close">Cerrar</button>
       </div>
     </form>
   </dialog>
